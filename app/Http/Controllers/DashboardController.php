@@ -134,41 +134,43 @@ class DashboardController extends Controller
      */
     private function adminDashboard(Organization $organization): Response
     {
-        $totalStudents = OrganizationUser::where('organization_id', $organization->id)
+        $totalStudents = rescue(fn () => OrganizationUser::where('organization_id', $organization->id)
             ->where('role', 'student')
-            ->count();
+            ->count(), 0, false);
 
-        $totalTeachers = OrganizationUser::where('organization_id', $organization->id)
+        $totalTeachers = rescue(fn () => OrganizationUser::where('organization_id', $organization->id)
             ->where('role', 'teacher')
-            ->count();
+            ->count(), 0, false);
 
-        $totalClasses = SchoolClass::where('organization_id', $organization->id)->count();
-        $totalSections = ClassSection::where('organization_id', $organization->id)->count();
-        $totalCourses = Course::where('organization_id', $organization->id)->count();
+        $totalClasses = rescue(fn () => SchoolClass::where('organization_id', $organization->id)->count(), 0, false);
+        $totalSections = rescue(fn () => ClassSection::where('organization_id', $organization->id)->count(), 0, false);
+        $totalCourses = rescue(fn () => Course::where('organization_id', $organization->id)->count(), 0, false);
 
-        $todayAttendance = Attendance::where('organization_id', $organization->id)
-            ->whereDate('date', now()->toDateString())
-            ->get();
+        $attendanceRate = rescue(function () use ($organization) {
+            $todayAttendance = Attendance::where('organization_id', $organization->id)
+                ->whereDate('date', now()->toDateString())
+                ->get();
 
-        $presentCount = $todayAttendance->where('status', 'present')->count();
-        $totalMarked = $todayAttendance->count();
-        $attendanceRate = $totalMarked > 0 ? round(($presentCount / $totalMarked) * 100, 1) : 100.0;
+            $presentCount = $todayAttendance->where('status', 'present')->count();
+            $totalMarked = $todayAttendance->count();
+            return $totalMarked > 0 ? round(($presentCount / $totalMarked) * 100, 1) : 100.0;
+        }, 100.0, false);
 
-        $recentMembers = OrganizationUser::with('user')
+        $recentMembers = rescue(fn () => OrganizationUser::with('user')
             ->where('organization_id', $organization->id)
             ->latest()
             ->take(6)
-            ->get();
+            ->get(), collect(), false);
 
-        $recentCourses = Course::with('category')
+        $recentCourses = rescue(fn () => Course::with('category')
             ->where('organization_id', $organization->id)
             ->latest()
             ->take(4)
-            ->get();
+            ->get(), collect(), false);
 
-        $currentAcademicYear = AcademicYear::where('organization_id', $organization->id)
+        $currentAcademicYear = rescue(fn () => AcademicYear::where('organization_id', $organization->id)
             ->where('is_current', true)
-            ->first();
+            ->first(), null, false);
 
         return Inertia::render('tenant/dashboard-admin', [
             'metrics' => [
@@ -383,7 +385,7 @@ class DashboardController extends Controller
         $mySubjects = collect();
         $todayTimetable = collect();
 
-        if ($classEnrollment) {
+        if ($classEnrollment && $classEnrollment->classSection) {
             $enrolledClassId = $classEnrollment->classSection->school_class_id;
             $currentDay = strtolower(now()->format('l'));
 

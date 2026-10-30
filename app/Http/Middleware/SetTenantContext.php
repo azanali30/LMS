@@ -122,38 +122,43 @@ class SetTenantContext
         $currentOrg = TenantContext::current();
 
         Inertia::share([
-            'tenant' => fn () => $currentOrg ? [
-                'id' => $currentOrg->id,
-                'name' => $currentOrg->name,
-                'slug' => $currentOrg->slug,
-                'organization_type' => $currentOrg->organization_type,
-                'logo_path' => $currentOrg->logo_path,
-                'primary_color' => $currentOrg->primary_color,
-                'accent_color' => $currentOrg->accent_color,
-                'status' => $currentOrg->status,
-                'subdomain_url' => $currentOrg->subdomainUrl(),
-            ] : null,
-            'currentOrganization' => fn () => $currentOrg?->only([
+            'tenant' => fn () => rescue(function () use ($currentOrg) {
+                return $currentOrg ? [
+                    'id' => $currentOrg->id,
+                    'name' => $currentOrg->name,
+                    'slug' => $currentOrg->slug,
+                    'organization_type' => $currentOrg->organization_type,
+                    'logo_path' => $currentOrg->logo_path,
+                    'primary_color' => $currentOrg->primary_color,
+                    'accent_color' => $currentOrg->accent_color,
+                    'status' => $currentOrg->status,
+                    'subdomain_url' => rescue(fn () => $currentOrg->subdomainUrl(), url('/'), false),
+                ] : null;
+            }, null, false),
+            'currentOrganization' => fn () => rescue(fn () => $currentOrg?->only([
                 'id', 'name', 'slug', 'organization_type', 'logo_path', 'primary_color', 'accent_color', 'timezone', 'status',
-            ]),
-            'currentRole' => fn () => TenantContext::currentRole($user),
-            'tenantSubscription' => fn () => $currentOrg?->subscription ? [
-                'status' => $currentOrg->subscription->status,
-                'has_access' => $currentOrg->subscription->hasAccess(),
-                'is_trialing' => $currentOrg->subscription->isTrialing(),
-                'is_expired' => $currentOrg->subscription->isTrialExpired(),
-                'days_remaining' => $currentOrg->subscription->daysRemainingInTrial(),
-            ] : null,
-            'userOrganizations' => fn () => $user ? $user->organizations()
+            ]), null, false),
+            'currentRole' => fn () => rescue(fn () => TenantContext::currentRole($user), null, false),
+            'tenantSubscription' => fn () => rescue(function () use ($currentOrg) {
+                $sub = $currentOrg?->subscription;
+                return $sub ? [
+                    'status' => $sub->status,
+                    'has_access' => (bool) $sub->hasAccess(),
+                    'is_trialing' => (bool) $sub->isTrialing(),
+                    'is_expired' => (bool) $sub->isTrialExpired(),
+                    'days_remaining' => (int) $sub->daysRemainingInTrial(),
+                ] : null;
+            }, null, false),
+            'userOrganizations' => fn () => $user ? rescue(fn () => $user->organizations()
                 ->where('organizations.status', 'active')
                 ->wherePivot('status', 'active')
                 ->withPivot('role', 'title', 'status')
-                ->get(['organizations.id', 'organizations.name', 'organizations.slug', 'organizations.organization_type', 'organizations.status']) : [],
+                ->get(['organizations.id', 'organizations.name', 'organizations.slug', 'organizations.organization_type', 'organizations.status']), [], false) : [],
         ]);
 
         // Enforce subscription access and configured expiry policy (read-only vs locked)
         if ($currentOrg && $user && ! $user->isSuperAdmin()) {
-            $subscription = $currentOrg->subscription;
+            $subscription = rescue(fn () => $currentOrg->subscription, null, false);
             if ($subscription && ! $subscription->hasAccess()) {
                 $policy = config('billing.expiry_policy', 'read_only');
 

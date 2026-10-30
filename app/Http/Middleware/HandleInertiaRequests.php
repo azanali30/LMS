@@ -40,45 +40,53 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'tenant' => fn () => \App\Services\TenantContext::current() ? [
-                'id' => \App\Services\TenantContext::current()->id,
-                'name' => \App\Services\TenantContext::current()->name,
-                'slug' => \App\Services\TenantContext::current()->slug,
-                'organization_type' => \App\Services\TenantContext::current()->organization_type,
-                'logo_path' => \App\Services\TenantContext::current()->logo_path,
-                'primary_color' => \App\Services\TenantContext::current()->primary_color,
-                'accent_color' => \App\Services\TenantContext::current()->accent_color,
-                'status' => \App\Services\TenantContext::current()->status,
-                'subdomain_url' => \App\Services\TenantContext::current()->subdomainUrl(),
-            ] : null,
+            'tenant' => fn () => rescue(function () {
+                $tenant = \App\Services\TenantContext::current();
+                return $tenant ? [
+                    'id' => $tenant->id,
+                    'name' => $tenant->name,
+                    'slug' => $tenant->slug,
+                    'organization_type' => $tenant->organization_type,
+                    'logo_path' => $tenant->logo_path,
+                    'primary_color' => $tenant->primary_color,
+                    'accent_color' => $tenant->accent_color,
+                    'status' => $tenant->status,
+                    'subdomain_url' => rescue(fn () => $tenant->subdomainUrl(), url('/'), false),
+                ] : null;
+            }, null, false),
             'auth' => [
                 'user' => $user,
-                'currentOrganization' => fn () => \App\Services\TenantContext::current(),
+                'currentOrganization' => fn () => rescue(fn () => \App\Services\TenantContext::current(), null, false),
                 'userOrganizations' => fn () => $user
-                    ? $user->organizations()
+                    ? rescue(fn () => $user->organizations()
                         ->where('organizations.status', 'active')
                         ->wherePivot('status', 'active')
                         ->withPivot('role', 'title', 'status')
-                        ->get(['organizations.id', 'organizations.name', 'organizations.slug', 'organizations.organization_type', 'organizations.status'])
+                        ->get(['organizations.id', 'organizations.name', 'organizations.slug', 'organizations.organization_type', 'organizations.status']), [], false)
                     : [],
-                'organizationRole' => fn () => \App\Services\TenantContext::currentRole($user),
-                'isSuperAdmin' => fn () => \App\Services\TenantContext::isSuperAdmin($user),
-                'canCreateOrganization' => fn () => $user ? $user->canCreateOrganization() : false,
+                'organizationRole' => fn () => rescue(fn () => \App\Services\TenantContext::currentRole($user), null, false),
+                'isSuperAdmin' => fn () => rescue(fn () => \App\Services\TenantContext::isSuperAdmin($user), false, false),
+                'canCreateOrganization' => fn () => $user ? rescue(fn () => $user->canCreateOrganization(), true, false) : false,
             ],
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
-            'notifications' => fn () => $user ? [
-                'unreadCount' => $user->unreadNotifications()->count(),
-                'recent' => $user->notifications()->take(10)->get()->map(fn ($n) => [
-                    'id' => $n->id,
-                    'type' => $n->type,
-                    'data' => $n->data,
-                    'read_at' => $n->read_at ? $n->read_at->toIso8601String() : null,
-                    'created_at' => $n->created_at->diffForHumans(),
-                ]),
-            ] : null,
+            'notifications' => fn () => $user ? rescue(function () use ($user) {
+                return [
+                    'unreadCount' => $user->unreadNotifications()->count(),
+                    'recent' => $user->notifications()->take(10)->get()->map(fn ($n) => [
+                        'id' => $n->id,
+                        'type' => $n->type,
+                        'data' => $n->data,
+                        'read_at' => $n->read_at ? $n->read_at->toIso8601String() : null,
+                        'created_at' => $n->created_at ? $n->created_at->diffForHumans() : '',
+                    ]),
+                ];
+            }, fn () => [
+                'unreadCount' => 0,
+                'recent' => [],
+            ], false) : null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

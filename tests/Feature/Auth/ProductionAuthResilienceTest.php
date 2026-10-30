@@ -153,4 +153,98 @@ class ProductionAuthResilienceTest extends TestCase
         $this->assertIsString($rpId);
         $this->assertNotEmpty($rpId);
     }
+
+    /**
+     * Test organization owner login redirects to /dashboard and renders organization dashboard with HTTP 200.
+     */
+    public function test_owner_login_redirects_and_renders_dashboard_successfully(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'azanali3005@gmail.com',
+            'password' => 'hashtageducation',
+            'role' => 'admin',
+        ]);
+
+        $org = Organization::create([
+            'name' => 'Education World',
+            'slug' => 'education-world-1',
+            'status' => 'active',
+            'created_by' => $user->id,
+        ]);
+
+        \App\Models\OrganizationUser::create([
+            'user_id' => $user->id,
+            'organization_id' => $org->id,
+            'role' => 'owner',
+            'status' => 'active',
+        ]);
+
+        $loginResponse = $this->post('/login', [
+            'email' => 'azanali3005@gmail.com',
+            'password' => 'hashtageducation',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $loginResponse->assertRedirect('/dashboard');
+
+        $dashResponse = $this->actingAs($user)->get('/dashboard');
+        $dashResponse->assertOk();
+    }
+
+    /**
+     * Test login and dashboard remain 100% resilient (HTTP 200) even when notifications or attendances tables are missing.
+     */
+    public function test_login_and_dashboard_resilience_when_notifications_and_attendances_unmigrated(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'resilient.owner@example.com',
+            'password' => 'ResilientPass123!@#',
+            'role' => 'admin',
+        ]);
+
+        $org = Organization::create([
+            'name' => 'Resilient Academy',
+            'slug' => 'resilient-academy',
+            'status' => 'active',
+            'created_by' => $user->id,
+        ]);
+
+        \App\Models\OrganizationUser::create([
+            'user_id' => $user->id,
+            'organization_id' => $org->id,
+            'role' => 'owner',
+            'status' => 'active',
+        ]);
+
+        // Drop notifications, attendances, and academic_years to simulate partial cloud DB
+        \Illuminate\Support\Facades\Schema::dropIfExists('notifications');
+        \Illuminate\Support\Facades\Schema::dropIfExists('attendances');
+        \Illuminate\Support\Facades\Schema::dropIfExists('academic_years');
+
+        $loginResponse = $this->post('/login', [
+            'email' => 'resilient.owner@example.com',
+            'password' => 'ResilientPass123!@#',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $loginResponse->assertRedirect('/dashboard');
+
+        // Dashboard must return 200 OK and not crash with 500 Server Error
+        $dashResponse = $this->actingAs($user)->get('/dashboard');
+        $dashResponse->assertOk();
+    }
+
+    /**
+     * Test invalid login credentials return validation error redirect (302) and never a 500 error.
+     */
+    public function test_invalid_login_credentials_return_validation_error_not_500(): void
+    {
+        $response = $this->post('/login', [
+            'email' => 'nobody@example.com',
+            'password' => 'wrongpassword123',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertSessionHasErrors('email');
+    }
 }

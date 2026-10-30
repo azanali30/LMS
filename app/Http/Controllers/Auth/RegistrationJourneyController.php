@@ -37,18 +37,28 @@ class RegistrationJourneyController extends Controller
 
         $invitation = null;
         if ($token) {
-            $invitation = OrganizationInvitation::with('organization')
-                ->where('token', $token)
-                ->whereNull('accepted_at')
-                ->where('expires_at', '>', now())
-                ->first();
+            try {
+                $invitation = OrganizationInvitation::with('organization')
+                    ->where('token', $token)
+                    ->whereNull('accepted_at')
+                    ->where('expires_at', '>', now())
+                    ->first();
 
-            if ($invitation) {
-                $journey = 'join';
+                if ($invitation) {
+                    $journey = 'join';
+                }
+            } catch (\Throwable $e) {
+                report($e);
             }
         }
 
-        $plans = SubscriptionPlan::where('is_active', true)->get();
+        $plans = collect();
+        try {
+            $plans = SubscriptionPlan::where('is_active', true)->get();
+        } catch (\Throwable $e) {
+            report($e);
+            $plans = collect();
+        }
 
         return Inertia::render('auth/register', [
             'initialJourney' => $journey,
@@ -177,9 +187,14 @@ class RegistrationJourneyController extends Controller
 
             // 5. Attach 30-Day Free Trial Subscription
             $selectedPlanSlug = $validated['plan'] ?? 'bronze';
-            $plan = SubscriptionPlan::where('slug', $selectedPlanSlug)->first()
-                ?? SubscriptionPlan::where('slug', 'bronze')->first()
-                ?? SubscriptionPlan::first();
+            $plan = null;
+            try {
+                $plan = SubscriptionPlan::where('slug', $selectedPlanSlug)->first()
+                    ?? SubscriptionPlan::where('slug', 'bronze')->first()
+                    ?? SubscriptionPlan::first();
+            } catch (\Throwable $e) {
+                report($e);
+            }
 
             $trialDays = (int) config('billing.trial_days', 30);
 
@@ -205,8 +220,10 @@ class RegistrationJourneyController extends Controller
             TenantContext::set($organization);
             $request->session()->put('current_organization_id', $organization->id);
 
-            // Subdomain redirect if configured and running on tenant domain
-            if ($request->getHost() !== app(TenantResolver::class)->getRootDomain()) {
+            // Subdomain redirect only if multi-tenant base domain is explicitly configured
+            // and the current host is a matched subdomain of that domain (not on localhost or single-domain cloud host)
+            $configuredDomain = config('app.domain');
+            if ($configuredDomain && str_ends_with($request->getHost(), '.'.$configuredDomain)) {
                 return redirect()->away($organization->subdomainUrl('/dashboard'))
                     ->with('success', "Welcome to SkillForge LMS! {$validated['school_name']} 30-day trial is now active.");
             }

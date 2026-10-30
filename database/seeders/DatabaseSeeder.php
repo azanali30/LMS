@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(PlatformSeeder::class);
+        $this->call([
+            SubscriptionPlanSeeder::class,
+            PlatformSeeder::class,
+        ]);
     }
 }

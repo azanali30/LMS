@@ -18,6 +18,7 @@ interface Metrics {
     totalUsers: number;
     totalCourses: number;
     totalEnrollments: number;
+    pendingApprovals?: number;
 }
 
 interface OrgItem {
@@ -118,6 +119,31 @@ export default function SuperAdminDashboard({
                     </Link>
                 </div>
             </div>
+
+            {/* Pending Approvals Alert Banner */}
+            {(metrics.pendingApprovals ?? 0) > 0 && (
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4">
+                    <div className="flex items-center gap-3">
+                        <div className="flex size-9 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300">
+                            <CreditCard className="size-5" />
+                        </div>
+                        <div>
+                            <div className="text-xs font-bold text-white">
+                                {metrics.pendingApprovals} Payment Approval Request{metrics.pendingApprovals === 1 ? '' : 's'} Awaiting Verification
+                            </div>
+                            <div className="text-[11px] text-amber-300/90">
+                                Applicants have submitted deposit slips and are waiting for account approval.
+                            </div>
+                        </div>
+                    </div>
+                    <Link
+                        href="/admin/payment-approvals"
+                        className="rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-md transition hover:bg-amber-500"
+                    >
+                        Review Requests &rarr;
+                    </Link>
+                </div>
+            )}
 
             {/* KPI Cards */}
             <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

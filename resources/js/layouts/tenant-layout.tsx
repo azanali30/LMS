@@ -545,6 +545,18 @@ export default function TenantLayout({
                                 <ShieldCheck className="size-4" />
                                 <span>Platform Metrics</span>
                             </Link>
+                            <Link
+                                href="/admin/payment-approvals"
+                                onClick={() => setMobileOpen(false)}
+                                className={`flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium transition ${
+                                    window.location.pathname.startsWith('/admin/payment-approvals')
+                                        ? 'border border-amber-500/30 bg-amber-500/10 font-semibold text-amber-500 dark:text-amber-300'
+                                        : 'text-amber-600 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-500/10'
+                                }`}
+                            >
+                                <CreditCard className="size-4" />
+                                <span>Payment Approvals</span>
+                            </Link>
                         </div>
                     )}
                 </div>

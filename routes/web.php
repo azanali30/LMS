@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminPaymentApprovalController;
 use App\Http\Controllers\Auth\RegistrationJourneyController;
+use App\Http\Controllers\Auth\SaaSOnboardingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Learning\CourseController;
 use App\Http\Controllers\Learning\LessonController;
@@ -33,9 +35,20 @@ Route::post('/contact', [PublicController::class, 'storeContact'])->name('contac
 Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
 Route::get('/courses/{course:slug}', [CourseController::class, 'show'])->name('courses.show');
 
-// Registration Journeys (Multi-tenant SaaS)
+// Multi-step SaaS Registration & Manual Payment Approval Onboarding Flow
+Route::get('/onboarding/status', [SaaSOnboardingController::class, 'status'])->name('onboarding.status');
+
 Route::middleware('guest')->group(function () {
-    Route::get('/register', [RegistrationJourneyController::class, 'show'])->name('register');
+    Route::get('/register', [SaaSOnboardingController::class, 'show'])->name('register');
+    Route::get('/onboarding', [SaaSOnboardingController::class, 'show'])->name('onboarding');
+    Route::post('/onboarding/check-email', [SaaSOnboardingController::class, 'checkEmail'])->name('onboarding.check-email');
+    Route::post('/onboarding/submit-payment', [SaaSOnboardingController::class, 'submitPayment'])->name('onboarding.submit-payment');
+
+    // Post-Approval Account & Institution Setup (single-use token)
+    Route::get('/onboarding/complete/{token}', [SaaSOnboardingController::class, 'showComplete'])->name('onboarding.complete.show');
+    Route::post('/onboarding/complete/{token}', [SaaSOnboardingController::class, 'storeComplete'])->name('onboarding.complete.store');
+
+    // Preserved alternate journeys (Invitation join & self-paced learner)
     Route::post('/register/school', [RegistrationJourneyController::class, 'registerSchool'])->name('register.school');
     Route::post('/register/join', [RegistrationJourneyController::class, 'registerJoin'])->name('register.join');
     Route::post('/register/learner', [RegistrationJourneyController::class, 'registerLearner'])->name('register.learner');
@@ -90,8 +103,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('cancel', [SubscriptionBillingController::class, 'cancel'])->name('cancel');
         Route::post('dev-trial-activate', [SubscriptionBillingController::class, 'devTrialActivate'])->name('dev-trial-activate');
     });
-    Route::post('admin/subscriptions/invoices/{invoice}/verify', [SubscriptionBillingController::class, 'adminVerifyPayment'])
-        ->name('admin.subscriptions.invoices.verify');
+
+    // Platform Super Admin Routes
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('dashboard', [DashboardController::class, 'superAdminDashboardRoute'])->name('dashboard');
+        Route::get('payment-approvals', [AdminPaymentApprovalController::class, 'index'])->name('payment-approvals.index');
+        Route::get('payment-approvals/{id}/receipt', [AdminPaymentApprovalController::class, 'downloadReceipt'])->name('payment-approvals.receipt');
+        Route::post('payment-approvals/{id}/approve', [AdminPaymentApprovalController::class, 'approve'])->name('payment-approvals.approve');
+        Route::post('payment-approvals/{id}/reject', [AdminPaymentApprovalController::class, 'reject'])->name('payment-approvals.reject');
+        Route::post('subscriptions/invoices/{invoice}/verify', [SubscriptionBillingController::class, 'adminVerifyPayment'])->name('subscriptions.invoices.verify');
+    });
 
     // School Management Module (Tenant-scoped)
     Route::prefix('school')->name('school.')->group(function () {

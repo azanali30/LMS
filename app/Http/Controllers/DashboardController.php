@@ -99,6 +99,15 @@ class DashboardController extends Controller
     /**
      * Platform-level Super Admin Dashboard.
      */
+    public function superAdminDashboardRoute(Request $request): Response
+    {
+        abort_unless($request->user()?->isSuperAdmin(), 403, 'Unauthorized. Platform administrator privileges required.');
+        return $this->superAdminDashboard();
+    }
+
+    /**
+     * Platform-level Super Admin Dashboard.
+     */
     private function superAdminDashboard(): Response
     {
         return TenantContext::bypass(function () {
@@ -107,6 +116,7 @@ class DashboardController extends Controller
             $totalUsers = User::count();
             $totalCourses = Course::count();
             $totalEnrollments = CourseEnrollment::count();
+            $pendingApprovals = \App\Models\PaymentApprovalRequest::where('status', \App\Models\PaymentApprovalRequest::STATUS_PENDING)->count();
 
             $organizations = Organization::withCount(['members', 'courses'])
                 ->latest()
@@ -122,6 +132,7 @@ class DashboardController extends Controller
                     'totalUsers' => $totalUsers,
                     'totalCourses' => $totalCourses,
                     'totalEnrollments' => $totalEnrollments,
+                    'pendingApprovals' => $pendingApprovals,
                 ],
                 'organizations' => $organizations,
                 'plans' => $plans,

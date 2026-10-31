@@ -12,7 +12,7 @@ export default function AppLogo() {
             </div>
             <div className="ml-2 grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-bold tracking-tight text-foreground">
-                    {name || 'SkillForge LMS'}
+                    {name || 'InstitutoPropio'}
                 </span>
                 <span className="truncate text-[11px] font-medium text-muted-foreground">
                     Online Learning

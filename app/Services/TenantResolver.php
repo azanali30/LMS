@@ -58,17 +58,17 @@ class TenantResolver
         // 2. Base domain resolution
         $rootDomain = $this->getRootDomain();
 
-        // Exact match with root domain (e.g. skillforge.com or lms.test)
+        // Exact match with root domain (e.g. institutopropio.com or lms.test)
         if ($host === $rootDomain) {
             // Local development query param fallback for localhost:8000 or IP addresses
             return $this->resolveDevFallback($request);
         }
 
-        // Subdomain check against configured root domain (e.g. {slug}.skillforge.com or {slug}.lms.test)
+        // Subdomain check against configured root domain (e.g. {slug}.institutopropio.com or {slug}.lms.test)
         $suffix = '.'.$rootDomain;
         if (str_ends_with($host, $suffix)) {
             $prefix = substr($host, 0, -strlen($suffix));
-            // Check if there are nested subdomains (e.g. foo.bar.skillforge.com -> foo)
+            // Check if there are nested subdomains (e.g. foo.bar.institutopropio.com -> foo)
             $parts = explode('.', $prefix);
             $subdomain = end($parts);
             return $subdomain !== '' ? $subdomain : null;

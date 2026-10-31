@@ -23,7 +23,32 @@ class PublicController extends Controller
      */
     public function pricing(): Response
     {
-        return Inertia::render('pricing');
+        $plans = \App\Models\SubscriptionPlan::where('is_active', true)
+            ->whereIn('slug', ['starter', 'growth', 'professional', 'enterprise'])
+            ->get()
+            ->map(fn (\App\Models\SubscriptionPlan $p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'description' => $p->description,
+                'price_cents' => $p->price_cents,
+                'price_annual_cents' => $p->price_annual_cents,
+                'price_monthly_formatted' => $p->formattedPrice('monthly'),
+                'price_annual_formatted' => $p->formattedPrice('annual'),
+                'currency' => $p->currency,
+                'max_organizations' => $p->max_organizations,
+                'organization_limit' => $p->organizationLimit(),
+                'features' => $p->features ?: [],
+                'is_popular' => $p->slug === 'growth',
+                'is_custom' => $p->isCustomPricing(),
+            ]);
+
+        return Inertia::render('pricing', [
+            'plans' => $plans,
+            'currency' => config('plans.currency', 'USD'),
+            'trial_days' => (int) config('plans.trial_days', 30),
+            'trialDays' => (int) config('plans.trial_days', 30),
+        ]);
     }
 
     /**

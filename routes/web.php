@@ -80,6 +80,15 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('organizations/billing')->name('organizations.billing.')->group(function () {
         Route::get('/', [SubscriptionBillingController::class, 'index'])->name('index');
         Route::post('invoice', [SubscriptionBillingController::class, 'requestManualInvoice'])->name('invoice.request');
+        Route::post('plan', [SubscriptionBillingController::class, 'changePlan'])->name('plan.change');
+        Route::post('cancel', [SubscriptionBillingController::class, 'cancel'])->name('cancel');
+        Route::post('dev-trial-activate', [SubscriptionBillingController::class, 'devTrialActivate'])->name('dev-trial-activate');
+    });
+    Route::prefix('billing')->name('billing.')->group(function () {
+        Route::get('/', [SubscriptionBillingController::class, 'index'])->name('index');
+        Route::post('change-plan', [SubscriptionBillingController::class, 'changePlan'])->name('change-plan');
+        Route::post('cancel', [SubscriptionBillingController::class, 'cancel'])->name('cancel');
+        Route::post('dev-trial-activate', [SubscriptionBillingController::class, 'devTrialActivate'])->name('dev-trial-activate');
     });
     Route::post('admin/subscriptions/invoices/{invoice}/verify', [SubscriptionBillingController::class, 'adminVerifyPayment'])
         ->name('admin.subscriptions.invoices.verify');

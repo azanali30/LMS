@@ -17,6 +17,10 @@ import {
     ArrowUpRight,
     Lock,
     ExternalLink,
+    RefreshCw,
+    XCircle,
+    History,
+    Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,21 +35,33 @@ interface Plan {
     max_organizations: number | null;
     organization_limit: string;
     price_cents: number;
+    price_annual_cents?: number;
+    price_monthly_formatted?: string;
+    price_annual_formatted?: string;
+    price_formatted?: string;
     currency: string;
-    billing_interval: string;
+    billing_interval?: string;
     features: string[];
+    is_custom?: boolean;
 }
 
 interface Subscription {
     id: number;
-    status: 'trialing' | 'pending' | 'active' | 'past_due' | 'expired' | 'cancelled';
+    status: 'pending_payment_method' | 'trialing' | 'pending' | 'active' | 'past_due' | 'expired' | 'cancelled';
     billing_type: string;
+    billing_interval?: string;
+    currency?: string;
+    payment_method?: string | null;
+    payment_method_status?: string;
+    is_pending_payment_method?: boolean;
     is_trialing: boolean;
     is_expired: boolean;
+    is_active?: boolean;
     days_remaining: number;
     starts_at: string | null;
     trial_ends_at: string | null;
     ends_at: string | null;
+    cancelled_at?: string | null;
     plan: Plan | null;
 }
 
@@ -53,6 +69,7 @@ interface Entitlement {
     owned_organizations_count: number;
     max_organizations_limit: number | null;
     can_create_more: boolean;
+    limit_text?: string;
 }
 
 interface GatewayInfo {
@@ -91,6 +108,18 @@ interface TransactionItem {
     processed_at: string | null;
 }
 
+interface SubscriptionHistoryItem {
+    id: number;
+    event: string;
+    from_status: string | null;
+    to_status: string | null;
+    billing_interval: string | null;
+    created_at: string;
+    from_plan?: { name: string } | null;
+    to_plan?: { name: string } | null;
+    user?: { name: string } | null;
+}
+
 interface BillingProps {
     organization: {
         id: number;
@@ -103,7 +132,9 @@ interface BillingProps {
     gateway: GatewayInfo;
     invoices: SubscriptionInvoiceItem[];
     transactions: TransactionItem[];
+    histories?: SubscriptionHistoryItem[];
     availablePlans: Plan[];
+    devBypassEnabled?: boolean;
 }
 
 export default function SubscriptionBilling({
@@ -113,7 +144,9 @@ export default function SubscriptionBilling({
     gateway,
     invoices,
     transactions,
+    histories = [],
     availablePlans,
+    devBypassEnabled = false,
 }: BillingProps) {
     const { auth } = usePage().props as any;
     const isSuperAdmin = Boolean(auth?.user?.roles?.includes('super-admin') || auth?.user?.is_super_admin);
@@ -124,13 +157,28 @@ export default function SubscriptionBilling({
     // Form: Request Manual Invoice
     const invoiceForm = useForm({
         plan_id: subscription?.plan?.id || (availablePlans[0]?.id ?? ''),
+        billing_interval: subscription?.billing_interval || 'monthly',
         notes: '',
+    });
+
+    // Form: Change Plan / Interval
+    const planForm = useForm({
+        plan_id: subscription?.plan?.id || (availablePlans[0]?.id ?? ''),
+        billing_interval: subscription?.billing_interval || 'monthly',
     });
 
     // Form: Admin Verify Payment
     const verifyForm = useForm({
         payment_reference: '',
         notes: '',
+    });
+
+    // Form: Dev Trial Activate
+    const devForm = useForm({});
+
+    // Form: Cancel Subscription
+    const cancelForm = useForm({
+        reason: '',
     });
 
     const handleInvoiceRequest = (e: React.FormEvent) => {
@@ -141,6 +189,27 @@ export default function SubscriptionBilling({
                 setSelectedTab('history');
             },
         });
+    };
+
+    const handlePlanChange = (e: React.FormEvent) => {
+        e.preventDefault();
+        planForm.post('/organizations/billing/plan', {
+            preserveScroll: true,
+        });
+    };
+
+    const handleDevTrialBypass = (e: React.FormEvent) => {
+        e.preventDefault();
+        devForm.post('/organizations/billing/dev-trial-activate', {
+            preserveScroll: true,
+        });
+    };
+
+    const handleCancel = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (confirm('Are you sure you want to cancel your subscription? Your school and student records will remain completely preserved under read-only policy.')) {
+            cancelForm.post('/organizations/billing/cancel');
+        }
     };
 
     const handleAdminVerify = (invoiceId: number, e: React.FormEvent) => {
@@ -155,13 +224,6 @@ export default function SubscriptionBilling({
 
     const getStatusBadge = (status?: string) => {
         switch (status) {
-            case 'trialing':
-                return (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-300">
-                        <Sparkles className="size-3.5" />
-                        30-Day Free Trial
-                    </span>
-                );
             case 'active':
                 return (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-700/10 dark:bg-emerald-900/30 dark:text-emerald-300">
@@ -169,11 +231,19 @@ export default function SubscriptionBilling({
                         Active Subscription
                     </span>
                 );
-            case 'past_due':
+            case 'pending_payment_method':
                 return (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-700/10 dark:bg-amber-900/30 dark:text-amber-300">
-                        <AlertTriangle className="size-3.5" />
-                        Past Due
+                        <Clock className="size-3.5" />
+                        Pending Payment Method
+                    </span>
+                );
+            case 'trialing':
+            case 'trial':
+                return (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#1769E0] ring-1 ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-300">
+                        <Sparkles className="size-3.5" />
+                        30-Day Free Trial
                     </span>
                 );
             case 'expired':
@@ -181,6 +251,13 @@ export default function SubscriptionBilling({
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 ring-1 ring-rose-700/10 dark:bg-rose-900/30 dark:text-rose-300">
                         <AlertCircle className="size-3.5" />
                         Trial Expired
+                    </span>
+                );
+            case 'cancelled':
+                return (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-700/10 dark:bg-slate-800 dark:text-slate-300">
+                        <XCircle className="size-3.5" />
+                        Cancelled
                     </span>
                 );
             case 'pending':
@@ -214,7 +291,7 @@ export default function SubscriptionBilling({
                             </h1>
                         </div>
                         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            Workspace tier, 30-day trial status, multi-organization limits, and verified invoice management.
+                            Manage your InstitutoPropio plan, billing interval, institution quotas, and invoices.
                         </p>
                     </div>
 
@@ -223,7 +300,36 @@ export default function SubscriptionBilling({
                     </div>
                 </div>
 
-                {/* Trial Expiry Warning Banner (If Expired or Nearing Expiry) */}
+                {/* Banner: Pending Payment Method Verification */}
+                {subscription?.is_pending_payment_method && (
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50/90 p-5 text-amber-900 shadow-sm dark:border-amber-900/40 dark:bg-amber-950/40 dark:text-amber-200">
+                        <div className="flex items-start justify-between gap-4 flex-wrap sm:flex-nowrap">
+                            <div className="flex items-start gap-3">
+                                <AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
+                                <div>
+                                    <h3 className="text-sm font-bold">Payment Method Setup Required</h3>
+                                    <p className="mt-1 text-xs leading-relaxed text-amber-800 dark:text-amber-300">
+                                        Your 30-day free trial will activate automatically upon payment method verification by our secure payment provider. You will not be charged a single penny during your 30-day trial period.
+                                    </p>
+                                </div>
+                            </div>
+                            {devBypassEnabled && (
+                                <form onSubmit={handleDevTrialBypass} className="shrink-0">
+                                    <Button
+                                        size="sm"
+                                        type="submit"
+                                        disabled={devForm.processing}
+                                        className="h-8 bg-amber-700 text-xs font-bold text-white hover:bg-amber-800 shadow-xs cursor-pointer"
+                                    >
+                                        {devForm.processing ? 'Simulating...' : 'Simulate Verification (Dev Test Only)'}
+                                    </Button>
+                                </form>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Trial Expiry Warning Banner (If Expired) */}
                 {subscription?.is_expired && (
                     <div className="rounded-2xl border border-rose-200 bg-rose-50/90 p-5 text-rose-900 shadow-sm dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-200">
                         <div className="flex items-start gap-3">
@@ -231,13 +337,13 @@ export default function SubscriptionBilling({
                             <div>
                                 <h3 className="text-sm font-bold">Your 30-Day Free Trial Has Ended</h3>
                                 <p className="mt-1 text-xs leading-relaxed text-rose-800 dark:text-rose-300">
-                                    All school data and academic records remain safely preserved. To resume administrative write operations, please request an invoice or complete verification with our platform team.
+                                    All school data and academic records remain safely preserved under our read-only policy. To resume administrative write operations, please request an invoice or choose an active plan.
                                 </p>
                                 <div className="mt-3">
                                     <Button
                                         size="sm"
                                         onClick={() => setSelectedTab('invoice_request')}
-                                        className="h-8 bg-rose-600 text-xs font-bold text-white hover:bg-rose-700"
+                                        className="h-8 bg-rose-600 text-xs font-bold text-white hover:bg-rose-700 cursor-pointer"
                                     >
                                         Request Renewal Invoice
                                     </Button>
@@ -249,7 +355,7 @@ export default function SubscriptionBilling({
 
                 {/* Metric Overview Grid */}
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                    {/* Card 1: Current Plan */}
+                    {/* Card 1: Current Plan & Interval */}
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Current Plan</span>
@@ -257,14 +363,17 @@ export default function SubscriptionBilling({
                         </div>
                         <div className="mt-3 flex items-baseline gap-2">
                             <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
-                                {subscription?.plan?.name || 'Standard Trial'}
+                                {subscription?.plan?.name || 'Starter'}
+                            </span>
+                            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold capitalize text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+                                {subscription?.billing_interval || 'Monthly'}
                             </span>
                         </div>
                         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                            {subscription?.plan?.description || '30-day comprehensive workspace trial.'}
+                            {subscription?.plan?.description || 'InstitutoPropio essential workspace.'}
                         </p>
-                        <div className="mt-4 border-t border-slate-100 pt-3 text-[11px] font-semibold text-slate-500 dark:border-slate-800">
-                            No student or teacher seat limits imposed.
+                        <div className="mt-4 border-t border-slate-100 pt-3 text-[11px] font-semibold text-emerald-600 dark:border-slate-800 dark:text-emerald-400">
+                            ✓ Unlimited students & teachers included.
                         </div>
                     </div>
 
@@ -284,7 +393,7 @@ export default function SubscriptionBilling({
                             <div className="flex justify-between">
                                 <span>Started:</span>
                                 <span className="font-mono font-medium text-slate-700 dark:text-slate-300">
-                                    {subscription?.starts_at ? new Date(subscription.starts_at).toLocaleDateString() : 'N/A'}
+                                    {subscription?.starts_at ? new Date(subscription.starts_at).toLocaleDateString() : 'Pending'}
                                 </span>
                             </div>
                             <div className="flex justify-between">
@@ -296,10 +405,10 @@ export default function SubscriptionBilling({
                         </div>
                     </div>
 
-                    {/* Card 3: Organization Entitlement */}
+                    {/* Card 3: Institution Entitlement */}
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Organization Limit</span>
+                            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Institution Limit</span>
                             <Building2 className="size-4 text-emerald-500" />
                         </div>
                         <div className="mt-3 flex items-baseline gap-2">
@@ -332,51 +441,123 @@ export default function SubscriptionBilling({
                     <button
                         type="button"
                         onClick={() => setSelectedTab('overview')}
-                        className={`border-b-2 px-5 py-3 transition-colors ${
+                        className={`cursor-pointer border-b-2 px-5 py-3 transition-colors ${
                             selectedTab === 'overview'
                                 ? 'border-[#1769E0] text-[#1769E0]'
                                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                     >
-                        Billing Overview & Channels
+                        Plan & Billing Overview
                     </button>
                     <button
                         type="button"
                         onClick={() => setSelectedTab('invoice_request')}
-                        className={`border-b-2 px-5 py-3 transition-colors ${
+                        className={`cursor-pointer border-b-2 px-5 py-3 transition-colors ${
                             selectedTab === 'invoice_request'
                                 ? 'border-[#1769E0] text-[#1769E0]'
                                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                     >
-                        Request Manual Invoice / Contact Sales
+                        Request Official Invoice
                     </button>
                     <button
                         type="button"
                         onClick={() => setSelectedTab('history')}
-                        className={`border-b-2 px-5 py-3 transition-colors ${
+                        className={`cursor-pointer border-b-2 px-5 py-3 transition-colors ${
                             selectedTab === 'history'
                                 ? 'border-[#1769E0] text-[#1769E0]'
                                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                     >
-                        Invoice & Transaction History ({invoices.length})
+                        Invoices & Audit History ({invoices.length + histories.length})
                     </button>
                 </div>
 
-                {/* TAB 1: OVERVIEW & CHANNELS */}
+                {/* TAB 1: OVERVIEW */}
                 {selectedTab === 'overview' && (
                     <div className="space-y-6">
-                        {/* Two Channels Grid */}
+                        {/* Plan Upgrade / Downgrade Section */}
+                        <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                                        Modify Subscription Plan & Billing Interval
+                                    </h3>
+                                    <p className="mt-1 text-xs text-slate-500">
+                                        Upgrade your tier to increase campus capacity or switch to annual billing to save ~16.67% (2 months free).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <form onSubmit={handlePlanChange} className="mt-6 space-y-4">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                            Subscription Tier
+                                        </Label>
+                                        <select
+                                            value={planForm.data.plan_id}
+                                            onChange={(e) => planForm.setData('plan_id', Number(e.target.value))}
+                                            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                        >
+                                            {availablePlans.map((plan) => (
+                                                <option key={plan.id} value={plan.id}>
+                                                    {plan.name} — {plan.organization_limit} ({planForm.data.billing_interval === 'annual' ? plan.price_annual_formatted + '/yr' : plan.price_monthly_formatted + '/mo'})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                            Billing Cadence
+                                        </Label>
+                                        <select
+                                            value={planForm.data.billing_interval}
+                                            onChange={(e) => planForm.setData('billing_interval', e.target.value as any)}
+                                            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                        >
+                                            <option value="monthly">Monthly Billing</option>
+                                            <option value="annual">Annual Billing (2 Months Free / ~17% Off)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <InputError message={planForm.errors.plan_id} />
+
+                                <div className="flex items-center justify-between pt-2">
+                                    <Button
+                                        type="submit"
+                                        disabled={planForm.processing}
+                                        className="bg-[#1769E0] text-xs font-bold text-white hover:bg-[#1256B8] cursor-pointer"
+                                    >
+                                        {planForm.processing ? 'Updating Plan...' : 'Save Subscription Changes'}
+                                    </Button>
+
+                                    {subscription && subscription.status !== 'cancelled' && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={handleCancel}
+                                            className="text-xs text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/30 cursor-pointer"
+                                        >
+                                            Cancel Subscription
+                                        </Button>
+                                    )}
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Payment Provider & Manual Channels */}
                         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            {/* Channel A: Online Payment Integration */}
+                            {/* Card A: Online Payment Architecture */}
                             <div className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-7 shadow-xs dark:border-slate-800 dark:bg-slate-900">
                                 <div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <CreditCard className="size-5 text-[#1769E0]" />
                                             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                                                Online Card / Gateway Billing
+                                                Online Card & Gateway Billing
                                             </h3>
                                         </div>
                                         <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
@@ -385,7 +566,7 @@ export default function SubscriptionBilling({
                                     </div>
 
                                     <p className="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                        SkillForge supports direct credit card and recurring digital payments via server-side verified webhooks with idempotent transaction replay protection.
+                                        InstitutoPropio supports direct credit card and recurring digital payments via server-side verified webhooks with idempotent transaction replay protection.
                                     </p>
 
                                     {/* Integration Notice */}
@@ -393,27 +574,17 @@ export default function SubscriptionBilling({
                                         <div className="flex items-start gap-2.5">
                                             <Lock className="mt-0.5 size-4 shrink-0 text-blue-600 dark:text-blue-400" />
                                             <div>
-                                                <strong className="block font-semibold">Payment Gateway Integration Note:</strong>
+                                                <strong className="block font-semibold">Payment Gateway Architecture:</strong>
                                                 <span>
-                                                    Live gateway credentials (e.g. Stripe, Razorpay) are pending final administrative selection. No fake test checkouts are displayed. You may proceed via official manual invoice.
+                                                    Live gateway credentials are awaiting final configuration. No fake card credentials are saved or processed. You can request official manual invoices anytime.
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                    <Button
-                                        disabled
-                                        variant="outline"
-                                        className="w-full text-xs font-semibold cursor-not-allowed opacity-60"
-                                    >
-                                        Online Checkout (Gateway Pending Configuration)
-                                    </Button>
-                                </div>
                             </div>
 
-                            {/* Channel B: Manual Invoice & Contact Sales */}
+                            {/* Card B: Manual Invoice & Wire Transfer */}
                             <div className="flex flex-col justify-between rounded-3xl border border-blue-200 bg-gradient-to-b from-blue-50/30 to-white p-7 shadow-xs dark:border-blue-900/40 dark:bg-slate-900">
                                 <div>
                                     <div className="flex items-center justify-between">
@@ -429,7 +600,7 @@ export default function SubscriptionBilling({
                                     </div>
 
                                     <p className="mt-3 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-                                        Generate an official invoice for institutional purchase orders, wire transfers, or direct purchase agreements. All manual payments are audited and verified by platform administrators.
+                                        Generate an official invoice for institutional purchase orders, wire transfers, or direct billing agreements. All manual payments are audited and verified by platform administrators.
                                     </p>
 
                                     <ul className="mt-4 space-y-2 text-xs text-slate-600 dark:text-slate-400">
@@ -451,7 +622,7 @@ export default function SubscriptionBilling({
                                 <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                                     <Button
                                         onClick={() => setSelectedTab('invoice_request')}
-                                        className="w-full bg-[#1769E0] text-xs font-bold text-white shadow-md shadow-blue-500/20 hover:bg-[#1256B8]"
+                                        className="w-full bg-[#1769E0] text-xs font-bold text-white shadow-md shadow-blue-500/20 hover:bg-[#1256B8] cursor-pointer"
                                     >
                                         <span>Request Official Invoice</span>
                                         <ArrowUpRight className="ml-1.5 size-4" />
@@ -463,7 +634,7 @@ export default function SubscriptionBilling({
                         {/* Entitlement Plans Reference */}
                         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-xs dark:border-slate-800 dark:bg-slate-900">
                             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                                Available Multi-Tenant Plan Tiers
+                                Available InstitutoPropio Plan Tiers
                             </h3>
                             <p className="mt-1 text-xs text-slate-500">
                                 Plan capacity applies directly to your master owner account across all campus deployments.
@@ -510,7 +681,7 @@ export default function SubscriptionBilling({
                                 Request Official Institutional Invoice
                             </h3>
                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                Submitting this request creates an official pending invoice. A platform administrator will review your organization details and verify payment upon bank transfer.
+                                Submitting this request creates an official pending invoice. An InstitutoPropio administrator will review your organization details and verify payment upon bank transfer.
                             </p>
 
                             <form onSubmit={handleInvoiceRequest} className="mt-6 space-y-5">
@@ -531,6 +702,20 @@ export default function SubscriptionBilling({
                                         ))}
                                     </select>
                                     <InputError message={invoiceForm.errors.plan_id} />
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                        Billing Cadence *
+                                    </Label>
+                                    <select
+                                        value={invoiceForm.data.billing_interval}
+                                        onChange={(e) => invoiceForm.setData('billing_interval', e.target.value as any)}
+                                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                    >
+                                        <option value="monthly">Monthly</option>
+                                        <option value="annual">Annual (~16.67% Discount / 2 Months Free)</option>
+                                    </select>
                                 </div>
 
                                 <div className="space-y-1.5">
@@ -557,7 +742,7 @@ export default function SubscriptionBilling({
                                 <Button
                                     type="submit"
                                     disabled={invoiceForm.processing}
-                                    className="bg-[#1769E0] text-xs font-bold text-white hover:bg-[#1256B8]"
+                                    className="bg-[#1769E0] text-xs font-bold text-white hover:bg-[#1256B8] cursor-pointer"
                                 >
                                     {invoiceForm.processing ? 'Submitting Invoice Request...' : 'Submit Invoice Request'}
                                 </Button>
@@ -566,7 +751,7 @@ export default function SubscriptionBilling({
                     </div>
                 )}
 
-                {/* TAB 3: INVOICE & TRANSACTION HISTORY */}
+                {/* TAB 3: INVOICE & AUDIT HISTORY */}
                 {selectedTab === 'history' && (
                     <div className="space-y-6">
                         {/* Invoices Table */}
@@ -591,7 +776,7 @@ export default function SubscriptionBilling({
                                             <tr>
                                                 <th className="px-5 py-3.5">Invoice #</th>
                                                 <th className="px-5 py-3.5">Plan</th>
-                                                <th className="px-5 py-3.5">Type</th>
+                                                <th className="px-5 py-3.5">Amount</th>
                                                 <th className="px-5 py-3.5">Status</th>
                                                 <th className="px-5 py-3.5">Due Date</th>
                                                 <th className="px-5 py-3.5">Verification</th>
@@ -600,23 +785,23 @@ export default function SubscriptionBilling({
                                         </thead>
                                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                             {invoices.map((inv) => (
-                                                <tr key={inv.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                                <tr key={inv.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
                                                     <td className="px-5 py-4 font-mono font-bold text-slate-900 dark:text-white">
                                                         {inv.invoice_number}
                                                     </td>
-                                                    <td className="px-5 py-4 font-semibold text-slate-700 dark:text-slate-300">
-                                                        {inv.plan?.name || 'N/A'}
+                                                    <td className="px-5 py-4 text-slate-700 dark:text-slate-300">
+                                                        {inv.plan?.name || 'Custom'}
                                                     </td>
-                                                    <td className="px-5 py-4 capitalize text-slate-500">
-                                                        {inv.billing_type.replace('_', ' ')}
+                                                    <td className="px-5 py-4 font-bold text-slate-900 dark:text-white">
+                                                        ${(inv.amount_cents / 100).toFixed(2)} {inv.currency}
                                                     </td>
                                                     <td className="px-5 py-4">
                                                         {inv.status === 'paid' ? (
-                                                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                                                                <CheckCircle2 className="size-3" /> Paid & Verified
+                                                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                                                                <Check className="size-3" /> Paid
                                                             </span>
                                                         ) : (
-                                                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                                                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                                                                 <Clock className="size-3" /> Pending Verification
                                                             </span>
                                                         )}
@@ -644,7 +829,7 @@ export default function SubscriptionBilling({
                                                                 <Button
                                                                     size="sm"
                                                                     onClick={() => setVerifyingInvoiceId(inv.id)}
-                                                                    className="h-7 bg-emerald-600 text-[10px] font-bold text-white hover:bg-emerald-700"
+                                                                    className="h-7 bg-emerald-600 text-[10px] font-bold text-white hover:bg-emerald-700 cursor-pointer"
                                                                 >
                                                                     Verify Payment
                                                                 </Button>
@@ -658,6 +843,59 @@ export default function SubscriptionBilling({
                                 </div>
                             )}
                         </div>
+
+                        {/* Subscription Lifecycle History */}
+                        {histories.length > 0 && (
+                            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
+                                <div className="border-b border-slate-200 p-5 dark:border-slate-800">
+                                    <div className="flex items-center gap-2">
+                                        <History className="size-4 text-[#1769E0]" />
+                                        <h3 className="font-bold text-sm text-slate-900 dark:text-white">
+                                            Subscription Audit Trail
+                                        </h3>
+                                    </div>
+                                    <p className="text-xs text-slate-500">
+                                        Recorded lifecycle transitions, upgrades, and status updates.
+                                    </p>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-xs">
+                                        <thead className="border-b border-slate-100 bg-slate-50 text-[11px] font-semibold text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
+                                            <tr>
+                                                <th className="px-5 py-3">Event</th>
+                                                <th className="px-5 py-3">Status</th>
+                                                <th className="px-5 py-3">Plan</th>
+                                                <th className="px-5 py-3">Interval</th>
+                                                <th className="px-5 py-3">Timestamp</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                            {histories.map((h) => (
+                                                <tr key={h.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
+                                                    <td className="px-5 py-3 font-semibold text-slate-800 dark:text-slate-200 capitalize">
+                                                        {h.event.replace(/_/g, ' ')}
+                                                    </td>
+                                                    <td className="px-5 py-3">
+                                                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                                            {h.to_status || 'N/A'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-5 py-3 text-slate-600 dark:text-slate-400">
+                                                        {h.to_plan?.name || 'N/A'}
+                                                    </td>
+                                                    <td className="px-5 py-3 capitalize text-slate-500">
+                                                        {h.billing_interval || 'Monthly'}
+                                                    </td>
+                                                    <td className="px-5 py-3 font-mono text-[11px] text-slate-400">
+                                                        {new Date(h.created_at).toLocaleString()}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Super Admin Modal for Manual Payment Verification */}
                         {verifyingInvoiceId && (
@@ -708,7 +946,7 @@ export default function SubscriptionBilling({
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => setVerifyingInvoiceId(null)}
-                                                className="text-xs text-slate-400 hover:text-white"
+                                                className="text-xs text-slate-400 hover:text-white cursor-pointer"
                                             >
                                                 Cancel
                                             </Button>
@@ -716,7 +954,7 @@ export default function SubscriptionBilling({
                                                 type="submit"
                                                 size="sm"
                                                 disabled={verifyForm.processing}
-                                                className="bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700"
+                                                className="bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700 cursor-pointer"
                                             >
                                                 {verifyForm.processing ? 'Verifying...' : 'Authorize & Activate'}
                                             </Button>

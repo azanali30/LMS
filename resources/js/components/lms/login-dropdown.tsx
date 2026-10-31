@@ -81,7 +81,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                                     Login
                                 </span>
                                 <p className="text-xs text-slate-500 line-clamp-1 dark:text-slate-400">
-                                    Sign in to your existing SkillForge account
+                                    Sign in to your existing InstitutoPropio account
                                 </p>
                             </div>
                         </div>
@@ -183,7 +183,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                                         </span>
                                     </div>
                                     <p className="text-[11px] text-slate-500 truncate dark:text-slate-400">
-                                        Sign in to your existing SkillForge account
+                                        Sign in to your existing InstitutoPropio account
                                     </p>
                                 </div>
                             </div>

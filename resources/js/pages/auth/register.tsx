@@ -37,6 +37,7 @@ interface RegisterProps {
     initialJourney?: 'school' | 'join' | 'learner';
     initialToken?: string | null;
     initialPlan?: string;
+    initialInterval?: 'monthly' | 'annual';
     plans?: PlanData[];
     invitation?: InvitationData | null;
 }
@@ -44,13 +45,25 @@ interface RegisterProps {
 export default function Register({
     initialJourney = 'school',
     initialToken = null,
-    initialPlan = 'bronze',
+    initialPlan = 'starter',
+    initialInterval = 'monthly',
     plans = [],
     invitation = null,
 }: RegisterProps) {
     const [journey, setJourney] = useState<'school' | 'join' | 'learner'>(
         invitation || initialToken ? 'join' : initialJourney,
     );
+
+    const resolvedInitialPlan =
+        initialPlan === 'bronze'
+            ? 'starter'
+            : initialPlan === 'silver'
+            ? 'growth'
+            : initialPlan === 'gold'
+            ? 'professional'
+            : initialPlan === 'premium'
+            ? 'enterprise'
+            : initialPlan || 'starter';
 
     // Form A: Create a School
     const schoolForm = useForm({
@@ -60,7 +73,8 @@ export default function Register({
         password_confirmation: '',
         school_name: '',
         subdomain: '',
-        plan: initialPlan || 'bronze',
+        plan: resolvedInitialPlan,
+        billing_interval: initialInterval || 'monthly',
         organization_type: 'school',
     });
 
@@ -156,10 +170,10 @@ export default function Register({
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-lg font-bold tracking-tight text-white">
-                                        SkillForge LMS
+                                        InstitutoPropio
                                     </span>
                                     <span className="text-[10px] font-semibold tracking-wider text-blue-400 uppercase">
-                                        Multi-Tenant Cloud
+                                        International SaaS
                                     </span>
                                 </div>
                             </Link>
@@ -396,24 +410,73 @@ export default function Register({
                                         <div className="flex items-center gap-2">
                                             <Sparkles className="size-4 text-blue-400" />
                                             <strong className="font-semibold text-white">
-                                                30-Day Free Trial Included
+                                                30-Day Free Trial
                                             </strong>
                                         </div>
                                         <span className="rounded-full bg-blue-500/20 px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase text-blue-300 border border-blue-400/30">
-                                            Selected: {schoolForm.data.plan.toUpperCase()} PLAN
+                                            Selected: {schoolForm.data.plan.toUpperCase()} • {schoolForm.data.billing_interval.toUpperCase()}
                                         </span>
                                     </div>
                                     <p className="mt-1.5 text-[11px] text-slate-300">
-                                        Workspace activates immediately upon signup. Full access to classrooms, faculty, and student portals. No credit card required.
+                                        Unlimited students & teachers on all plans. Payment method verification required before trial activation with zero initial charges.
                                     </p>
+
+                                    {/* Monthly / Annual Interval Toggle */}
+                                    <div className="mt-3 flex items-center gap-2 border-b border-blue-900/40 pb-2.5">
+                                        <button
+                                            type="button"
+                                            onClick={() => schoolForm.setData('billing_interval', 'monthly')}
+                                            className={`rounded-lg px-3 py-1 text-xs font-semibold transition ${
+                                                schoolForm.data.billing_interval === 'monthly'
+                                                    ? 'bg-blue-600 text-white shadow-xs'
+                                                    : 'bg-slate-900/80 text-slate-400 hover:text-white'
+                                            }`}
+                                        >
+                                            Monthly Billing
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => schoolForm.setData('billing_interval', 'annual')}
+                                            className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition ${
+                                                schoolForm.data.billing_interval === 'annual'
+                                                    ? 'bg-blue-600 text-white shadow-xs'
+                                                    : 'bg-slate-900/80 text-slate-400 hover:text-white'
+                                            }`}
+                                        >
+                                            <span>Annual Billing</span>
+                                            <span className="rounded-full bg-emerald-500/20 px-1.5 py-0.2 text-[9px] font-bold text-emerald-400">
+                                                ~17% Off (2 Mo Free)
+                                            </span>
+                                        </button>
+                                    </div>
                                     
                                     {/* Plan Selector Buttons */}
-                                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                                    <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
                                         {[
-                                            { slug: 'bronze', name: 'Bronze', limit: '1 School' },
-                                            { slug: 'silver', name: 'Silver', limit: 'Up to 5' },
-                                            { slug: 'gold', name: 'Gold', limit: 'Up to 10' },
-                                            { slug: 'premium', name: 'Premium', limit: 'Unlimited' },
+                                            {
+                                                slug: 'starter',
+                                                name: 'Starter',
+                                                limit: '1 Institution',
+                                                price: schoolForm.data.billing_interval === 'annual' ? '$190/yr' : '$19/mo',
+                                            },
+                                            {
+                                                slug: 'growth',
+                                                name: 'Growth',
+                                                limit: 'Up to 5',
+                                                price: schoolForm.data.billing_interval === 'annual' ? '$490/yr' : '$49/mo',
+                                            },
+                                            {
+                                                slug: 'professional',
+                                                name: 'Professional',
+                                                limit: 'Up to 10',
+                                                price: schoolForm.data.billing_interval === 'annual' ? '$990/yr' : '$99/mo',
+                                            },
+                                            {
+                                                slug: 'enterprise',
+                                                name: 'Enterprise',
+                                                limit: 'Unlimited',
+                                                price: 'Custom',
+                                            },
                                         ].map((p) => (
                                             <button
                                                 key={p.slug}
@@ -425,8 +488,11 @@ export default function Register({
                                                         : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/60'
                                                 }`}
                                             >
-                                                <div className="font-bold text-xs">{p.name}</div>
-                                                <div className="text-[10px] text-slate-400">{p.limit}</div>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="font-bold text-xs">{p.name}</span>
+                                                    <span className="text-[10px] text-blue-300 font-semibold">{p.price}</span>
+                                                </div>
+                                                <div className="text-[10px] text-slate-400 mt-0.5">{p.limit}</div>
                                             </button>
                                         ))}
                                     </div>
@@ -586,13 +652,13 @@ export default function Register({
                                             className="h-10 rounded-xl border-slate-800 bg-slate-900 pr-32 text-xs text-white placeholder-slate-600 focus-visible:ring-violet-500"
                                         />
                                         <div className="pointer-events-none absolute right-3 text-xs font-semibold text-slate-500">
-                                            .skillforge.com
+                                            .institutopropio.com
                                         </div>
                                     </div>
                                     <p className="text-[11px] text-slate-400">
                                         Your dedicated portal will be accessible at:{' '}
                                         <span className="font-mono text-blue-400">
-                                            https://{schoolForm.data.subdomain || (schoolForm.data.school_name ? schoolForm.data.school_name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 30) : 'your-school')}.skillforge.com
+                                            https://{schoolForm.data.subdomain || (schoolForm.data.school_name ? schoolForm.data.school_name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 30) : 'your-school')}.institutopropio.com
                                         </span>
                                     </p>
                                     <InputError message={schoolForm.errors.subdomain} />

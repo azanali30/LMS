@@ -48,7 +48,7 @@ export default function Welcome() {
         name?: string;
     };
     const user = auth?.user ?? null;
-    const platformName = name || 'SkillForge LMS';
+    const platformName = name || 'InstitutoPropio';
 
     // Solution tab switcher
     const [activeSolution, setActiveSolution] = useState<
@@ -88,7 +88,7 @@ export default function Welcome() {
             badge: 'Single Campus Governance',
             headline: 'Replace Disconnected Tools with One Operating System',
             description:
-                'Single-campus schools struggle when attendance is on paper, grades in spreadsheets, and fee records in desktop accounting software. SkillForge centralizes admissions, academic terms, and tuition invoicing into one unified platform.',
+                'Single-campus schools struggle when attendance is on paper, grades in spreadsheets, and fee records in desktop accounting software. InstitutoPropio centralizes admissions, academic terms, and tuition invoicing into one unified platform.',
             points: [
                 'Full student directory, classroom sections & subject management',
                 '30-second daily attendance roll call with instant percentage logs',
@@ -147,8 +147,8 @@ export default function Welcome() {
 
     const faqs = [
         {
-            question: 'How does SkillForge combine School Management with an Online LMS?',
-            answer: 'Unlike legacy campus tools that only manage administrative registers or disconnected video portals, SkillForge unites institutional governance (student admissions, attendance roll call, timetable schedules, exam gradebooks, and fee billing) with a full multimedia e-learning catalog where instructors publish structured courses, video lessons, and digital certificates under one unified single sign-on system.',
+            question: 'How does InstitutoPropio combine School Management with an Online LMS?',
+            answer: 'Unlike legacy campus tools that only manage administrative registers or disconnected video portals, InstitutoPropio unites institutional governance (student admissions, attendance roll call, timetable schedules, exam gradebooks, and fee billing) with a full multimedia e-learning catalog where instructors publish structured courses, video lessons, and digital certificates under one unified single sign-on system.',
         },
         {
             question: 'How does multi-tenant data isolation protect school records?',
@@ -156,7 +156,7 @@ export default function Welcome() {
         },
         {
             question: 'What are the organization limits in the proposed pricing tiers?',
-            answer: 'Our proposed plan tiers are based primarily on organization count: Bronze covers 1 organization, Silver accommodates up to 5 organizations, Gold supports up to 10 organizations, and Premium provides unlimited organizations for large educational trusts. There are no arbitrary student or teacher limits within an organization.',
+            answer: 'Our plan tiers are based primarily on organization count: Starter covers 1 organization, Growth accommodates up to 5 organizations, Professional supports up to 10 organizations, and Enterprise provides unlimited organizations for large educational networks. There are no arbitrary student or teacher limits within an organization.',
         },
         {
             question: 'Does the application provide separate portals for Teachers, Students, and Parents?',
@@ -443,7 +443,7 @@ export default function Welcome() {
                             Real-World Educational Workflows
                         </span>
                         <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-4xl">
-                            See What's Possible with SkillForge LMS
+                            See What's Possible with InstitutoPropio
                         </h2>
                         <p className="mt-3 text-sm text-slate-600 leading-relaxed">
                             Discover how campus leadership, faculty, students, and parents experience the unified operating system across every stage of the academic journey.
@@ -646,7 +646,7 @@ export default function Welcome() {
                                 School Management: Admissions, Classes, Sections & Staff
                             </h3>
                             <p className="text-xs leading-relaxed text-slate-600 sm:text-sm">
-                                Establishing a structured institution requires clean relational data. SkillForge allows administrators to configure academic years, define grade levels, divide classrooms into manageable sections, and assign qualified teachers to subjects with zero configuration drift.
+                                Establishing a structured institution requires clean relational data. InstitutoPropio allows administrators to configure academic years, define grade levels, divide classrooms into manageable sections, and assign qualified teachers to subjects with zero configuration drift.
                             </p>
                             <div className="space-y-2 pt-2 text-xs text-slate-700">
                                 <div className="flex items-center gap-2">

@@ -68,7 +68,7 @@ class PlatformSeeder extends Seeder
 
         // 2. Platform Super Admin
         $superAdmin = User::firstOrCreate(
-            ['email' => 'admin@skillforge.io'],
+            ['email' => 'admin@institutopropio.com'],
             [
                 'name' => 'Super Administrator',
                 'password' => Hash::make('Password123!'),

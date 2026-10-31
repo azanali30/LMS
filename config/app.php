@@ -60,7 +60,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Used by the multi-tenant architecture to resolve school subdomains.
-    | In production: skillforge.com (allowing school.skillforge.com).
+    | In production: institutopropio.com (allowing school.institutopropio.com).
     | In local dev: lms.test (allowing school.lms.test) or localhost.
     |
     */

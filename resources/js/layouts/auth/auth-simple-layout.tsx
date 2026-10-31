@@ -20,7 +20,7 @@ export default function AuthSimpleLayout({
             organization_type?: string;
         } | null;
     };
-    const platformName = (name as string) || 'SkillForge LMS';
+    const platformName = (name as string) || 'InstitutoPropio';
     const isTenant = Boolean(tenant && tenant.name);
     const displayName = isTenant ? tenant!.name : platformName;
     const brandColor = tenant?.primary_color || '#1769E0';

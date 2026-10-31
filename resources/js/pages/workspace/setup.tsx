@@ -46,7 +46,7 @@ interface SetupWizardProps {
 }
 
 const PRESET_COLORS = [
-    { label: 'SkillForge Purple', value: '#7c3aed' },
+    { label: 'Instituto Purple', value: '#7c3aed' },
     { label: 'Royal Indigo', value: '#4f46e5' },
     { label: 'Ocean Blue', value: '#2563eb' },
     { label: 'Emerald Green', value: '#059669' },
@@ -56,7 +56,7 @@ const PRESET_COLORS = [
 
 export default function WorkspaceSetupWizard({
     plans = [],
-    initialPlan = 'bronze',
+    initialPlan = 'starter',
     defaultAcademicSession,
     rootDomain = 'localhost',
     appUrl = 'http://127.0.0.1:8000',
@@ -92,7 +92,7 @@ export default function WorkspaceSetupWizard({
     const [currency, setCurrency] = useState('USD');
 
     // Plan & submission
-    const [selectedPlan] = useState(initialPlan || 'bronze');
+    const [selectedPlan] = useState(initialPlan || 'starter');
     const [submitting, setSubmitting] = useState(false);
     const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -257,7 +257,7 @@ export default function WorkspaceSetupWizard({
 
     return (
         <div className="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-900 selection:bg-purple-500 selection:text-white dark:bg-[#070b14] dark:text-slate-100">
-            <Head title="Create Your School Workspace — SkillForge LMS" />
+            <Head title="Create Your School Workspace — InstitutoPropio" />
 
             {/* Top Navigation Bar */}
             <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 px-6 py-4 backdrop-blur-md dark:border-slate-800 dark:bg-[#0B1220]/90">
@@ -268,7 +268,7 @@ export default function WorkspaceSetupWizard({
                         </div>
                         <div>
                             <span className="block text-base font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                SkillForge LMS
+                                InstitutoPropio
                             </span>
                             <span className="text-[10px] font-semibold tracking-wider text-purple-600 uppercase dark:text-purple-400">
                                 Workspace Setup Wizard

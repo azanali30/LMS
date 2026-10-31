@@ -65,7 +65,7 @@ export default function ContactPage() {
     ];
 
     return (
-        <PublicLayout title="Contact Us & Talk to Sales — SkillForge LMS">
+        <PublicLayout title="Contact Us & Talk to Sales — InstitutoPropio">
             <div className="bg-white py-16 sm:py-24 border-b border-slate-100">
                 {/* Hero Header */}
                 <section className="relative mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
@@ -102,10 +102,10 @@ export default function ContactPage() {
                                                 Electronic Mail
                                             </h3>
                                             <p className="mt-0.5 text-sm font-semibold text-slate-900">
-                                                sales@skillforgelms.com
+                                                sales@institutopropio.com
                                             </p>
                                             <p className="text-xs text-slate-500">
-                                                support@skillforgelms.com
+                                                support@institutopropio.com
                                             </p>
                                         </div>
                                     </div>

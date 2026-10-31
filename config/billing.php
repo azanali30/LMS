@@ -4,24 +4,47 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Product Name & Brand Identity
+    |--------------------------------------------------------------------------
+    */
+
+    'product_name' => 'InstitutoPropio',
+
+    /*
+    |--------------------------------------------------------------------------
     | Free Trial Settings
     |--------------------------------------------------------------------------
     |
-    | SkillForge LMS provides a 30-day free trial on initial school registration.
-    | The school workspace is immediately activated during the trial period.
+    | InstitutoPropio provides a 30-day free trial on initial school registration.
+    | A payment method must be verified before trial activation. In production,
+    | registrations stay in 'pending_payment_method' until verified via webhook.
     |
     */
 
     'trial_days' => 30,
+
+    'trial_requires_payment_method' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Development-Only Trial Bypass
+    |--------------------------------------------------------------------------
+    |
+    | For local testing and automated feature tests ONLY.
+    | MUST NEVER BE USABLE IN PRODUCTION.
+    |
+    */
+
+    'allow_dev_trial_bypass' => env('ALLOW_DEV_TRIAL_BYPASS', false),
 
     /*
     |--------------------------------------------------------------------------
     | Trial Grace Period & Expiry Policy
     |--------------------------------------------------------------------------
     |
-    | The trial-expiry grace period and exact price/currency remain configurable
-    | until finalized by business leadership.
-    | Policies: 'read_only' (allow inspection, block new data creation) or 'locked'
+    | When a trial expires, the subscription transitions to 'expired'.
+    | The expiry policy applies 'read_only' access to protect existing school,
+    | student, curriculum, and financial records from deletion.
     |
     */
 
@@ -34,7 +57,8 @@ return [
     | Trial Reminders
     |--------------------------------------------------------------------------
     |
-    | Days before trial expiration to send automatic billing reminders.
+    | Days before trial expiration to send automatic billing reminders:
+    | 7 days, 3 days, 1 day, and 0 days (day of expiry).
     |
     */
 
@@ -45,9 +69,10 @@ return [
     | Payment Gateway Configuration
     |--------------------------------------------------------------------------
     |
-    | Online payment gateway configuration placeholders. Until credentials are
-    | finalized and provided, the placeholder driver cleanly indicates that online
-    | checkout is awaiting configuration and routes users to manual invoice requests.
+    | Future payment gateway integration is prepared through provider-independent
+    | contracts. Until live provider credentials are configured, the placeholder
+    | driver cleanly communicates pending payment method status and routes users
+    | to manual invoice processing without falsifying payment method verification.
     |
     */
 
@@ -55,7 +80,7 @@ return [
 
     'gateways' => [
         'placeholder' => [
-            'name' => 'Gateway Integration Placeholder',
+            'name' => 'Pending Payment Provider Integration',
             'configured' => false,
         ],
         'stripe' => [

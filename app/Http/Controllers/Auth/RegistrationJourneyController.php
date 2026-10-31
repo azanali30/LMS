@@ -11,6 +11,7 @@ use App\Models\OrganizationSubscription;
 use App\Models\OrganizationUser;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\Billing\SubscriptionService;
 use App\Services\TenantContext;
 use App\Services\TenantResolver;
 use Illuminate\Auth\Events\Registered;
@@ -26,6 +27,10 @@ use Inertia\Response;
 
 class RegistrationJourneyController extends Controller
 {
+    public function __construct(
+        protected SubscriptionService $subscriptionService
+    ) {}
+
     /**
      * Show the unified 3-journey registration view.
      */
@@ -33,7 +38,8 @@ class RegistrationJourneyController extends Controller
     {
         $journey = $request->query('journey', 'school');
         $token = $request->query('token');
-        $selectedPlan = $request->query('plan', 'bronze');
+        $selectedPlan = $request->query('plan', 'starter');
+        $selectedInterval = $request->query('interval', 'monthly');
 
         $invitation = null;
         if ($token) {
@@ -54,7 +60,25 @@ class RegistrationJourneyController extends Controller
 
         $plans = collect();
         try {
-            $plans = SubscriptionPlan::where('is_active', true)->get();
+            $plans = SubscriptionPlan::where('is_active', true)
+                ->whereIn('slug', ['starter', 'growth', 'professional', 'enterprise'])
+                ->get()
+                ->map(fn (SubscriptionPlan $p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'description' => $p->description,
+                    'price_cents' => $p->price_cents,
+                    'price_annual_cents' => $p->price_annual_cents,
+                    'price_monthly_formatted' => $p->formattedPrice('monthly'),
+                    'price_annual_formatted' => $p->formattedPrice('annual'),
+                    'currency' => $p->currency,
+                    'max_organizations' => $p->max_organizations,
+                    'organization_limit' => $p->organizationLimit(),
+                    'features' => $p->features ?: [],
+                    'is_popular' => $p->slug === 'growth',
+                    'is_custom' => $p->isCustomPricing(),
+                ]);
         } catch (\Throwable $e) {
             report($e);
             $plans = collect();
@@ -64,7 +88,10 @@ class RegistrationJourneyController extends Controller
             'initialJourney' => $journey,
             'initialToken' => $token,
             'initialPlan' => $selectedPlan,
+            'initialInterval' => $selectedInterval,
             'plans' => $plans,
+            'currency' => config('plans.currency', 'USD'),
+            'trialDays' => (int) config('plans.trial_days', 30),
             'invitation' => $invitation ? [
                 'token' => $invitation->token,
                 'email' => $invitation->email,
@@ -101,7 +128,8 @@ class RegistrationJourneyController extends Controller
                 },
             ],
             'plan' => 'nullable|string|max:50',
-            'organization_type' => 'required|string|in:school,academy,coaching_center,online_course_provider',
+            'billing_interval' => 'nullable|string|in:monthly,annual',
+            'organization_type' => 'required|string|in:school,academy,coaching_center,online_course_provider,college,training_institute,other',
         ]);
 
         // Prevent repeated registrations from bypassing trial eligibility
@@ -127,8 +155,9 @@ class RegistrationJourneyController extends Controller
         }
 
         $organization = null;
-        $user = DB::transaction(function () use ($validated, $slug, &$organization) {
-            // 1. Create Owner User (safe default platform role)
+        $subscription = null;
+        $user = DB::transaction(function () use ($validated, $slug, &$organization, &$subscription) {
+            // 1. Create Owner User
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -185,29 +214,23 @@ class RegistrationJourneyController extends Controller
                 'is_current' => false,
             ]);
 
-            // 5. Attach 30-Day Free Trial Subscription
-            $selectedPlanSlug = $validated['plan'] ?? 'bronze';
-            $plan = null;
-            try {
-                $plan = SubscriptionPlan::where('slug', $selectedPlanSlug)->first()
-                    ?? SubscriptionPlan::where('slug', 'bronze')->first()
-                    ?? SubscriptionPlan::first();
-            } catch (\Throwable $e) {
-                report($e);
-            }
+            // 5. Attach 30-Day Free Trial Subscription via SubscriptionService
+            $selectedPlanSlug = $validated['plan'] ?? 'starter';
+            $plan = SubscriptionPlan::findBySlug($selectedPlanSlug)
+                ?? SubscriptionPlan::findBySlug('starter')
+                ?? SubscriptionPlan::where('slug', 'starter')->first()
+                ?? SubscriptionPlan::where('slug', 'bronze')->first()
+                ?? SubscriptionPlan::first();
 
-            $trialDays = (int) config('billing.trial_days', 30);
+            $billingInterval = $validated['billing_interval'] ?? 'monthly';
 
             if ($plan) {
-                OrganizationSubscription::create([
-                    'organization_id' => $organization->id,
-                    'plan_id' => $plan->id,
-                    'user_id' => $user->id,
-                    'status' => OrganizationSubscription::STATUS_TRIALING,
-                    'starts_at' => now(),
-                    'trial_ends_at' => now()->addDays($trialDays),
-                    'billing_type' => 'trial',
-                ]);
+                $subscription = $this->subscriptionService->createInitialSubscription(
+                    $organization,
+                    $user,
+                    $plan,
+                    $billingInterval
+                );
             }
 
             return $user;
@@ -220,17 +243,22 @@ class RegistrationJourneyController extends Controller
             TenantContext::set($organization);
             $request->session()->put('current_organization_id', $organization->id);
 
-            // Subdomain redirect only if multi-tenant base domain is explicitly configured
-            // and the current host is a matched subdomain of that domain (not on localhost or single-domain cloud host)
+            $message = ($subscription && $subscription->isPendingPaymentMethod())
+                ? "Welcome to InstitutoPropio! {$validated['school_name']} workspace has been registered. Set up your payment method to activate your 30-day trial."
+                : "Welcome to InstitutoPropio! {$validated['school_name']} 30-day trial is now active.";
+
             $configuredDomain = config('app.domain');
             if ($configuredDomain && str_ends_with($request->getHost(), '.'.$configuredDomain)) {
                 return redirect()->away($organization->subdomainUrl('/dashboard'))
-                    ->with('success', "Welcome to SkillForge LMS! {$validated['school_name']} 30-day trial is now active.");
+                    ->with('success', $message);
             }
         }
 
-        return redirect()->route('dashboard')
-            ->with('success', "Welcome to SkillForge LMS! {$validated['school_name']} 30-day trial is now active.");
+        $message = ($subscription && $subscription->isPendingPaymentMethod())
+            ? "Welcome to InstitutoPropio! {$validated['school_name']} workspace has been registered. Set up your payment method to activate your 30-day trial."
+            : "Welcome to InstitutoPropio! {$validated['school_name']} 30-day trial is now active.";
+
+        return redirect()->route('dashboard')->with('success', $message);
     }
 
     /**

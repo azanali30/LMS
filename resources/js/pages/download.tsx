@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button';
 
 export default function DownloadPage() {
     return (
-        <PublicLayout title="Windows Desktop Application — SkillForge LMS">
+        <PublicLayout title="Windows Desktop Application — InstitutoPropio">
             <div className="relative overflow-hidden bg-white">
                 {/* Hero Header */}
                 <section className="relative mx-auto w-full max-w-[1720px] px-6 pt-16 pb-12 text-center sm:px-8 md:px-12 lg:px-16 xl:px-20 border-b border-slate-100">
@@ -312,7 +312,7 @@ export default function DownloadPage() {
                                         {
                                             step: '03',
                                             title: 'Connect Your LMS Server',
-                                            desc: 'Enter your custom campus URL (e.g., https://school.skillforgelms.com) or use the default cloud endpoint.',
+                                            desc: 'Enter your custom campus URL (e.g., https://school.institutopropio.com) or use the default cloud endpoint.',
                                         },
                                         {
                                             step: '04',

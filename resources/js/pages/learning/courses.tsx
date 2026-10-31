@@ -117,7 +117,7 @@ export default function CoursesCatalogPage({
     };
 
     return (
-        <PublicLayout title="Explore Courses & Specializations — SkillForge LMS">
+        <PublicLayout title="Explore Courses & Specializations — InstitutoPropio">
             {/* FULL-WIDTH HERO SECTION (Left-Aligned, RingCentral Style) */}
             <section className="relative w-full border-b border-slate-200/80 bg-white pt-14 pb-12 sm:pt-18 sm:pb-16">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">

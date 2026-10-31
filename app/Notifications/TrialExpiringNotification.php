@@ -36,7 +36,7 @@ class TrialExpiringNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $orgName = $this->subscription->organization?->name ?? 'Your Institution';
-        $planName = $this->subscription->plan?->name ?? 'SkillForge';
+        $planName = $this->subscription->plan?->name ?? 'Starter';
         $days = $this->daysRemaining;
 
         $subject = $days === 0
@@ -57,7 +57,7 @@ class TrialExpiringNotification extends Notification
         return $mail
             ->line("To ensure uninterrupted administrative write access, you can request an official invoice or complete your subscription verification.")
             ->action('Manage Subscription & Billing', url('/organizations/billing'))
-            ->line('Thank you for choosing SkillForge LMS for your educational institution.');
+            ->line('Thank you for choosing InstitutoPropio for your educational institution.');
     }
 
     /**

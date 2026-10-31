@@ -36,7 +36,7 @@ interface SettingsProps {
 }
 
 const PRESET_COLORS = [
-    { label: 'SkillForge Purple', value: '#7c3aed' },
+    { label: 'InstitutoPropio Purple', value: '#7c3aed' },
     { label: 'Royal Indigo', value: '#4f46e5' },
     { label: 'Ocean Blue', value: '#2563eb' },
     { label: 'Emerald Green', value: '#059669' },

@@ -12,6 +12,7 @@ class OrganizationSubscription extends Model
     use HasFactory;
 
     // Supported subscription lifecycle states
+    public const STATUS_PENDING_PAYMENT_METHOD = 'pending_payment_method';
     public const STATUS_TRIALING = 'trialing';
     public const STATUS_TRIAL = 'trial'; // backward compatibility
     public const STATUS_PENDING = 'pending';
@@ -20,6 +21,10 @@ class OrganizationSubscription extends Model
     public const STATUS_EXPIRED = 'expired';
     public const STATUS_CANCELLED = 'cancelled';
 
+    // Supported billing intervals
+    public const INTERVAL_MONTHLY = 'monthly';
+    public const INTERVAL_ANNUAL = 'annual';
+
     protected $fillable = [
         'organization_id',
         'plan_id',
@@ -27,9 +32,15 @@ class OrganizationSubscription extends Model
         'status',
         'billing_type',
         'payment_method',
+        'billing_interval',
+        'currency',
+        'gateway_customer_id',
+        'gateway_subscription_id',
+        'payment_method_status',
         'trial_ends_at',
         'starts_at',
         'ends_at',
+        'cancelled_at',
         'last_reminded_at',
     ];
 
@@ -39,6 +50,7 @@ class OrganizationSubscription extends Model
             'trial_ends_at' => 'datetime',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'cancelled_at' => 'datetime',
             'last_reminded_at' => 'datetime',
         ];
     }
@@ -51,6 +63,11 @@ class OrganizationSubscription extends Model
     public function plan(): BelongsTo
     {
         return $this->belongsTo(SubscriptionPlan::class, 'plan_id');
+    }
+
+    public function subscriptionPlan(): BelongsTo
+    {
+        return $this->plan();
     }
 
     public function owner(): BelongsTo
@@ -66,6 +83,20 @@ class OrganizationSubscription extends Model
     public function transactions(): HasMany
     {
         return $this->hasMany(PaymentTransaction::class, 'subscription_id');
+    }
+
+    public function histories(): HasMany
+    {
+        return $this->hasMany(SubscriptionHistory::class, 'subscription_id');
+    }
+
+    /**
+     * Determine if subscription is pending payment method verification.
+     */
+    public function isPendingPaymentMethod(): bool
+    {
+        return $this->status === self::STATUS_PENDING_PAYMENT_METHOD
+            || $this->payment_method_status === 'unverified';
     }
 
     /**
@@ -108,7 +139,7 @@ class OrganizationSubscription extends Model
             return true;
         }
 
-        // Check configurable grace period
+        // Check configurable grace period for expired trials
         $graceDays = (int) config('billing.trial_grace_days', 0);
         if ($graceDays > 0 && $this->trial_ends_at && now()->diffInDays($this->trial_ends_at, false) >= -$graceDays) {
             return true;
@@ -127,5 +158,21 @@ class OrganizationSubscription extends Model
         }
 
         return (int) ceil(now()->diffInSeconds($this->trial_ends_at, false) / 86400);
+    }
+
+    /**
+     * Check if interval is annual.
+     */
+    public function isAnnual(): bool
+    {
+        return in_array(strtolower($this->billing_interval ?: ''), ['annual', 'yearly', 'year'], true);
+    }
+
+    /**
+     * Check if interval is monthly.
+     */
+    public function isMonthly(): bool
+    {
+        return ! $this->isAnnual();
     }
 }

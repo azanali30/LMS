@@ -99,7 +99,7 @@ export default function BenefitsPage() {
 
                         <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
                             Traditional educational software is fragmented across isolated legacy databases, paper attendance registers, and clunky separate video platforms.
-                            SkillForge LMS unites campus governance and online learning into one cohesive, high-performance operating system.
+                            InstitutoPropio unites campus governance and online learning into one cohesive, high-performance operating system.
                         </p>
                     </div>
                 </div>

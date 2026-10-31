@@ -5,275 +5,344 @@ import {
     ArrowRight,
     Building2,
     Check,
-    CheckCircle2,
     ChevronDown,
+    CreditCard,
+    Globe2,
     HelpCircle,
     Info,
     Layers,
     Mail,
     Minus,
     PhoneCall,
+    Shield,
     ShieldCheck,
     Sparkles,
+    Users,
     Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { register } from '@/routes';
 
-interface PricingPlan {
+interface PlanProp {
+    id?: number;
     name: string;
-    orgLimit: string;
-    target: string;
-    badge?: string;
-    badgeColor?: string;
+    slug: string;
     description: string;
-    ctaText: string;
-    ctaHref: string;
-    isPrimary?: boolean;
+    price_cents: number;
+    price_annual_cents: number;
+    price_monthly_formatted?: string;
+    price_annual_formatted?: string;
+    currency: string;
+    max_organizations: number | null;
+    organization_limit: string;
     features: string[];
+    is_popular?: boolean;
+    is_custom?: boolean;
 }
 
-export default function PricingPage() {
+interface PricingPageProps {
+    plans?: PlanProp[];
+    currency?: string;
+    trialDays?: number;
+}
+
+export default function PricingPage({
+    plans: serverPlans = [],
+    currency = 'USD',
+    trialDays = 30,
+}: PricingPageProps) {
+    const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly');
     const [activeFaq, setActiveFaq] = useState<number | null>(0);
 
-    const plans: PricingPlan[] = [
+    // Fallback official InstitutoPropio plans if not passed via props
+    const defaultPlans: PlanProp[] = [
         {
-            name: 'Bronze',
-            orgLimit: '1 Organization',
-            target: 'Single Campus / Independent School',
+            name: 'Starter',
+            slug: 'starter',
             description:
-                'Ideal for standalone private schools, single-branch academies, and specialized training institutes needing a complete digital operating system.',
-            ctaText: 'Start 30-Day Free Trial',
-            ctaHref: '/register?journey=school&plan=bronze',
-            isPrimary: false,
+                'Essential digital campus operating system for a single independent school, academy, or specialized training institute.',
+            price_cents: 1900,
+            price_annual_cents: 19000,
+            price_monthly_formatted: '$19',
+            price_annual_formatted: '$190',
+            currency: 'USD',
+            max_organizations: 1,
+            organization_limit: '1 Institution',
             features: [
-                '1 Isolated organization tenant',
-                'Unlimited students, teachers & classrooms',
+                '1 Isolated institution workspace',
+                '30-Day free trial included',
+                'Unlimited students & teacher accounts',
+                'Student admission & class rosters',
                 'Daily roll call & substitute tracking',
-                'Weekly timetable & room allocations',
-                'Curriculum syllabi & topic tracking',
-                'Student fee invoices & PDF receipts',
-                'Gradebook & exam marks entry',
-                'Community & email support',
+                'Weekly timetable & room scheduling',
+                'Curriculum syllabus & topic tracking',
+                'Fee structures & PDF invoices/receipts',
+                'Gradebook & exam marks recording',
+                'Standard email & portal support',
             ],
+            is_popular: false,
+            is_custom: false,
         },
         {
-            name: 'Silver',
-            orgLimit: 'Up to 5 Organizations',
-            target: 'Growing Multi-Campus Schools',
-            badge: 'Most Popular',
-            badgeColor: 'bg-blue-50 text-[#1769E0] border border-blue-200',
+            name: 'Growth',
+            slug: 'growth',
             description:
-                'Tailored for expanding education groups managing primary, middle, and secondary schools or twin campuses with unified executive oversight.',
-            ctaText: 'Start 30-Day Free Trial',
-            ctaHref: '/register?journey=school&plan=silver',
-            isPrimary: true,
+                'Multi-campus expansion system for educational groups operating up to 5 branch institutions with centralized oversight.',
+            price_cents: 4900,
+            price_annual_cents: 49000,
+            price_monthly_formatted: '$49',
+            price_annual_formatted: '$490',
+            currency: 'USD',
+            max_organizations: 5,
+            organization_limit: 'Up to 5 Institutions',
             features: [
-                'Up to 5 Isolated organization tenants',
-                'Instant organization switching in 1 click',
-                'Unified executive owner account',
-                'Separate academic calendars & terms per school',
-                'Independent fee structures & accounts',
+                'Up to 5 Isolated institution workspaces',
+                '30-Day free trial included',
+                'Unlimited students & teacher accounts',
+                'Instant 1-click institution switcher',
+                'Unified executive owner oversight',
+                'Independent academic years & terms per school',
+                'Separate campus fee structures & bank accounts',
                 'Cross-campus faculty assignments',
-                'All Bronze core capabilities included',
-                'Standard priority email & ticketing support',
+                'All Starter capabilities included',
+                'Priority email & ticketing support',
             ],
+            is_popular: true,
+            is_custom: false,
         },
         {
-            name: 'Gold',
-            orgLimit: 'Up to 10 Organizations',
-            target: 'Regional School Networks',
+            name: 'Professional',
+            slug: 'professional',
             description:
-                'Engineered for regional educational groups, multi-city academy chains, and comprehensive campus networks requiring consolidated metrics.',
-            ctaText: 'Start 30-Day Free Trial',
-            ctaHref: '/register?journey=school&plan=gold',
-            isPrimary: false,
+                'Regional campus network architecture managing up to 10 institutions with consolidated portfolio reporting and shared curricula.',
+            price_cents: 9900,
+            price_annual_cents: 99000,
+            price_monthly_formatted: '$99',
+            price_annual_formatted: '$990',
+            currency: 'USD',
+            max_organizations: 10,
+            organization_limit: 'Up to 10 Institutions',
             features: [
-                'Up to 10 Isolated organization tenants',
-                'Consolidated executive reporting',
-                'Dedicated database query scoping',
-                'Centralized curriculum sharing templates',
-                'Role-based multi-campus administrator delegation',
-                'Parent portal link across family enrollments',
-                'Full multimedia course LMS authoring',
+                'Up to 10 Isolated institution workspaces',
+                '30-Day free trial included',
+                'Unlimited students & teacher accounts',
+                'Consolidated executive portfolio reporting',
+                'Cross-school curriculum sharing & templates',
+                'Delegated campus administration roles',
+                'Multi-institution fee audit & reconciliation',
+                'LMS multimedia course creation & certificates',
+                'All Growth capabilities included',
                 'Dedicated onboarding specialist',
             ],
+            is_popular: false,
+            is_custom: false,
         },
         {
-            name: 'Premium',
-            orgLimit: 'Unlimited Organizations',
-            target: 'Large Educational Trusts & Districts',
-            badge: 'Enterprise',
-            badgeColor: 'bg-purple-50 text-purple-700 border border-purple-200',
+            name: 'Enterprise',
+            slug: 'enterprise',
             description:
-                'For national educational trusts, school franchises, and government educational divisions requiring unlimited tenant provisioning and custom SLAs.',
-            ctaText: 'Start 30-Day Free Trial',
-            ctaHref: '/register?journey=school&plan=premium',
-            isPrimary: false,
+                'For national educational trusts, school franchises, and university networks requiring unlimited institutions and bespoke SLAs.',
+            price_cents: 0,
+            price_annual_cents: 0,
+            price_monthly_formatted: 'Custom',
+            price_annual_formatted: 'Custom',
+            currency: 'USD',
+            max_organizations: null,
+            organization_limit: 'Unlimited Institutions',
             features: [
-                'Unlimited organization tenants',
-                'Dynamic organization provisioning on demand',
-                'Strict tenant data boundary guarantees',
-                'Custom domain / branding configuration',
-                'Tailored faculty & administrator onboarding sessions',
-                'Windows Tauri Desktop client site deployment',
+                'Unlimited isolated institution workspaces',
+                'Unlimited students & teacher accounts',
+                'Dedicated private cloud infrastructure',
+                'Custom domain names & Single Sign-On (SSO)',
                 '99.9% Uptime SLA & 24/7 dedicated telephone support',
-                'Executive quarterly review & roadmap influence',
+                'Tailored faculty & staff onboarding workshops',
+                'Bespoke data compliance, audit logs & export',
+                'Custom payment gateway & billing integrations',
+                'Executive account director & roadmap influence',
             ],
+            is_popular: false,
+            is_custom: true,
         },
     ];
 
+    const displayPlans = serverPlans.length > 0 ? serverPlans : defaultPlans;
+
     const comparisonCategories = [
         {
-            title: 'Multi-Tenant Governance',
+            title: 'Multi-Tenant Scale & Institutions',
             items: [
                 {
-                    name: 'Organization Limit',
-                    bronze: '1 Organization',
-                    silver: 'Up to 5 Organizations',
-                    gold: 'Up to 10 Organizations',
-                    premium: 'Unlimited',
+                    name: 'Institution Workspaces Allowed',
+                    starter: '1 Institution',
+                    growth: 'Up to 5 Institutions',
+                    professional: 'Up to 10 Institutions',
+                    enterprise: 'Unlimited',
                 },
                 {
-                    name: 'Tenant Data Isolation (Query-Level Scoping)',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Students & Teachers Allowed',
+                    starter: 'Unlimited',
+                    growth: 'Unlimited',
+                    professional: 'Unlimited',
+                    enterprise: 'Unlimited',
                 },
                 {
-                    name: 'One-Click Organization Switcher',
-                    bronze: false,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Strict Tenant Data Isolation',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Cryptographic Faculty Invitation Tokens',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: '1-Click Instant Institution Switcher',
+                    starter: false,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Custom Domain / Subdomain Provisioning',
-                    bronze: false,
-                    silver: false,
-                    gold: 'On Request',
-                    premium: true,
+                    name: 'Consolidated Executive Multi-School Dashboard',
+                    starter: false,
+                    growth: false,
+                    professional: true,
+                    enterprise: true,
                 },
             ],
         },
         {
-            title: 'School Operations & Administration',
+            title: 'Campus & School Governance',
             items: [
                 {
-                    name: 'Student Admissions & Records',
-                    bronze: 'Unlimited',
-                    silver: 'Unlimited',
-                    gold: 'Unlimited',
-                    premium: 'Unlimited',
+                    name: 'Classrooms, Sections & Academic Terms',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Classrooms, Sections & Subjects',
-                    bronze: 'Unlimited',
-                    silver: 'Unlimited',
-                    gold: 'Unlimited',
-                    premium: 'Unlimited',
+                    name: 'Student Admission & Bio Documents',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Rapid Attendance Roll Call with Substitutes',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Daily Roll Call & Substitute Tracking',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Weekly Timetable Matrices & Room Allocations',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Weekly Timetable Matrix Scheduling',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Curriculum Syllabi & Progress Checklists',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Curriculum Syllabi, Units & Topic Progress',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
+                },
+                {
+                    name: 'Cross-Campus Faculty Teaching Assignments',
+                    starter: false,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
             ],
         },
         {
-            title: 'Financial Management & Billing',
+            title: 'Tuition Fees & Financial Operations',
             items: [
                 {
-                    name: 'Class-Level Fee Structures',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Custom Fee Structures & Schedules',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Batch Invoice Generation',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Automated Invoice Generation',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Printable Fee Vouchers & Receipts',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Printable / Downloadable PDF Invoices & Receipts',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Multi-Campus Consolidated Billing Audits',
-                    bronze: false,
-                    silver: 'Per School',
-                    gold: true,
-                    premium: true,
+                    name: 'Multi-Campus Consolidated Financial Reconciliation',
+                    starter: false,
+                    growth: false,
+                    professional: true,
+                    enterprise: true,
                 },
             ],
         },
         {
-            title: 'E-Learning, Portals & Desktop',
+            title: 'Digital LMS & Course Authoring',
             items: [
                 {
-                    name: 'Dedicated Portals (Admin, Teacher, Student, Parent)',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Online Course Hub & Lesson Player',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Course Catalog & Video Lessons',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Video Lessons & Module Progress Tracking',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Verifiable Digital Graduation Certificates',
-                    bronze: true,
-                    silver: true,
-                    gold: true,
-                    premium: true,
+                    name: 'Digital Course Completion Certificates',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
+                },
+            ],
+        },
+        {
+            title: 'Support, SLAs & Infrastructure',
+            items: [
+                {
+                    name: 'Free Trial Duration',
+                    starter: `${trialDays} Days`,
+                    growth: `${trialDays} Days`,
+                    professional: `${trialDays} Days`,
+                    enterprise: `${trialDays} Days`,
                 },
                 {
-                    name: 'Windows Desktop Client (Tauri)',
-                    bronze: 'Coming Soon',
-                    silver: 'Coming Soon',
-                    gold: 'Coming Soon',
-                    premium: 'Priority Access',
+                    name: 'Support Channel',
+                    starter: 'Standard Email & Portal',
+                    growth: 'Priority Ticketing & Email',
+                    professional: 'Dedicated Specialist',
+                    enterprise: '24/7 Telephone & Private Slack',
                 },
                 {
-                    name: 'Support Level',
-                    bronze: 'Standard Email',
-                    silver: 'Priority Ticketing',
-                    gold: 'Dedicated Specialist',
-                    premium: '24/7 Phone & SLA',
+                    name: 'Custom Domain & SSO Integrations',
+                    starter: false,
+                    growth: false,
+                    professional: false,
+                    enterprise: true,
+                },
+                {
+                    name: 'Uptime SLA Guarantee',
+                    starter: '99.5%',
+                    growth: '99.8%',
+                    professional: '99.9%',
+                    enterprise: '99.95% Custom SLA',
                 },
             ],
         },
@@ -281,279 +350,353 @@ export default function PricingPage() {
 
     const faqs = [
         {
-            q: 'How are organizations distinguished across plans?',
-            a: 'In SkillForge LMS, an Organization represents an autonomous school or campus entity with its own dedicated academic sessions, classrooms, attendance logs, teacher staff rosters, and financial accounts. The primary distinction between plans is the number of independent organizations you can create and manage under your master executive account.',
+            q: 'How does the 30-day free trial work?',
+            a: `Every new institution owner can start with an unrestricted 30-day free trial on our Starter, Growth, or Professional plans. A verified payment method is registered upfront to ensure uninterrupted continuity, but your card will never be charged during the trial period. You can modify or cancel your subscription at any time prior to day 30 with zero penalty.`,
         },
         {
-            q: 'Are there student or teacher seat limits imposed?',
-            a: 'No arbitrary limits are imposed on students or teachers within your provisioned organizations. Whether you have 200 or 2,000 students in a school, your institution has full capacity to operate without per-seat penalty fees.',
+            q: 'What is considered an "Institution" in InstitutoPropio?',
+            a: 'In InstitutoPropio, an Institution is a fully isolated school or academy workspace with its own dedicated academic terms, student admissions, class sections, timetables, and fee structures. Starter includes 1 institution, Growth accommodates up to 5, Professional supports up to 10, and Enterprise offers unlimited institution provisioning.',
         },
         {
-            q: 'What are the current pricing rates and billing cycles?',
-            a: 'Pricing tiers are currently proposed and tailored to institutional requirements. Contact our education solutions team for a personalized quotation based on your organization structure and support requirements. No unexpected charges will ever be applied without your explicit approval.',
+            q: 'Are there any limits on students or teachers?',
+            a: 'No. Unlike legacy school management software that penalizes you per student or teacher head, InstitutoPropio offers 100% UNLIMITED students and teachers across every plan tier.',
         },
         {
-            q: 'Can I easily upgrade when our school network expands?',
-            a: 'Yes. Upgrading between Bronze, Silver, Gold, and Premium is instantaneous. When your institution opens new campuses or branches, you can immediately increase your organization allocation without re-installing software or migrating databases.',
+            q: 'How much do I save with annual billing?',
+            a: 'When you choose annual billing, you receive approximately 16.67% off, which is equivalent to two months completely free. For example, the Starter plan is $190/year (instead of $228), and the Growth plan is $490/year (instead of $588).',
         },
         {
-            q: 'How does multi-organization data isolation work?',
-            a: 'Each organization operates within strict database query boundaries enforced by our backend TenantScope system. Even when an executive owner oversees multiple campuses, teachers and students are strictly scoped to their assigned school domain.',
+            q: 'Can I upgrade or downgrade between plans later?',
+            a: 'Yes. You can upgrade instantly from your Billing & Subscription dashboard as your institution opens additional branches or campus locations. When downgrading, our system verifies that your existing institution count fits within the target plan.',
         },
         {
-            q: 'Can each organization maintain distinct fee structures and academic calendars?',
-            a: 'Yes, each organization has independent control over its academic terms, admission cycles, grading formulas, and fee schedules.',
+            q: 'What happens to our school data if our trial expires?',
+            a: 'Your educational data is sacred. When a trial expires, your institution transitions to a safe read-only policy. No students, grades, timetables, or financial records are ever deleted. You can restore administrative write access at any time by renewing your subscription.',
         },
     ];
 
     return (
-        <PublicLayout title="Transparent Institutional Pricing — SkillForge LMS">
-            {/* PAGE HEADER */}
-            <section className="bg-white pt-14 pb-12 sm:pt-20 sm:pb-16 border-b border-slate-100">
-                <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
+        <PublicLayout title="Transparent International SaaS Pricing — InstitutoPropio">
+            {/* HERO SECTION */}
+            <section className="relative overflow-hidden bg-[#070b14] pt-20 pb-16 text-white sm:pt-28 sm:pb-20">
+                {/* Subtle radial glow */}
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
+
+                <div className="relative mx-auto w-full max-w-[1720px] px-6 text-center sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="mx-auto max-w-4xl">
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-semibold text-[#1769E0]">
-                        <Sparkles className="size-3.5" />
-                        <span>Proposed Institutional Plan Tiers</span>
-                    </div>
+                        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-300 backdrop-blur-md">
+                            <Sparkles className="size-4 text-blue-400" />
+                            <span>Transparent Global SaaS Pricing • USD</span>
+                        </div>
 
-                    <h1 className="text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-5xl lg:text-6xl">
-                        Simple, Scalable Pricing for{' '}
-                        <span className="text-[#1769E0]">Modern Schools</span>
-                    </h1>
+                        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl">
+                            Empower Every School with{' '}
+                            <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-sky-400 bg-clip-text text-transparent">
+                                InstitutoPropio
+                            </span>
+                        </h1>
 
-                    <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-                        Choose the right tier for your educational setup. Pricing is anchored primarily by the number of independent organizations you need to govern.
-                    </p>
+                        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-xl">
+                            World-class multi-tenant school governance and e-learning. Straightforward pricing based exclusively on the number of institutions you govern.
+                        </p>
 
-                    {/* Proposed Pricing Notice */}
-                    <div className="mx-auto mt-6 inline-flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2 text-xs font-medium text-amber-800 border border-amber-200">
-                        <Info className="size-4 shrink-0 text-amber-600" />
-                        <span>
-                            <strong>Note on Proposed Tiers:</strong> Plan rates are configurable per institutional contract. Contact our team to confirm approved pricing.
-                        </span>
-                    </div>
+                        {/* Unlimited Students & Teachers Banner */}
+                        <div className="mx-auto mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 px-6 py-3 text-sm font-medium text-slate-200 shadow-xl backdrop-blur-md">
+                            <span className="flex items-center gap-2 text-emerald-400 font-semibold">
+                                <Users className="size-4" />
+                                Unlimited Students & Teachers
+                            </span>
+                            <span className="hidden text-slate-600 sm:inline">•</span>
+                            <span className="flex items-center gap-2 text-blue-400 font-semibold">
+                                <Shield className="size-4" />
+                                30-Day Free Trial
+                            </span>
+                            <span className="hidden text-slate-600 sm:inline">•</span>
+                            <span className="flex items-center gap-2 text-indigo-400 font-semibold">
+                                <CreditCard className="size-4" />
+                                Zero Setup Fees
+                            </span>
+                        </div>
+
+                        {/* MONTHLY / ANNUAL TOGGLE */}
+                        <div className="mt-10 flex items-center justify-center">
+                            <div className="relative flex items-center rounded-2xl border border-slate-800 bg-slate-900/90 p-1.5 shadow-2xl backdrop-blur-lg">
+                                <button
+                                    type="button"
+                                    onClick={() => setBillingInterval('monthly')}
+                                    className={`relative z-10 cursor-pointer rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
+                                        billingInterval === 'monthly'
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                                            : 'text-slate-400 hover:text-white'
+                                    }`}
+                                >
+                                    Monthly Billing
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setBillingInterval('annual')}
+                                    className={`relative z-10 flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
+                                        billingInterval === 'annual'
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                                            : 'text-slate-400 hover:text-white'
+                                    }`}
+                                >
+                                    <span>Annual Billing</span>
+                                    <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-extrabold text-emerald-400 border border-emerald-500/30">
+                                        2 Months Free (~17% Off)
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* 4 PLAN CARDS GRID */}
-            <section className="bg-[#F7F9FC] py-16 sm:py-20">
+            {/* PLAN CARDS GRID */}
+            <section className="relative z-10 -mt-8 bg-slate-950 pb-20 sm:pb-28">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                        {plans.map((plan) => (
-                            <div
-                                key={plan.name}
-                                className={`flex flex-col justify-between rounded-3xl border bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${
-                                    plan.isPrimary
-                                        ? 'border-[#1769E0] ring-2 ring-[#1769E0]/20 shadow-lg shadow-blue-500/10'
-                                        : 'border-slate-200 shadow-xs'
-                                }`}
-                            >
-                                <div>
-                                    {/* Header & Badges */}
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="text-xl font-extrabold text-[#0B1528]">
-                                            {plan.name}
-                                        </h3>
-                                        {plan.badge && (
-                                            <span
-                                                className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${plan.badgeColor}`}
-                                            >
-                                                {plan.badge}
-                                            </span>
-                                        )}
-                                    </div>
+                    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+                        {displayPlans.map((plan) => {
+                            const isEnterprise = plan.is_custom || plan.slug === 'enterprise';
+                            const monthlyPriceDollars = Math.round(plan.price_cents / 100);
+                            const annualPriceDollars = Math.round(plan.price_annual_cents / 100);
+                            const effectiveMonthlyFromAnnual = Math.round(annualPriceDollars / 12);
 
-                                    {/* Organization limit pill */}
-                                    <div className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-[#0B1528]">
-                                        <Building2 className="size-3.5 text-[#1769E0]" />
-                                        <span>{plan.orgLimit}</span>
-                                    </div>
+                            const displayPrice = isEnterprise
+                                ? 'Custom'
+                                : billingInterval === 'annual'
+                                ? `$${annualPriceDollars}`
+                                : `$${monthlyPriceDollars}`;
 
-                                    {/* Target audience */}
-                                    <p className="mt-2 text-xs font-semibold text-slate-500">
-                                        {plan.target}
-                                    </p>
+                            const pricePeriod = isEnterprise
+                                ? ''
+                                : billingInterval === 'annual'
+                                ? '/year'
+                                : '/month';
 
-                                    {/* Price tag placeholder */}
-                                    <div className="mt-6 border-t border-slate-100 pt-5">
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-2xl font-black tracking-tight text-[#0B1528]">
-                                                Custom Quote
+                            const targetHref = isEnterprise
+                                ? '/contact?subject=Enterprise+Inquiry'
+                                : `/register?journey=school&plan=${plan.slug}&interval=${billingInterval}`;
+
+                            const ctaLabel = isEnterprise
+                                ? 'Contact Sales'
+                                : `Start 30-Day Free Trial`;
+
+                            return (
+                                <div
+                                    key={plan.slug}
+                                    className={`group relative flex flex-col justify-between rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${
+                                        plan.is_popular
+                                            ? 'border-blue-500 bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 shadow-xl shadow-blue-500/10 ring-2 ring-blue-500/30'
+                                            : 'border-slate-800 bg-slate-900/60 shadow-lg backdrop-blur-md hover:border-slate-700'
+                                    }`}
+                                >
+                                    {plan.is_popular && (
+                                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-1 text-xs font-extrabold text-white shadow-md shadow-blue-500/30">
+                                                <Sparkles className="size-3.5" />
+                                                Most Popular Choice
                                             </span>
                                         </div>
-                                        <p className="mt-1 text-[11px] text-slate-500">
-                                            Tailored to institutional scale
+                                    )}
+
+                                    <div>
+                                        {/* Card Header */}
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="text-2xl font-black text-white">
+                                                {plan.name}
+                                            </h3>
+                                            <span className="rounded-lg border border-slate-700 bg-slate-800/80 px-2.5 py-1 text-xs font-semibold text-slate-300">
+                                                {plan.organization_limit}
+                                            </span>
+                                        </div>
+
+                                        <p className="mt-3 text-sm leading-relaxed text-slate-400">
+                                            {plan.description}
                                         </p>
-                                    </div>
 
-                                    {/* Description */}
-                                    <p className="mt-4 text-xs leading-relaxed text-slate-600">
-                                        {plan.description}
-                                    </p>
-
-                                    {/* Feature List */}
-                                    <div className="mt-6 space-y-2.5 border-t border-slate-100 pt-5">
-                                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                                            What's Included:
-                                        </span>
-                                        {plan.features.map((feat, i) => (
-                                            <div
-                                                key={i}
-                                                className="flex items-start gap-2.5 text-xs text-slate-700"
-                                            >
-                                                <Check className="mt-0.5 size-3.5 shrink-0 text-[#1769E0]" />
-                                                <span>{feat}</span>
+                                        {/* Pricing Block */}
+                                        <div className="mt-6 border-y border-slate-800/80 py-5">
+                                            <div className="flex items-baseline gap-1.5">
+                                                <span className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+                                                    {displayPrice}
+                                                </span>
+                                                <span className="text-sm font-semibold text-slate-400">
+                                                    {pricePeriod}
+                                                </span>
                                             </div>
-                                        ))}
+
+                                            {!isEnterprise && billingInterval === 'annual' && (
+                                                <p className="mt-1.5 text-xs font-medium text-emerald-400">
+                                                    Equivalent to ${effectiveMonthlyFromAnnual}/mo • 2 months free!
+                                                </p>
+                                            )}
+
+                                            {!isEnterprise && billingInterval === 'monthly' && (
+                                                <p className="mt-1.5 text-xs text-slate-500">
+                                                    Billed monthly in USD. Cancel anytime.
+                                                </p>
+                                            )}
+
+                                            {isEnterprise && (
+                                                <p className="mt-1.5 text-xs text-slate-400">
+                                                    Bespoke pricing tailored to your multi-campus network.
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {/* Unlimited Feature Highlights */}
+                                        <div className="mt-6 space-y-3">
+                                            <div className="flex items-center gap-2.5 text-xs font-bold text-emerald-400">
+                                                <Users className="size-4 shrink-0 text-emerald-400" />
+                                                <span>Unlimited Students & Teachers</span>
+                                            </div>
+                                            <div className="flex items-center gap-2.5 text-xs font-bold text-blue-400">
+                                                <Building2 className="size-4 shrink-0 text-blue-400" />
+                                                <span>{plan.organization_limit}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Features List */}
+                                        <ul className="mt-6 space-y-3 text-sm text-slate-300">
+                                            {plan.features.map((feature, idx) => (
+                                                <li key={idx} className="flex items-start gap-3">
+                                                    <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
+                                                        <Check className="size-3 stroke-[3]" />
+                                                    </div>
+                                                    <span className="text-xs leading-relaxed text-slate-300">
+                                                        {feature}
+                                                    </span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    {/* Action Button */}
+                                    <div className="mt-8 pt-4">
+                                        <Link href={targetHref} className="block w-full">
+                                            <Button
+                                                className={`w-full py-6 text-sm font-bold shadow-lg transition-all duration-200 cursor-pointer ${
+                                                    plan.is_popular
+                                                        ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-600/30'
+                                                        : isEnterprise
+                                                        ? 'bg-slate-800 text-white hover:bg-slate-700 border border-slate-700'
+                                                        : 'bg-white text-slate-900 hover:bg-slate-100'
+                                                }`}
+                                            >
+                                                <span>{ctaLabel}</span>
+                                                <ArrowRight className="ml-2 size-4" />
+                                            </Button>
+                                        </Link>
+
+                                        {!isEnterprise && (
+                                            <p className="mt-2 text-center text-[11px] text-slate-500">
+                                                30 days free • Payment method required
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
-
-                                {/* Plan CTA Button */}
-                                <div className="mt-8 pt-4">
-                                    <Button
-                                        asChild
-                                        className={`w-full font-bold cursor-pointer transition-all ${
-                                            plan.isPrimary
-                                                ? 'bg-[#FF7A30] text-white shadow-md shadow-orange-500/20 hover:bg-[#E5661E]'
-                                                : 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-50 hover:text-[#1769E0]'
-                                        }`}
-                                    >
-                                        <Link href={plan.ctaHref}>
-                                            <span>{plan.ctaText}</span>
-                                            <ArrowRight className="ml-1.5 size-4" />
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
-            {/* DETAILED PLAN COMPARISON TABLE */}
-            <section className="bg-white py-16 sm:py-24 border-t border-slate-200">
+            {/* 30-DAY TRIAL BANNER */}
+            <section className="bg-slate-900 border-y border-slate-800 py-12">
+                <div className="mx-auto w-full max-w-5xl px-6 sm:px-8 text-center">
+                    <div className="inline-flex items-center justify-center size-14 rounded-2xl bg-blue-500/10 text-blue-400 mb-4 border border-blue-500/20">
+                        <ShieldCheck className="size-7" />
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+                        Experience InstitutoPropio Free for 30 Days
+                    </h2>
+                    <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-slate-300">
+                        To protect our network integrity and ensure seamless uninterrupted service, an active payment method is verified upon registration. You will not be charged a single penny during your 30-day trial period, and you can cancel anytime.
+                    </p>
+                </div>
+            </section>
+
+            {/* FULL FEATURE COMPARISON MATRIX */}
+            <section className="bg-slate-950 py-20 sm:py-28 text-white">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                    <div className="text-center">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
-                            Deep Feature Breakdown
-                        </span>
-                        <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-4xl">
-                            Compare Features Across All Plans
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+                            Detailed Feature Comparison
                         </h2>
-                        <p className="mx-auto mt-3 max-w-2xl text-xs text-slate-600 sm:text-sm">
-                            Inspect exactly how governance, operations, academics, and billing scale with your organization tier.
+                        <p className="mt-4 text-base text-slate-400 max-w-2xl mx-auto">
+                            Examine every operational capability across all four tiers of InstitutoPropio.
                         </p>
                     </div>
 
-                    <div className="mt-12 overflow-x-auto rounded-2xl border border-slate-200 shadow-xs">
-                        <table className="w-full text-left border-collapse">
+                    <div className="overflow-x-auto rounded-3xl border border-slate-800 bg-slate-900/60 shadow-2xl">
+                        <table className="w-full min-w-[800px] border-collapse text-left">
                             <thead>
-                                <tr className="border-b border-slate-200 bg-[#F7F9FC]">
-                                    <th className="py-4 px-6 text-xs font-extrabold uppercase tracking-wider text-slate-700 w-1/3">
-                                        Platform Features
+                                <tr className="border-b border-slate-800 bg-slate-900">
+                                    <th className="py-5 px-6 text-sm font-extrabold text-white uppercase tracking-wider">
+                                        Features & Specifications
                                     </th>
-                                    <th className="py-4 px-4 text-center text-xs font-bold text-slate-900">
-                                        Bronze
-                                        <span className="block text-[10px] font-normal text-slate-500">1 Org</span>
+                                    <th className="py-5 px-6 text-sm font-extrabold text-white uppercase tracking-wider text-center">
+                                        Starter
                                     </th>
-                                    <th className="py-4 px-4 text-center text-xs font-bold text-[#1769E0] bg-blue-50/60">
-                                        Silver
-                                        <span className="block text-[10px] font-normal text-[#1769E0]">Up to 5 Orgs</span>
+                                    <th className="py-5 px-6 text-sm font-extrabold text-blue-400 uppercase tracking-wider text-center">
+                                        Growth
                                     </th>
-                                    <th className="py-4 px-4 text-center text-xs font-bold text-slate-900">
-                                        Gold
-                                        <span className="block text-[10px] font-normal text-slate-500">Up to 10 Orgs</span>
+                                    <th className="py-5 px-6 text-sm font-extrabold text-white uppercase tracking-wider text-center">
+                                        Professional
                                     </th>
-                                    <th className="py-4 px-4 text-center text-xs font-bold text-slate-900">
-                                        Premium
-                                        <span className="block text-[10px] font-normal text-slate-500">Unlimited</span>
+                                    <th className="py-5 px-6 text-sm font-extrabold text-purple-400 uppercase tracking-wider text-center">
+                                        Enterprise
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
-                                {comparisonCategories.map((cat) => (
-                                    <>
-                                        <tr key={cat.title} className="bg-slate-50/70">
+                            <tbody>
+                                {comparisonCategories.map((category, catIdx) => (
+                                    <React.Fragment key={catIdx}>
+                                        <tr className="bg-slate-800/60 border-t border-b border-slate-800">
                                             <td
                                                 colSpan={5}
-                                                className="py-3 px-6 text-xs font-bold text-[#0B1528] uppercase tracking-wider"
+                                                className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-slate-400"
                                             >
-                                                {cat.title}
+                                                {category.title}
                                             </td>
                                         </tr>
-                                        {cat.items.map((row) => (
+                                        {category.items.map((item, itemIdx) => (
                                             <tr
-                                                key={row.name}
-                                                className="hover:bg-slate-50/60 transition-colors"
+                                                key={itemIdx}
+                                                className="border-b border-slate-800/50 hover:bg-slate-900/40 transition-colors"
                                             >
-                                                <td className="py-3.5 px-6 font-medium text-slate-800">
-                                                    {row.name}
+                                                <td className="py-4 px-6 text-sm font-medium text-slate-200">
+                                                    {item.name}
                                                 </td>
-
-                                                {/* Bronze */}
-                                                <td className="py-3.5 px-4 text-center">
-                                                    {typeof row.bronze === 'boolean' ? (
-                                                        row.bronze ? (
-                                                            <Check className="mx-auto size-4 text-emerald-600" />
-                                                        ) : (
-                                                            <Minus className="mx-auto size-4 text-slate-300" />
-                                                        )
-                                                    ) : (
-                                                        <span className="font-semibold text-slate-800">
-                                                            {row.bronze}
-                                                        </span>
-                                                    )}
-                                                </td>
-
-                                                {/* Silver */}
-                                                <td className="py-3.5 px-4 text-center bg-blue-50/20">
-                                                    {typeof row.silver === 'boolean' ? (
-                                                        row.silver ? (
-                                                            <Check className="mx-auto size-4 text-[#1769E0]" />
-                                                        ) : (
-                                                            <Minus className="mx-auto size-4 text-slate-300" />
-                                                        )
-                                                    ) : (
-                                                        <span className="font-bold text-[#1769E0]">
-                                                            {row.silver}
-                                                        </span>
-                                                    )}
-                                                </td>
-
-                                                {/* Gold */}
-                                                <td className="py-3.5 px-4 text-center">
-                                                    {typeof row.gold === 'boolean' ? (
-                                                        row.gold ? (
-                                                            <Check className="mx-auto size-4 text-emerald-600" />
-                                                        ) : (
-                                                            <Minus className="mx-auto size-4 text-slate-300" />
-                                                        )
-                                                    ) : (
-                                                        <span className="font-semibold text-slate-800">
-                                                            {row.gold}
-                                                        </span>
-                                                    )}
-                                                </td>
-
-                                                {/* Premium */}
-                                                <td className="py-3.5 px-4 text-center">
-                                                    {typeof row.premium === 'boolean' ? (
-                                                        row.premium ? (
-                                                            <Check className="mx-auto size-4 text-emerald-600" />
-                                                        ) : (
-                                                            <Minus className="mx-auto size-4 text-slate-300" />
-                                                        )
-                                                    ) : (
-                                                        <span className="font-bold text-purple-700">
-                                                            {row.premium}
-                                                        </span>
-                                                    )}
-                                                </td>
+                                                {['starter', 'growth', 'professional', 'enterprise'].map((col) => {
+                                                    const val = (item as any)[col];
+                                                    return (
+                                                        <td
+                                                            key={col}
+                                                            className="py-4 px-6 text-center text-sm font-medium text-slate-300"
+                                                        >
+                                                            {typeof val === 'boolean' ? (
+                                                                val ? (
+                                                                    <div className="inline-flex size-6 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
+                                                                        <Check className="size-4" />
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="inline-flex size-6 items-center justify-center rounded-full bg-slate-800 text-slate-500">
+                                                                        <Minus className="size-4" />
+                                                                    </div>
+                                                                )
+                                                            ) : (
+                                                                <span className="font-semibold text-white">
+                                                                    {val}
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                    );
+                                                })}
                                             </tr>
                                         ))}
-                                    </>
+                                    </React.Fragment>
                                 ))}
                             </tbody>
                         </table>
@@ -562,43 +705,42 @@ export default function PricingPage() {
             </section>
 
             {/* FREQUENTLY ASKED QUESTIONS */}
-            <section className="bg-[#F7F9FC] py-16 sm:py-24 border-t border-slate-200">
-                <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                    <div className="mx-auto max-w-4xl">
-                    <div className="text-center">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
-                            Clear Pricing Guidance
-                        </span>
-                        <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-4xl">
-                            Frequently Asked Questions
+            <section className="bg-slate-900 py-20 border-t border-slate-800">
+                <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
+                    <div className="text-center mb-12">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1 text-xs font-semibold text-blue-400">
+                            <HelpCircle className="size-3.5" />
+                            <span>Frequently Asked Questions</span>
+                        </div>
+                        <h2 className="mt-4 text-3xl sm:text-4xl font-extrabold text-white">
+                            Everything You Need to Know
                         </h2>
-                        <p className="mx-auto mt-2 max-w-xl text-xs text-slate-600 sm:text-sm">
-                            Everything you need to know about organization tiers, campus scaling, and subscription rules.
-                        </p>
                     </div>
 
-                    <div className="mt-10 space-y-3">
+                    <div className="space-y-4">
                         {faqs.map((faq, idx) => {
                             const isOpen = activeFaq === idx;
                             return (
                                 <div
                                     key={idx}
-                                    className="rounded-2xl border border-slate-200 bg-white transition-all shadow-2xs"
+                                    className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 transition-all"
                                 >
                                     <button
                                         type="button"
                                         onClick={() => setActiveFaq(isOpen ? null : idx)}
-                                        className="flex w-full items-center justify-between p-5 text-left text-sm font-bold text-slate-900 focus-visible:outline-none"
+                                        className="flex w-full cursor-pointer items-center justify-between p-6 text-left transition hover:bg-slate-900"
                                     >
-                                        <span>{faq.q}</span>
+                                        <span className="text-base font-bold text-white pr-4">
+                                            {faq.q}
+                                        </span>
                                         <ChevronDown
-                                            className={`size-4 text-slate-400 transition-transform duration-200 ${
-                                                isOpen ? 'rotate-180 text-[#1769E0]' : ''
+                                            className={`size-5 shrink-0 text-slate-400 transition-transform duration-200 ${
+                                                isOpen ? 'rotate-180 text-blue-400' : ''
                                             }`}
                                         />
                                     </button>
                                     {isOpen && (
-                                        <div className="border-t border-slate-100 px-5 pt-3 pb-5 text-xs leading-relaxed text-slate-600">
+                                        <div className="border-t border-slate-800/80 p-6 pt-4 text-sm leading-relaxed text-slate-300">
                                             {faq.a}
                                         </div>
                                     )}
@@ -606,46 +748,31 @@ export default function PricingPage() {
                             );
                         })}
                     </div>
-                    </div>
                 </div>
             </section>
 
-            {/* FINAL CTA BANNER */}
-            <section className="bg-[#1769E0] py-16 sm:py-20 text-white">
-                <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
-                    <div className="mx-auto max-w-4xl">
-                    <span className="rounded-full bg-white/20 px-3.5 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
-                        Tailored Institutional Deployments
-                    </span>
-                    <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-                        Ready to Empower Your Campus or Multi-School Network?
+            {/* CTA SECTION */}
+            <section className="bg-gradient-to-b from-slate-900 to-[#070b14] py-20 border-t border-slate-800 text-center">
+                <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
+                    <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                        Ready to Transform Your Educational System?
                     </h2>
-                    <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-blue-100 sm:text-sm">
-                        Get started in minutes with our free school registration or contact our education specialists to configure multi-organization enterprise plans.
+                    <p className="mx-auto mt-4 max-w-2xl text-base text-slate-300 sm:text-lg">
+                        Start your 30-day free trial today or consult our enterprise team for customized campus network rollouts.
                     </p>
-
-                    <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                        <Button
-                            asChild
-                            size="lg"
-                            className="h-12 w-full cursor-pointer bg-[#FF7A30] px-8 font-bold text-white shadow-lg shadow-black/20 hover:bg-[#E5661E] sm:w-auto"
-                        >
-                            <Link href={register()}>
-                                Create Your First School Free
-                                <ArrowRight className="ml-2 size-4" />
-                            </Link>
-                        </Button>
-                        <Button
-                            asChild
-                            variant="outline"
-                            size="lg"
-                            className="h-12 w-full border-white/40 bg-white/10 px-6 font-semibold text-white hover:bg-white/20 sm:w-auto"
-                        >
-                            <Link href="/contact">
-                                Schedule Custom Pricing Call
-                            </Link>
-                        </Button>
-                    </div>
+                    <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                        <Link href="/register?journey=school&plan=growth">
+                            <Button className="bg-blue-600 px-8 py-6 text-base font-bold text-white hover:bg-blue-500 shadow-xl shadow-blue-600/30 cursor-pointer">
+                                <span>Get Started with 30-Day Free Trial</span>
+                                <ArrowRight className="ml-2 size-5" />
+                            </Button>
+                        </Link>
+                        <Link href="/contact?subject=Sales+Inquiry">
+                            <Button variant="outline" className="border-slate-700 bg-slate-800/60 px-8 py-6 text-base font-bold text-white hover:bg-slate-800 cursor-pointer">
+                                <PhoneCall className="mr-2 size-5" />
+                                <span>Talk to an Expert</span>
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -653,4 +780,5 @@ export default function PricingPage() {
     );
 }
 
-PricingPage.layout = (page: React.ReactNode) => page;
+// React import needed for React.Fragment in JSX
+import React from 'react';

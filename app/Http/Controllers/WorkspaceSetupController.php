@@ -44,8 +44,26 @@ class WorkspaceSetupController extends Controller
             abort(403, 'Unauthorized. You have reached the maximum organization limit allowed by your subscription plan. Please upgrade your plan to create additional workspaces.');
         }
 
-        $plans = SubscriptionPlan::where('is_active', true)->get();
-        $selectedPlan = $request->query('plan', 'bronze');
+        $plans = SubscriptionPlan::where('is_active', true)
+            ->whereIn('slug', ['starter', 'growth', 'professional', 'enterprise'])
+            ->get()
+            ->map(fn (SubscriptionPlan $p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'slug' => $p->slug,
+                'description' => $p->description,
+                'price_cents' => $p->price_cents,
+                'price_annual_cents' => $p->price_annual_cents,
+                'price_monthly_formatted' => $p->formattedPrice('monthly'),
+                'price_annual_formatted' => $p->formattedPrice('annual'),
+                'currency' => $p->currency,
+                'max_organizations' => $p->max_organizations,
+                'organization_limit' => $p->organizationLimit(),
+                'features' => $p->features ?: [],
+                'is_popular' => $p->slug === 'growth',
+                'is_custom' => $p->isCustomPricing(),
+            ]);
+        $selectedPlan = $request->query('plan', 'starter');
 
         $currentYear = (int) date('Y');
         $defaultAcademicSession = [
@@ -285,8 +303,10 @@ class WorkspaceSetupController extends Controller
                 ]);
             } else {
                 // New registration trial
-                $selectedPlanSlug = $validated['plan'] ?? 'bronze';
-                $plan = SubscriptionPlan::where('slug', $selectedPlanSlug)->first()
+                $selectedPlanSlug = $validated['plan'] ?? 'starter';
+                $plan = SubscriptionPlan::findBySlug($selectedPlanSlug)
+                    ?? SubscriptionPlan::findBySlug('starter')
+                    ?? SubscriptionPlan::where('slug', 'starter')->first()
                     ?? SubscriptionPlan::where('slug', 'bronze')->first()
                     ?? SubscriptionPlan::first();
 
@@ -300,6 +320,8 @@ class WorkspaceSetupController extends Controller
                         'starts_at' => now(),
                         'trial_ends_at' => now()->addDays($trialDays),
                         'billing_type' => 'trial',
+                        'billing_interval' => 'monthly',
+                        'currency' => config('plans.currency', 'USD'),
                     ]);
                 }
             }
@@ -313,6 +335,6 @@ class WorkspaceSetupController extends Controller
         $request->session()->forget('is_learner');
 
         return redirect()->route('dashboard')
-            ->with('success', "Welcome to SkillForge LMS! {$organization->name} workspace setup is complete and your 30-day free trial is active.");
+            ->with('success', "Welcome to InstitutoPropio! {$organization->name} workspace setup is complete and your 30-day free trial is active.");
     }
 }

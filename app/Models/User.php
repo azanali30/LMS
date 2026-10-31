@@ -199,8 +199,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     }
 
     /**
-     * Get the maximum organization limit allowed by the user's active/trial subscription.
-     * Returns null if unlimited (Premium), or an integer count (Bronze: 1, Silver: 5, Gold: 10).
+     * Get the maximum organization/institution limit allowed by the user's active/trial subscription.
+     * Returns null if unlimited (Enterprise), or an integer count (Starter: 1, Growth: 5, Professional: 10).
      */
     public function maxOrganizationEntitlement(): ?int
     {

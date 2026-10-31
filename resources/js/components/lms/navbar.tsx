@@ -35,7 +35,7 @@ interface NavbarProps {
 
 export default function Navbar({ user }: NavbarProps) {
     const { name } = usePage().props;
-    const platformName = (name as string) || 'SkillForge LMS';
+    const platformName = (name as string) || 'InstitutoPropio';
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileSubmenu, setMobileSubmenu] = useState<'product' | 'solutions' | null>(null);

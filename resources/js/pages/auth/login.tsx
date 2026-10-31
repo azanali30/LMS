@@ -38,7 +38,7 @@ export default function Login({ status, canResetPassword }: Props) {
         if (typeof window !== 'undefined') {
             const host = window.location.host;
             const protocol = window.location.protocol;
-            // If running on a domain with dots (e.g. skillforge.com or lms.test)
+            // If running on a domain with dots (e.g. institutopropio.com or lms.test)
             if (host.includes('.')) {
                 window.location.href = `${protocol}//${slug}.${host}/login`;
             } else {

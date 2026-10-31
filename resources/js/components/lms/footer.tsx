@@ -5,7 +5,7 @@ import { home, login, register } from '@/routes';
 
 export default function Footer() {
     const { name } = usePage().props;
-    const platformName = (name as string) || 'SkillForge LMS';
+    const platformName = (name as string) || 'InstitutoPropio';
     const currentYear = new Date().getFullYear();
 
     return (
@@ -159,7 +159,7 @@ export default function Footer() {
                                         href="/contact"
                                         className="text-[11px] text-[#1769E0] hover:underline"
                                     >
-                                        sales@skillforgelms.com
+                                        sales@institutopropio.com
                                     </Link>
                                 </div>
                             </li>

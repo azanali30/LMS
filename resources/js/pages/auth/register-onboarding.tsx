@@ -16,11 +16,13 @@ import {
     FileText,
     Sparkles,
     Calendar,
+    Users,
     ChevronRight,
     HelpCircle,
     Lock,
     ExternalLink,
 } from 'lucide-react';
+import PublicLayout from '@/layouts/public-layout';
 
 interface Plan {
     name: string;
@@ -262,804 +264,890 @@ export default function RegisterOnboarding({
     };
 
     return (
-        <div className="relative min-h-screen bg-[#070b14] font-sans text-slate-100 selection:bg-purple-500 selection:text-white">
-            <Head title="Get Started — SaaS Onboarding & Manual Payment Approval" />
-
-            {/* Ambient Glow */}
-            <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-purple-600/15 blur-[140px]"
-            />
-
-            {/* Top Navigation Bar */}
-            <header className="border-b border-slate-800/80 bg-[#0B1220]/80 backdrop-blur-md">
-                <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
-                    <Link href="/" className="flex items-center gap-3">
-                        <div className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/30">
-                            <Building2 className="size-5" />
-                        </div>
-                        <span className="text-lg font-bold tracking-tight text-white">
-                            InstitutoPropio
-                        </span>
-                    </Link>
-
-                    <div className="flex items-center gap-4 text-xs font-semibold">
-                        <Link
-                            href="/onboarding/status"
-                            className="text-slate-400 hover:text-purple-400 transition"
-                        >
-                            Track Approval Status &rarr;
-                        </Link>
-                        <Link
-                            href="/login"
-                            className="rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-slate-200 transition hover:border-purple-500/40 hover:text-white"
-                        >
-                            Sign In
-                        </Link>
-                    </div>
-                </div>
-            </header>
-
-            <main className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-                {/* Step Indicator Header */}
-                {step < 5 && (
-                    <div className="mb-10 text-center">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-3.5 py-1 text-xs font-bold text-purple-300">
-                            <Sparkles className="size-3.5" />
-                            <span>Official 30-Day Free Trial Onboarding</span>
-                        </div>
-                        <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl">
-                            Register Your Educational Institution
-                        </h1>
-                        <p className="mt-2 text-xs text-slate-400 sm:text-sm">
-                            Step-by-step verified onboarding with manual payment approval and instant multi-campus activation.
-                        </p>
-
-                        {/* Visual Progress Breadcrumb */}
-                        <div className="mx-auto mt-8 flex max-w-xl items-center justify-between px-2">
-                            {[
-                                { num: 1, label: 'Work Email' },
-                                { num: 2, label: 'Select Plan' },
-                                { num: 3, label: 'Instructions' },
-                                { num: 4, label: 'Payment Proof' },
-                            ].map((s, idx) => (
-                                <React.Fragment key={s.num}>
-                                    <div className="flex flex-col items-center">
-                                        <div
-                                            className={`flex size-8 items-center justify-center rounded-full text-xs font-bold transition-all ${
-                                                step === s.num
-                                                    ? 'border-2 border-purple-400 bg-purple-600 text-white shadow-lg shadow-purple-600/40'
-                                                    : step > s.num
-                                                    ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                                                    : 'border border-slate-800 bg-slate-900 text-slate-500'
-                                            }`}
-                                        >
-                                            {step > s.num ? <Check className="size-4" /> : s.num}
-                                        </div>
-                                        <span
-                                            className={`mt-1.5 text-[11px] font-semibold ${
-                                                step === s.num
-                                                    ? 'text-white'
-                                                    : step > s.num
-                                                    ? 'text-emerald-400'
-                                                    : 'text-slate-500'
-                                            }`}
-                                        >
-                                            {s.label}
-                                        </span>
-                                    </div>
-                                    {idx < 3 && (
-                                        <div
-                                            className={`h-0.5 flex-1 transition-colors ${
-                                                step > s.num ? 'bg-emerald-500/40' : 'bg-slate-800'
-                                            }`}
-                                        />
-                                    )}
-                                </React.Fragment>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* STEP 1: Enter Email Only */}
-                {step === 1 && (
-                    <div className="mx-auto max-w-lg rounded-2xl border border-slate-800 bg-[#0B1220] p-6 shadow-2xl sm:p-8">
-                        <div className="mb-6 flex items-center gap-3">
-                            <div className="flex size-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
-                                <Mail className="size-5" />
+        <PublicLayout title="Get Started with InstitutoPropio — SaaS Registration & Onboarding">
+            <div className="bg-[#F8FAFC] py-10 sm:py-14 md:py-16 border-b border-slate-100">
+                <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+                    {/* Step Indicator Header */}
+                    {step < 5 && (
+                        <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-12">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/90 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
+                                <Sparkles className="size-3.5" />
+                                <span>Official 30-Day Free Trial • Instant Multi-Campus Activation</span>
                             </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-white">Step 1 — Administrative Email</h2>
-                                <p className="text-xs text-slate-400">
-                                    Only your primary email is needed to start your application.
-                                </p>
-                            </div>
-                        </div>
-
-                        {emailError && (
-                            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-300">
-                                <AlertCircle className="size-4 shrink-0 text-rose-400" />
-                                <div>
-                                    <p className="font-semibold">{emailError}</p>
-                                    {emailError.includes('already exists') && (
-                                        <Link href="/login" className="mt-1 inline-block font-bold underline hover:text-white">
-                                            Log in to your account &rarr;
-                                        </Link>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {emailNotice && (
-                            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-300">
-                                <Clock className="size-4 shrink-0 text-amber-400" />
-                                <span>{emailNotice}</span>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleCheckEmail} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-300">
-                                    Institution Owner / Work Email <span className="text-rose-400">*</span>
-                                </label>
-                                <div className="relative mt-1.5">
-                                    <Mail className="pointer-events-none absolute left-3.5 top-3.5 size-4 text-slate-500" />
-                                    <input
-                                        type="email"
-                                        required
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="director@schoolname.edu"
-                                        className="w-full rounded-xl border border-slate-700 bg-slate-900/90 py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 transition focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                                    />
-                                </div>
-                                <p className="mt-1.5 text-[11px] text-slate-500">
-                                    We do not ask for passwords or institution details at this stage. You will set them securely after your payment verification.
-                                </p>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={emailLoading}
-                                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-purple-600 py-3 text-xs font-bold text-white shadow-lg shadow-purple-600/30 transition hover:bg-purple-500 disabled:opacity-50"
-                            >
-                                {emailLoading ? (
-                                    <>
-                                        <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                        <span>Checking Availability...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>Continue to Select Plan</span>
-                                        <ArrowRight className="size-4" />
-                                    </>
-                                )}
-                            </button>
-                        </form>
-
-                        <div className="mt-6 border-t border-slate-800/80 pt-4 text-center">
-                            <p className="text-[11px] text-slate-500">
-                                Have an existing invitation?{' '}
-                                <Link href="/register?journey=join" className="font-semibold text-purple-400 hover:underline">
-                                    Join an existing school
-                                </Link>
+                            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-4xl md:text-5xl">
+                                Get Started with InstitutoPropio
+                            </h1>
+                            <p className="mt-3 text-sm text-slate-600 sm:text-base leading-relaxed">
+                                Join modern educational institutions worldwide. Complete our verified 4-step onboarding to activate your isolated school workspace with zero upfront setup fees.
                             </p>
-                        </div>
-                    </div>
-                )}
 
-                {/* STEP 2: Select Subscription Plan */}
-                {step === 2 && (
-                    <div className="space-y-8">
-                        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-800 bg-[#0B1220] p-4 sm:flex-row sm:px-6">
-                            <div className="flex items-center gap-2 text-xs text-slate-400">
-                                <span className="font-semibold text-slate-300">Applying as:</span>
-                                <span className="rounded-lg bg-slate-800 px-2.5 py-1 font-mono text-purple-300">
-                                    {email}
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(1)}
-                                    className="ml-2 text-[11px] text-purple-400 underline hover:text-purple-300"
-                                >
-                                    Change
-                                </button>
-                            </div>
-
-                            {/* Billing Interval Toggle */}
-                            <div className="flex items-center gap-2 rounded-xl border border-slate-700/80 bg-slate-900 p-1">
-                                <button
-                                    type="button"
-                                    onClick={() => setBillingInterval('monthly')}
-                                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                                        billingInterval === 'monthly'
-                                            ? 'bg-purple-600 text-white shadow-sm'
-                                            : 'text-slate-400 hover:text-white'
-                                    }`}
-                                >
-                                    Monthly Billing
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setBillingInterval('annual')}
-                                    className={`relative rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                                        billingInterval === 'annual'
-                                            ? 'bg-purple-600 text-white shadow-sm'
-                                            : 'text-slate-400 hover:text-white'
-                                    }`}
-                                >
-                                    <span>Yearly Billing</span>
-                                    <span className="ml-1.5 rounded-full bg-amber-500/20 px-1.5 py-0.2 text-[9px] font-bold text-amber-300">
-                                        Pending
-                                    </span>
-                                </button>
+                            {/* Clean Horizontal Progress Stepper */}
+                            <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
+                                <div className="flex items-center justify-between">
+                                    {[
+                                        { num: 1, label: 'Work Email' },
+                                        { num: 2, label: 'Select Plan' },
+                                        { num: 3, label: 'Payment Details' },
+                                        { num: 4, label: 'Upload Proof' },
+                                    ].map((s, idx) => (
+                                        <React.Fragment key={s.num}>
+                                            <div className="flex flex-col items-center flex-1">
+                                                <div
+                                                    className={`flex size-8 sm:size-9 items-center justify-center rounded-full text-xs font-extrabold transition-all ${
+                                                        step === s.num
+                                                            ? 'border-2 border-[#1769E0] bg-[#1769E0] text-white shadow-md shadow-blue-600/25'
+                                                            : step > s.num
+                                                            ? 'border border-emerald-500 bg-emerald-50 text-emerald-600'
+                                                            : 'border border-slate-200 bg-slate-100 text-slate-400'
+                                                    }`}
+                                                >
+                                                    {step > s.num ? <Check className="size-4 stroke-[3]" /> : s.num}
+                                                </div>
+                                                <span
+                                                    className={`mt-1.5 text-[11px] sm:text-xs font-bold ${
+                                                        step === s.num
+                                                            ? 'text-[#1769E0]'
+                                                            : step > s.num
+                                                            ? 'text-emerald-700'
+                                                            : 'text-slate-400'
+                                                    }`}
+                                                >
+                                                    {s.label}
+                                                </span>
+                                            </div>
+                                            {idx < 3 && (
+                                                <div
+                                                    className={`h-0.5 w-6 sm:w-12 md:w-16 -mt-5 transition-colors ${
+                                                        step > s.num ? 'bg-emerald-500' : 'bg-slate-200'
+                                                    }`}
+                                                />
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
                             </div>
                         </div>
+                    )}
 
-                        {billingInterval === 'annual' && !yearlyPricingAvailable && (
-                            <div className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-300">
-                                <AlertCircle className="size-4 shrink-0 text-amber-400" />
-                                <span>
-                                    <strong>Notice:</strong> Yearly pricing packages are currently being finalized. Please continue with Monthly billing to start your 30-day trial immediately, or contact sales for custom terms.
-                                </span>
-                            </div>
-                        )}
+                    {/* STEP 1: Enter Email Only (Two-Column Spacious SaaS Card) */}
+                    {step === 1 && (
+                        <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+                            <div className="grid grid-cols-1 lg:grid-cols-12">
+                                {/* Left Column: Email Form */}
+                                <div className="p-6 sm:p-10 lg:col-span-7 flex flex-col justify-between">
+                                    <div>
+                                        <div className="mb-6 flex items-center gap-3">
+                                            <div className="flex size-11 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                                                <Mail className="size-5.5" />
+                                            </div>
+                                            <div>
+                                                <h2 className="text-xl font-bold text-[#0B1528]">Step 1 — Administrative Email</h2>
+                                                <p className="text-xs text-slate-500 mt-0.5">
+                                                    Only your primary work email is needed to start your application.
+                                                </p>
+                                            </div>
+                                        </div>
 
-                        {/* Plan Cards */}
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                            {plans.map((p) => {
-                                const isSelected = selectedPlanSlug === p.slug;
-                                const isPopular = p.is_popular;
-                                return (
-                                    <div
-                                        key={p.slug}
-                                        onClick={() => setSelectedPlanSlug(p.slug)}
-                                        className={`relative flex cursor-pointer flex-col justify-between rounded-2xl border p-6 transition-all ${
-                                            isSelected
-                                                ? 'border-purple-500 bg-gradient-to-b from-purple-950/30 to-[#0B1220] shadow-xl shadow-purple-950/40 ring-2 ring-purple-500/50'
-                                                : 'border-slate-800 bg-[#0B1220] hover:border-slate-700 hover:bg-slate-900/60'
-                                        }`}
-                                    >
-                                        {isPopular && (
-                                            <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border border-purple-500/30 bg-purple-600 px-3 py-0.5 text-[10px] font-bold text-white shadow-md">
-                                                Most Popular
+                                        {emailError && (
+                                            <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/80 p-4 text-xs text-rose-800">
+                                                <AlertCircle className="size-4.5 shrink-0 text-rose-600 mt-0.5" />
+                                                <div>
+                                                    <p className="font-semibold">{emailError}</p>
+                                                    {emailError.includes('already exists') && (
+                                                        <Link href="/login" className="mt-1.5 inline-block font-bold text-[#1769E0] underline hover:text-[#1256B8]">
+                                                            Log in to your account &rarr;
+                                                        </Link>
+                                                    )}
+                                                </div>
                                             </div>
                                         )}
 
-                                        <div>
-                                            <div className="flex items-center justify-between">
-                                                <h3 className="text-base font-bold text-white">{p.name}</h3>
-                                                <div
-                                                    className={`flex size-5 items-center justify-center rounded-full border ${
-                                                        isSelected
-                                                            ? 'border-purple-500 bg-purple-600 text-white'
-                                                            : 'border-slate-700 bg-slate-900'
-                                                    }`}
-                                                >
-                                                    {isSelected && <Check className="size-3" />}
+                                        {emailNotice && (
+                                            <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/80 p-4 text-xs text-amber-800">
+                                                <Clock className="size-4.5 shrink-0 text-amber-600 mt-0.5" />
+                                                <span>{emailNotice}</span>
+                                            </div>
+                                        )}
+
+                                        <form onSubmit={handleCheckEmail} className="space-y-5">
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-700">
+                                                    Institution Owner / Work Email <span className="text-rose-500">*</span>
+                                                </label>
+                                                <div className="relative mt-2">
+                                                    <Mail className="pointer-events-none absolute left-3.5 top-3.5 size-4 text-slate-400" />
+                                                    <input
+                                                        type="email"
+                                                        required
+                                                        autoFocus
+                                                        value={email}
+                                                        onChange={(e) => setEmail(e.target.value)}
+                                                        placeholder="director@schoolname.edu"
+                                                        className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                                    />
                                                 </div>
+                                                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                                                    We do not ask for passwords or institution details at this stage. You will set them securely after your payment verification.
+                                                </p>
                                             </div>
 
-                                            <p className="mt-1 text-[11px] text-slate-400">{p.headline}</p>
-
-                                            <div className="my-4">
-                                                <div className="flex items-baseline gap-1">
-                                                    <span className="text-3xl font-extrabold text-white">
-                                                        ${p.monthly_cents / 100}
-                                                    </span>
-                                                    <span className="text-xs text-slate-400">/ month</span>
-                                                </div>
-                                                <span className="mt-1 inline-block rounded-md border border-purple-500/20 bg-purple-500/10 px-2 py-0.5 text-[10px] font-semibold text-purple-300">
-                                                    {p.max_organizations} {p.max_organizations === 1 ? 'Campus Workspace' : 'Campuses Included'}
-                                                </span>
-                                            </div>
-
-                                            <div className="space-y-2 border-t border-slate-800/80 pt-4">
-                                                <div className="text-[11px] font-bold text-slate-300">Included Features:</div>
-                                                {p.features.map((feat, i) => (
-                                                    <div key={i} className="flex items-start gap-2 text-xs text-slate-400">
-                                                        <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-purple-400" />
-                                                        <span>{feat}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            onClick={() => setSelectedPlanSlug(p.slug)}
-                                            className={`mt-6 w-full rounded-xl py-2 text-xs font-bold transition ${
-                                                isSelected
-                                                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                                                    : 'border border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-800'
-                                            }`}
-                                        >
-                                            {isSelected ? 'Plan Selected' : 'Choose Plan'}
-                                        </button>
+                                            <button
+                                                type="submit"
+                                                disabled={emailLoading}
+                                                className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#FF7A30] font-bold text-sm text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E] disabled:opacity-50"
+                                            >
+                                                {emailLoading ? (
+                                                    <>
+                                                        <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                        <span>Checking Email Availability...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <span>Continue to Select Plan</span>
+                                                        <ArrowRight className="size-4" />
+                                                    </>
+                                                )}
+                                            </button>
+                                        </form>
                                     </div>
-                                );
-                            })}
-                        </div>
 
-                        {/* Free Trial Banner */}
-                        <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-950/20 p-5 sm:flex-row">
-                            <div className="flex items-center gap-3">
-                                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300">
-                                    <Clock className="size-5" />
+                                    <div className="mt-8 border-t border-slate-100 pt-5 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+                                        <span>
+                                            Already registered?{' '}
+                                            <Link href="/login" className="font-bold text-[#1769E0] hover:underline">
+                                                Sign In
+                                            </Link>
+                                        </span>
+                                        <span>
+                                            Joining with invite?{' '}
+                                            <Link href="/register?journey=join" className="font-bold text-[#1769E0] hover:underline">
+                                                Join existing campus
+                                            </Link>
+                                        </span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 className="text-xs font-bold text-white sm:text-sm">
-                                        30-Day Free Trial Terms & Policy
-                                    </h4>
-                                    <p className="text-[11px] text-slate-400">
-                                        Your 30 days begin immediately once your manual payment proof is verified by our finance team. Unlimited students and teachers across all tiers.
-                                    </p>
+
+                                {/* Right Column: Benefits & Trust Panel */}
+                                <div className="border-t border-slate-200 bg-[#F7F9FC] p-6 sm:p-10 lg:col-span-5 lg:border-t-0 lg:border-l flex flex-col justify-between">
+                                    <div>
+                                        <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                                            Why InstitutoPropio?
+                                        </span>
+                                        <h3 className="mt-2 text-lg font-extrabold tracking-tight text-[#0B1528]">
+                                            The Modern Operating System for Educational Campuses
+                                        </h3>
+                                        <p className="mt-2 text-xs text-slate-600 leading-relaxed">
+                                            Say goodbye to fragmented paper registers and disconnected software. Run admissions, attendance, timetables, and billing on one platform.
+                                        </p>
+
+                                        <div className="mt-6 space-y-4">
+                                            {[
+                                                {
+                                                    icon: ShieldCheck,
+                                                    title: 'Cryptographic Tenant Isolation',
+                                                    desc: 'Every institution operates in its own dedicated database scope with zero data bleeding.',
+                                                },
+                                                {
+                                                    icon: Users,
+                                                    title: 'Unlimited Students & Teachers',
+                                                    desc: 'Every plan includes unlimited student and teacher accounts without per-seat penalty fees.',
+                                                },
+                                                {
+                                                    icon: Clock,
+                                                    title: '30-Day Free Trial',
+                                                    desc: 'Full operational access to academic terms, fee vouchers, and gradebooks from day one.',
+                                                },
+                                            ].map((b, i) => {
+                                                const Icon = b.icon;
+                                                return (
+                                                    <div key={i} className="flex items-start gap-3">
+                                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-100/70 text-[#1769E0]">
+                                                            <Icon className="size-4" />
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs font-bold text-slate-900">{b.title}</div>
+                                                            <div className="text-[11px] text-slate-500 leading-relaxed">{b.desc}</div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8 rounded-xl border border-blue-200 bg-blue-50/60 p-4">
+                                        <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
+                                            <span>Already submitted payment?</span>
+                                            <Link href="/onboarding/status" className="font-bold text-[#1769E0] hover:underline">
+                                                Track Status &rarr;
+                                            </Link>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(1)}
-                                    className="cursor-pointer rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700"
-                                >
-                                    Back
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(3)}
-                                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-purple-600/30 transition hover:bg-purple-500"
-                                >
-                                    <span>Continue to Payment Instructions</span>
-                                    <ArrowRight className="size-4" />
-                                </button>
-                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* STEP 3: Manual Payment Instructions */}
-                {step === 3 && (
-                    <div className="space-y-8">
-                        {/* Summary Pill */}
-                        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-purple-500/30 bg-gradient-to-r from-purple-950/40 via-slate-900 to-indigo-950/40 p-5 shadow-xl">
-                            <div>
-                                <span className="text-[10px] font-bold tracking-wider text-purple-400 uppercase">
-                                    Selected Subscription Order
-                                </span>
-                                <h2 className="text-lg font-bold text-white">
-                                    {selectedPlan.name} Plan — ${selectedPlan.monthly_cents / 100}.00 {currency}
-                                </h2>
-                                <p className="text-xs text-slate-400">
-                                    Order registered for: <strong className="text-white">{email}</strong>
-                                </p>
+                    {/* STEP 2: Select Subscription Plan */}
+                    {step === 2 && (
+                        <div className="space-y-8 max-w-5xl mx-auto">
+                            {/* Top Summary & Toggle Bar */}
+                            <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:px-6 shadow-xs">
+                                <div className="flex items-center gap-2 text-xs text-slate-600">
+                                    <span className="font-medium">Applying as:</span>
+                                    <span className="rounded-lg bg-blue-50 px-2.5 py-1 font-mono font-bold text-[#1769E0]">
+                                        {email}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setStep(1)}
+                                        className="ml-2 text-xs font-semibold text-[#1769E0] underline hover:text-[#1256B8]"
+                                    >
+                                        Change
+                                    </button>
+                                </div>
+
+                                {/* Billing Interval Toggle */}
+                                <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => setBillingInterval('monthly')}
+                                        className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${
+                                            billingInterval === 'monthly'
+                                                ? 'bg-[#1769E0] text-white shadow-xs'
+                                                : 'text-slate-600 hover:text-slate-900'
+                                        }`}
+                                    >
+                                        Monthly Billing
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setBillingInterval('annual')}
+                                        className={`relative rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${
+                                            billingInterval === 'annual'
+                                                ? 'bg-[#1769E0] text-white shadow-xs'
+                                                : 'text-slate-600 hover:text-slate-900'
+                                        }`}
+                                    >
+                                        <span>Annual Billing</span>
+                                        <span className="ml-1.5 rounded-full bg-emerald-100 border border-emerald-200 px-1.5 py-0.2 text-[9px] font-extrabold text-emerald-800">
+                                            2 Mos Free
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400">
-                                    Includes 30-Day Free Trial
-                                </span>
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(2)}
-                                    className="text-xs text-purple-400 underline hover:text-purple-300"
-                                >
-                                    Change Plan
-                                </button>
-                            </div>
-                        </div>
 
-                        {/* Payment Method Selector */}
-                        <div className="rounded-2xl border border-slate-800 bg-[#0B1220] p-6 shadow-xl">
-                            <h3 className="text-sm font-bold text-white">
-                                Step 3 — Select Your Preferred Payment Channel
-                            </h3>
-                            <p className="mt-1 text-xs text-slate-400">
-                                All payment accounts below are verified corporate channels of InstitutoPropio. Select your method to view coordinates.
-                            </p>
+                            {billingInterval === 'annual' && !yearlyPricingAvailable && (
+                                <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
+                                    <AlertCircle className="size-4 shrink-0 text-amber-600" />
+                                    <span>
+                                        <strong>Notice:</strong> Yearly billing packages are currently being finalized. Please continue with Monthly billing to start your 30-day trial immediately, or contact sales for custom terms.
+                                    </span>
+                                </div>
+                            )}
 
-                            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
-                                {paymentMethods.map((m) => {
-                                    const active = selectedMethodId === m.id;
+                            {/* Plan Cards Grid */}
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                                {plans.map((p) => {
+                                    const isSelected = selectedPlanSlug === p.slug;
+                                    const isPopular = p.is_popular;
                                     return (
-                                        <button
-                                            key={m.id}
-                                            type="button"
-                                            onClick={() => setSelectedMethodId(m.id)}
-                                            className={`flex cursor-pointer flex-col items-start rounded-xl border p-3.5 text-left transition ${
-                                                active
-                                                    ? 'border-purple-500 bg-purple-500/15 shadow-md shadow-purple-950'
-                                                    : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
+                                        <div
+                                            key={p.slug}
+                                            onClick={() => setSelectedPlanSlug(p.slug)}
+                                            className={`relative flex cursor-pointer flex-col justify-between rounded-3xl border p-7 transition-all duration-200 ${
+                                                isSelected
+                                                    ? 'border-[#1769E0] ring-2 ring-[#1769E0]/20 bg-white shadow-lg'
+                                                    : 'border-slate-200 bg-[#F7F9FC] hover:border-slate-300 hover:bg-white hover:shadow-md'
                                             }`}
                                         >
-                                            <div className="flex w-full items-center justify-between">
-                                                <CreditCard className={`size-4 ${active ? 'text-purple-400' : 'text-slate-400'}`} />
-                                                {active && <Check className="size-3.5 text-purple-400" />}
-                                            </div>
-                                            <span className="mt-2 text-xs font-bold text-white">{m.name}</span>
-                                            {m.badge && (
-                                                <span className="mt-1 text-[10px] text-purple-400">{m.badge}</span>
+                                            {isPopular && (
+                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#FF7A30] px-3.5 py-0.5 text-[10px] font-extrabold text-white shadow-md shadow-orange-500/20">
+                                                    Most Popular Choice
+                                                </div>
                                             )}
-                                        </button>
+
+                                            <div>
+                                                <div className="flex items-center justify-between">
+                                                    <h3 className="text-xl font-black text-[#0B1528]">{p.name}</h3>
+                                                    <div
+                                                        className={`flex size-5 items-center justify-center rounded-full border ${
+                                                            isSelected
+                                                                ? 'border-[#1769E0] bg-[#1769E0] text-white'
+                                                                : 'border-slate-300 bg-white'
+                                                        }`}
+                                                    >
+                                                        {isSelected && <Check className="size-3 stroke-[3]" />}
+                                                    </div>
+                                                </div>
+
+                                                <p className="mt-1 text-xs text-slate-500">{p.headline}</p>
+
+                                                <div className="my-5 border-y border-slate-100 py-4">
+                                                    <div className="flex items-baseline gap-1">
+                                                        <span className="text-3xl font-extrabold text-[#0B1528]">
+                                                            ${p.monthly_cents / 100}
+                                                        </span>
+                                                        <span className="text-xs text-slate-500 font-medium">/ month</span>
+                                                    </div>
+                                                    <span className="mt-2 inline-block rounded-md border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-[#1769E0]">
+                                                        {p.max_organizations} {p.max_organizations === 1 ? 'Campus Workspace' : 'Campuses Included'}
+                                                    </span>
+                                                </div>
+
+                                                <div className="space-y-2.5">
+                                                    <div className="text-xs font-bold text-slate-800">Included Features:</div>
+                                                    {p.features.map((feat, i) => (
+                                                        <div key={i} className="flex items-start gap-2 text-xs text-slate-600">
+                                                            <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-[#1769E0]" />
+                                                            <span>{feat}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                type="button"
+                                                onClick={() => setSelectedPlanSlug(p.slug)}
+                                                className={`mt-6 w-full rounded-xl py-2.5 text-xs font-bold transition ${
+                                                    isSelected
+                                                        ? 'bg-[#1769E0] text-white shadow-md shadow-blue-500/20'
+                                                        : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-[#1769E0]'
+                                                }`}
+                                            >
+                                                {isSelected ? 'Plan Selected' : 'Choose Plan'}
+                                            </button>
+                                        </div>
                                     );
                                 })}
                             </div>
 
-                            {/* Method Coordinate Display Card */}
-                            <div className="mt-6 rounded-xl border border-slate-700/80 bg-slate-900/80 p-5">
-                                <div className="mb-4 flex items-center justify-between border-b border-slate-800 pb-3">
-                                    <div className="flex items-center gap-2">
-                                        <Building2 className="size-4 text-purple-400" />
-                                        <span className="text-xs font-bold text-white">
-                                            {selectedMethod.name} Coordinates
-                                        </span>
+                            {/* Free Trial Banner & Actions */}
+                            <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-5 sm:flex-row shadow-xs">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+                                        <Clock className="size-5" />
                                     </div>
-                                    <span className="text-[11px] font-semibold text-emerald-400">
-                                        Amount Payable: ${selectedPlan.monthly_cents / 100}.00 {currency}
+                                    <div>
+                                        <h4 className="text-xs font-bold text-emerald-950 sm:text-sm">
+                                            30-Day Free Trial Terms & Policy
+                                        </h4>
+                                        <p className="text-xs text-emerald-800">
+                                            Your 30-day trial begins immediately once payment proof is approved. Unlimited students and teachers across all tiers.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => setStep(1)}
+                                        className="cursor-pointer rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                                    >
+                                        Back
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setStep(3)}
+                                        className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#FF7A30] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                    >
+                                        <span>Continue to Payment Instructions</span>
+                                        <ArrowRight className="size-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* STEP 3: Manual Payment Instructions */}
+                    {step === 3 && (
+                        <div className="space-y-8 max-w-5xl mx-auto">
+                            {/* Selected Order Summary Pill */}
+                            <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-blue-200 bg-blue-50/80 p-5 shadow-xs">
+                                <div>
+                                    <span className="text-[10px] font-bold tracking-wider text-[#1769E0] uppercase">
+                                        Selected Subscription Order
                                     </span>
+                                    <h2 className="text-lg font-bold text-[#0B1528]">
+                                        {selectedPlan.name} Plan — ${selectedPlan.monthly_cents / 100}.00 {currency}
+                                    </h2>
+                                    <p className="text-xs text-slate-600 mt-0.5">
+                                        Order registered for: <strong className="text-slate-900">{email}</strong>
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <span className="rounded-xl border border-emerald-200 bg-emerald-100/80 px-3 py-1.5 text-xs font-bold text-emerald-800">
+                                        Includes 30-Day Free Trial
+                                    </span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setStep(2)}
+                                        className="text-xs font-semibold text-[#1769E0] underline hover:text-[#1256B8]"
+                                    >
+                                        Change Plan
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Payment Method Selector & Coordinates Card */}
+                            <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-xs">
+                                <h3 className="text-base font-bold text-[#0B1528]">
+                                    Step 3 — Select Your Preferred Payment Channel
+                                </h3>
+                                <p className="mt-1 text-xs text-slate-500">
+                                    All payment channels below are official, verified corporate accounts of InstitutoPropio. Select your method to view coordinates.
+                                </p>
+
+                                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+                                    {paymentMethods.map((m) => {
+                                        const active = selectedMethodId === m.id;
+                                        return (
+                                            <button
+                                                key={m.id}
+                                                type="button"
+                                                onClick={() => setSelectedMethodId(m.id)}
+                                                className={`flex cursor-pointer flex-col items-start rounded-2xl border p-4 text-left transition-all ${
+                                                    active
+                                                        ? 'border-[#1769E0] bg-blue-50/80 ring-2 ring-[#1769E0]/20 shadow-xs'
+                                                        : 'border-slate-200 bg-[#F7F9FC] hover:border-slate-300 hover:bg-white'
+                                                }`}
+                                            >
+                                                <div className="flex w-full items-center justify-between">
+                                                    <CreditCard className={`size-4.5 ${active ? 'text-[#1769E0]' : 'text-slate-400'}`} />
+                                                    {active && <Check className="size-4 text-[#1769E0] stroke-[3]" />}
+                                                </div>
+                                                <span className={`mt-2.5 text-xs font-bold ${active ? 'text-[#1769E0]' : 'text-slate-900'}`}>{m.name}</span>
+                                                {m.badge && (
+                                                    <span className="mt-1 rounded-md bg-blue-100/70 px-1.5 py-0.5 text-[10px] font-bold text-[#1769E0]">{m.badge}</span>
+                                                )}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
 
-                                {selectedMethod.id === 'bank_transfer' && (
-                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                        <div className="rounded-lg bg-[#0B1220] p-3">
-                                            <span className="text-[10px] text-slate-500 uppercase">Bank Name</span>
-                                            <div className="text-xs font-semibold text-white">{selectedMethod.bank_name}</div>
+                                {/* Method Coordinates Display Box */}
+                                <div className="mt-8 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6 sm:p-8">
+                                    <div className="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-4">
+                                        <div className="flex items-center gap-2">
+                                            <Building2 className="size-5 text-[#1769E0]" />
+                                            <span className="text-sm font-bold text-[#0B1528]">
+                                                {selectedMethod.name} Coordinates
+                                            </span>
                                         </div>
-                                        <div className="rounded-lg bg-[#0B1220] p-3">
-                                            <span className="text-[10px] text-slate-500 uppercase">Account Title</span>
-                                            <div className="text-xs font-semibold text-white">{selectedMethod.account_title}</div>
-                                        </div>
-                                        <div className="flex items-center justify-between rounded-lg bg-[#0B1220] p-3">
-                                            <div>
-                                                <span className="text-[10px] text-slate-500 uppercase">Account Number</span>
-                                                <div className="font-mono text-xs font-semibold text-white">{selectedMethod.account_number}</div>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => copyToClipboard(selectedMethod.account_number || '', 'acc')}
-                                                className="cursor-pointer rounded p-1 text-slate-400 hover:text-white"
-                                                title="Copy account number"
-                                            >
-                                                {copiedField === 'acc' ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
-                                            </button>
-                                        </div>
-                                        <div className="flex items-center justify-between rounded-lg bg-[#0B1220] p-3">
-                                            <div>
-                                                <span className="text-[10px] text-slate-500 uppercase">IBAN</span>
-                                                <div className="font-mono text-xs font-semibold text-white">{selectedMethod.iban}</div>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => copyToClipboard(selectedMethod.iban || '', 'iban')}
-                                                className="cursor-pointer rounded p-1 text-slate-400 hover:text-white"
-                                                title="Copy IBAN"
-                                            >
-                                                {copiedField === 'iban' ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
-                                            </button>
-                                        </div>
-                                        {selectedMethod.swift && (
-                                            <div className="rounded-lg bg-[#0B1220] p-3">
-                                                <span className="text-[10px] text-slate-500 uppercase">SWIFT / BIC Code</span>
-                                                <div className="font-mono text-xs font-semibold text-white">{selectedMethod.swift}</div>
-                                            </div>
-                                        )}
-                                        {selectedMethod.branch && (
-                                            <div className="rounded-lg bg-[#0B1220] p-3">
-                                                <span className="text-[10px] text-slate-500 uppercase">Branch</span>
-                                                <div className="text-xs font-semibold text-white">{selectedMethod.branch}</div>
-                                            </div>
-                                        )}
+                                        <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1">
+                                            Amount Payable: ${selectedPlan.monthly_cents / 100}.00 {currency}
+                                        </span>
                                     </div>
-                                )}
 
-                                {(selectedMethod.id === 'jazzcash' || selectedMethod.id === 'easypaisa') && (
-                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                        <div className="rounded-lg bg-[#0B1220] p-3">
-                                            <span className="text-[10px] text-slate-500 uppercase">Account Title</span>
-                                            <div className="text-xs font-semibold text-white">{selectedMethod.account_title}</div>
-                                        </div>
-                                        <div className="flex items-center justify-between rounded-lg bg-[#0B1220] p-3">
-                                            <div>
-                                                <span className="text-[10px] text-slate-500 uppercase">Mobile Account Number</span>
-                                                <div className="font-mono text-xs font-semibold text-white">{selectedMethod.account_number}</div>
+                                    {selectedMethod.id === 'bank_transfer' && (
+                                        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+                                            <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bank Name</span>
+                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.bank_name}</div>
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => copyToClipboard(selectedMethod.account_number || '', 'mobile')}
-                                                className="cursor-pointer rounded p-1 text-slate-400 hover:text-white"
-                                                title="Copy number"
-                                            >
-                                                {copiedField === 'mobile' ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
-                                            </button>
-                                        </div>
-                                        {selectedMethod.till_id && (
-                                            <div className="flex items-center justify-between rounded-lg bg-[#0B1220] p-3">
+                                            <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Title</span>
+                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.account_title}</div>
+                                            </div>
+                                            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
                                                 <div>
-                                                    <span className="text-[10px] text-slate-500 uppercase">Till ID</span>
-                                                    <div className="font-mono text-xs font-semibold text-white">{selectedMethod.till_id}</div>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Number</span>
+                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.account_number}</div>
                                                 </div>
                                                 <button
                                                     type="button"
-                                                    onClick={() => copyToClipboard(selectedMethod.till_id || '', 'till')}
-                                                    className="cursor-pointer rounded p-1 text-slate-400 hover:text-white"
-                                                    title="Copy Till ID"
+                                                    onClick={() => copyToClipboard(selectedMethod.account_number || '', 'acc')}
+                                                    className="cursor-pointer rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition"
+                                                    title="Copy account number"
                                                 >
-                                                    {copiedField === 'till' ? <Check className="size-3.5 text-emerald-400" /> : <Copy className="size-3.5" />}
+                                                    {copiedField === 'acc' ? <Check className="size-4 text-emerald-600 stroke-[3]" /> : <Copy className="size-4" />}
                                                 </button>
                                             </div>
-                                        )}
+                                            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
+                                                <div>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">IBAN</span>
+                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.iban}</div>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => copyToClipboard(selectedMethod.iban || '', 'iban')}
+                                                    className="cursor-pointer rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition"
+                                                    title="Copy IBAN"
+                                                >
+                                                    {copiedField === 'iban' ? <Check className="size-4 text-emerald-600 stroke-[3]" /> : <Copy className="size-4" />}
+                                                </button>
+                                            </div>
+                                            {selectedMethod.swift && (
+                                                <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">SWIFT / BIC Code</span>
+                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.swift}</div>
+                                                </div>
+                                            )}
+                                            {selectedMethod.branch && (
+                                                <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Branch</span>
+                                                    <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.branch}</div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {(selectedMethod.id === 'jazzcash' || selectedMethod.id === 'easypaisa') && (
+                                        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+                                            <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Title</span>
+                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.account_title}</div>
+                                            </div>
+                                            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
+                                                <div>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mobile Account Number</span>
+                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.account_number}</div>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => copyToClipboard(selectedMethod.account_number || '', 'mobile')}
+                                                    className="cursor-pointer rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition"
+                                                    title="Copy mobile number"
+                                                >
+                                                    {copiedField === 'mobile' ? <Check className="size-4 text-emerald-600 stroke-[3]" /> : <Copy className="size-4" />}
+                                                </button>
+                                            </div>
+                                            {selectedMethod.till_id && (
+                                                <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
+                                                    <div>
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Till ID</span>
+                                                        <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.till_id}</div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => copyToClipboard(selectedMethod.till_id || '', 'till')}
+                                                        className="cursor-pointer rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition"
+                                                        title="Copy Till ID"
+                                                    >
+                                                        {copiedField === 'till' ? <Check className="size-4 text-emerald-600 stroke-[3]" /> : <Copy className="size-4" />}
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {selectedMethod.id === 'other' && (
+                                        <div className="rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-700 leading-relaxed">
+                                            <p>{selectedMethod.instructions}</p>
+                                        </div>
+                                    )}
+
+                                    <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-slate-700">
+                                        <div className="font-bold text-[#1769E0]">Important Payment Instructions:</div>
+                                        <p className="mt-1 text-slate-600 leading-relaxed">{selectedMethod.instructions}</p>
                                     </div>
-                                )}
-
-                                {selectedMethod.id === 'other' && (
-                                    <div className="rounded-lg bg-[#0B1220] p-4 text-xs text-slate-300">
-                                        <p>{selectedMethod.instructions}</p>
-                                    </div>
-                                )}
-
-                                <div className="mt-4 rounded-lg border border-purple-500/20 bg-purple-500/5 p-3 text-xs text-slate-300">
-                                    <div className="font-semibold text-purple-300">Important Instructions:</div>
-                                    <p className="mt-1 text-[11px] text-slate-400">{selectedMethod.instructions}</p>
                                 </div>
-                            </div>
 
-                            <div className="mt-6 flex items-center justify-between">
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(2)}
-                                    className="cursor-pointer rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700"
-                                >
-                                    Back
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(4)}
-                                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-purple-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-purple-600/30 transition hover:bg-purple-500"
-                                >
-                                    <span>I Have Completed Payment &rarr; Upload Proof</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* STEP 4: Submit Payment Proof */}
-                {step === 4 && (
-                    <div className="mx-auto max-w-2xl rounded-2xl border border-slate-800 bg-[#0B1220] p-6 shadow-2xl sm:p-8">
-                        <div className="mb-6 flex items-center gap-3">
-                            <div className="flex size-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
-                                <Upload className="size-5" />
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-white">Step 4 — Upload Payment Receipt & Proof</h2>
-                                <p className="text-xs text-slate-400">
-                                    Attach transaction details so our finance team can verify and approve your registration.
-                                </p>
-                            </div>
-                        </div>
-
-                        {submitError && (
-                            <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-300">
-                                <AlertCircle className="size-4 shrink-0 text-rose-400" />
-                                <span>{submitError}</span>
-                            </div>
-                        )}
-
-                        <form onSubmit={handleSubmitProof} className="space-y-5">
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-300">
-                                        Selected Plan & Amount
-                                    </label>
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        disabled
-                                        value={`${selectedPlan.name} Plan ($${selectedPlan.monthly_cents / 100}.00 ${currency})`}
-                                        className="mt-1.5 w-full rounded-xl border border-slate-800 bg-slate-900/50 px-3.5 py-2.5 text-xs font-semibold text-purple-300"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-300">
-                                        Payment Method
-                                    </label>
-                                    <select
-                                        value={selectedMethodId}
-                                        onChange={(e) => setSelectedMethodId(e.target.value)}
-                                        className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs text-white transition focus:border-purple-500 focus:outline-none"
+                                <div className="mt-8 flex items-center justify-between">
+                                    <button
+                                        type="button"
+                                        onClick={() => setStep(2)}
+                                        className="cursor-pointer rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                                     >
-                                        {paymentMethods.map((m) => (
-                                            <option key={m.id} value={m.id}>
-                                                {m.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        Back
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setStep(4)}
+                                        className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#FF7A30] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                    >
+                                        <span>I Have Completed Payment &rarr; Upload Proof</span>
+                                    </button>
                                 </div>
                             </div>
+                        </div>
+                    )}
 
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-300">
-                                    Transaction ID / Reference Number <span className="text-rose-400">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={txnReference}
-                                    onChange={(e) => setTxnReference(e.target.value)}
-                                    placeholder="e.g. FT2610319802 or TID-9823412 or 032187654"
-                                    className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-900 py-2.5 px-3.5 text-xs text-white placeholder-slate-500 transition focus:border-purple-500 focus:outline-none"
-                                />
-                                <p className="mt-1 text-[11px] text-slate-500">
-                                    Found on your bank SMS confirmation, electronic deposit voucher, or app screen.
-                                </p>
-                            </div>
+                    {/* STEP 4: Submit Payment Proof (Spacious Two-Column Layout) */}
+                    {step === 4 && (
+                        <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white shadow-xs overflow-hidden">
+                            <div className="grid grid-cols-1 lg:grid-cols-12">
+                                {/* Left Column: Order Summary & Review */}
+                                <div className="border-b border-slate-200 bg-[#F7F9FC] p-6 sm:p-10 lg:col-span-5 lg:border-b-0 lg:border-r flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex size-11 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                                            <Upload className="size-5.5" />
+                                        </div>
+                                        <h2 className="mt-4 text-xl font-bold text-[#0B1528]">Step 4 — Upload Payment Receipt</h2>
+                                        <p className="mt-1 text-xs text-slate-500 leading-relaxed">
+                                            Attach your deposit voucher or transfer screenshot so our finance team can verify and approve your registration.
+                                        </p>
 
-                            {/* Receipt File Upload */}
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-300">
-                                    Upload Receipt / Deposit Slip <span className="text-rose-400">*</span>
-                                </label>
-                                <div className="mt-1.5 rounded-xl border-2 border-dashed border-slate-700 bg-slate-900/50 p-6 text-center transition hover:border-purple-500">
-                                    {receiptPreview ? (
-                                        <div className="flex flex-col items-center">
-                                            <img
-                                                src={receiptPreview}
-                                                alt="Receipt preview"
-                                                className="max-h-48 rounded-lg border border-slate-700 object-contain shadow-md"
-                                            />
-                                            <p className="mt-2 text-xs font-semibold text-slate-300">
-                                                {receiptFile?.name} ({(receiptFile!.size / 1024).toFixed(1)} KB)
-                                            </p>
-                                            <label className="mt-2 inline-block cursor-pointer text-xs text-purple-400 underline hover:text-purple-300">
-                                                Replace Image
-                                                <input
-                                                    type="file"
-                                                    accept=".jpg,.jpeg,.png,.webp,.pdf"
-                                                    onChange={handleFileChange}
-                                                    className="hidden"
-                                                />
-                                            </label>
+                                        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 space-y-3 shadow-xs">
+                                            <div className="text-xs font-bold text-[#0B1528] border-b border-slate-100 pb-2">
+                                                Application Summary
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-slate-500">Applicant:</span>
+                                                <span className="font-semibold text-slate-900">{email}</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-slate-500">Plan:</span>
+                                                <span className="font-bold text-[#1769E0]">{selectedPlan.name}</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-slate-500">Billing:</span>
+                                                <span className="capitalize text-slate-800 font-medium">{billingInterval}</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-slate-500">Amount Due:</span>
+                                                <span className="font-extrabold text-slate-900">
+                                                    ${selectedPlan.monthly_cents / 100}.00 {currency}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-slate-500">Channel:</span>
+                                                <span className="font-semibold text-slate-800">{selectedMethod.name}</span>
+                                            </div>
                                         </div>
-                                    ) : receiptFile ? (
-                                        <div className="flex flex-col items-center">
-                                            <FileText className="size-10 text-purple-400" />
-                                            <p className="mt-2 text-xs font-semibold text-slate-300">
-                                                {receiptFile.name} ({(receiptFile.size / 1024).toFixed(1)} KB)
-                                            </p>
-                                            <label className="mt-2 inline-block cursor-pointer text-xs text-purple-400 underline hover:text-purple-300">
-                                                Change File
-                                                <input
-                                                    type="file"
-                                                    accept=".jpg,.jpeg,.png,.webp,.pdf"
-                                                    onChange={handleFileChange}
-                                                    className="hidden"
-                                                />
-                                            </label>
+
+                                        <div className="mt-6 flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-slate-700">
+                                            <ShieldCheck className="size-4 shrink-0 text-[#1769E0] mt-0.5" />
+                                            <span>
+                                                Submissions are reviewed by our operations desk in real time. Once verified, you will receive an automated invitation to activate your school.
+                                            </span>
                                         </div>
-                                    ) : (
-                                        <label className="flex cursor-pointer flex-col items-center justify-center">
-                                            <Upload className="size-8 text-slate-500" />
-                                            <p className="mt-2 text-xs font-semibold text-white">
-                                                Click to upload or drag & drop receipt
-                                            </p>
-                                            <p className="mt-1 text-[11px] text-slate-500">
-                                                PNG, JPG, WEBP, or PDF (Max 5MB)
-                                            </p>
+                                    </div>
+
+                                    <div className="mt-8 text-xs text-slate-500">
+                                        Need help? <Link href="/contact" className="font-bold text-[#1769E0] hover:underline">Contact verification support</Link>
+                                    </div>
+                                </div>
+
+                                {/* Right Column: Proof Upload Form */}
+                                <div className="p-6 sm:p-10 lg:col-span-7">
+                                    {submitError && (
+                                        <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/80 p-4 text-xs text-rose-800">
+                                            <AlertCircle className="size-4.5 shrink-0 text-rose-600 mt-0.5" />
+                                            <span>{submitError}</span>
+                                        </div>
+                                    )}
+
+                                    <form onSubmit={handleSubmitProof} className="space-y-5">
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-700">
+                                                    Selected Plan & Fee
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    readOnly
+                                                    disabled
+                                                    value={`${selectedPlan.name} Plan ($${selectedPlan.monthly_cents / 100}.00 ${currency})`}
+                                                    className="mt-1.5 h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs font-bold text-[#1769E0]"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold text-slate-700">
+                                                    Payment Method
+                                                </label>
+                                                <select
+                                                    value={selectedMethodId}
+                                                    onChange={(e) => setSelectedMethodId(e.target.value)}
+                                                    className="mt-1.5 h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                                >
+                                                    {paymentMethods.map((m) => (
+                                                        <option key={m.id} value={m.id}>
+                                                            {m.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700">
+                                                Transaction ID / Reference Number <span className="text-rose-500">*</span>
+                                            </label>
                                             <input
-                                                type="file"
+                                                type="text"
                                                 required
-                                                accept=".jpg,.jpeg,.png,.webp,.pdf"
-                                                onChange={handleFileChange}
-                                                className="hidden"
+                                                value={txnReference}
+                                                onChange={(e) => setTxnReference(e.target.value)}
+                                                placeholder="e.g. FT2610319802 or TID-9823412 or 032187654"
+                                                className="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
                                             />
-                                        </label>
-                                    )}
+                                            <p className="mt-1.5 text-xs text-slate-500">
+                                                Found on your bank SMS confirmation, electronic deposit voucher, or mobile receipt.
+                                            </p>
+                                        </div>
+
+                                        {/* Receipt File Upload */}
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700">
+                                                Upload Receipt / Deposit Slip <span className="text-rose-500">*</span>
+                                            </label>
+                                            <div className="mt-1.5 rounded-2xl border-2 border-dashed border-slate-300 bg-[#F8FAFC] p-6 text-center transition hover:border-[#1769E0] hover:bg-blue-50/20">
+                                                {receiptPreview ? (
+                                                    <div className="flex flex-col items-center">
+                                                        <img
+                                                            src={receiptPreview}
+                                                            alt="Receipt preview"
+                                                            className="max-h-48 rounded-xl border border-slate-200 object-contain shadow-xs"
+                                                        />
+                                                        <p className="mt-2.5 text-xs font-bold text-slate-800">
+                                                            {receiptFile?.name} ({(receiptFile!.size / 1024).toFixed(1)} KB)
+                                                        </p>
+                                                        <label className="mt-2 inline-block cursor-pointer text-xs font-bold text-[#1769E0] hover:underline">
+                                                            Replace Image
+                                                            <input
+                                                                type="file"
+                                                                accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                                                onChange={handleFileChange}
+                                                                className="hidden"
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                ) : receiptFile ? (
+                                                    <div className="flex flex-col items-center">
+                                                        <FileText className="size-10 text-[#1769E0]" />
+                                                        <p className="mt-2.5 text-xs font-bold text-slate-800">
+                                                            {receiptFile.name} ({(receiptFile.size / 1024).toFixed(1)} KB)
+                                                        </p>
+                                                        <label className="mt-2 inline-block cursor-pointer text-xs font-bold text-[#1769E0] hover:underline">
+                                                            Change File
+                                                            <input
+                                                                type="file"
+                                                                accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                                                onChange={handleFileChange}
+                                                                className="hidden"
+                                                            />
+                                                        </label>
+                                                    </div>
+                                                ) : (
+                                                    <label className="flex cursor-pointer flex-col items-center justify-center">
+                                                        <div className="flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-[#1769E0]">
+                                                            <Upload className="size-6" />
+                                                        </div>
+                                                        <p className="mt-3 text-xs font-bold text-slate-800">
+                                                            Click to upload or drag & drop receipt
+                                                        </p>
+                                                        <p className="mt-1 text-[11px] text-slate-500">
+                                                            PNG, JPG, WEBP, or PDF (Max 5MB)
+                                                        </p>
+                                                        <input
+                                                            type="file"
+                                                            required
+                                                            accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                                            onChange={handleFileChange}
+                                                            className="hidden"
+                                                        />
+                                                    </label>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-700">
+                                                Additional Payment Notes (Optional)
+                                            </label>
+                                            <textarea
+                                                rows={2}
+                                                value={notes}
+                                                onChange={(e) => setNotes(e.target.value)}
+                                                placeholder="e.g. Deposited via branch teller / depositor name"
+                                                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white py-2 px-3 text-xs text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                            />
+                                        </div>
+
+                                        <div className="flex items-center justify-between border-t border-slate-100 pt-5">
+                                            <button
+                                                type="button"
+                                                onClick={() => setStep(3)}
+                                                className="cursor-pointer rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                                            >
+                                                Back
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                disabled={submitting}
+                                                className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#FF7A30] px-7 py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E] disabled:opacity-50"
+                                            >
+                                                {submitting ? (
+                                                    <>
+                                                        <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                        <span>Submitting for Verification...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <CheckCircle2 className="size-4" />
+                                                        <span>Submit Payment for Approval</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* STEP 5: Confirmation / Pending Review Screen */}
+                    {step === 5 && submissionResult && (
+                        <div className="mx-auto max-w-xl rounded-3xl border border-slate-200 bg-white p-8 sm:p-10 text-center shadow-sm">
+                            <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+                                <Clock className="size-8" />
+                            </div>
+
+                            <h2 className="mt-5 text-2xl font-extrabold text-[#0B1528]">
+                                Payment Awaiting Verification
+                            </h2>
+                            <p className="mt-2 text-xs leading-relaxed text-slate-600 sm:text-sm">
+                                Thank you! Your payment proof has been successfully received by our administration team.
+                                Your subscription and workspace will be activated upon manual finance review.
+                            </p>
+
+                            <div className="my-6 space-y-3 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 text-left text-xs">
+                                <div className="flex justify-between border-b border-slate-200/80 pb-2">
+                                    <span className="text-slate-500">Tracking Reference:</span>
+                                    <span className="font-mono font-bold text-[#1769E0]">{submissionResult.reference}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-slate-200/80 pb-2">
+                                    <span className="text-slate-500">Applicant Email:</span>
+                                    <span className="font-bold text-slate-900">{submissionResult.email}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-slate-200/80 pb-2">
+                                    <span className="text-slate-500">Subscription Tier:</span>
+                                    <span className="font-bold text-slate-900">{submissionResult.plan}</span>
+                                </div>
+                                <div className="flex justify-between border-b border-slate-200/80 pb-2">
+                                    <span className="text-slate-500">Submission Time:</span>
+                                    <span className="text-slate-700">{submissionResult.submitted_at}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-1">
+                                    <span className="text-slate-500">Review Status:</span>
+                                    <span className="rounded-full bg-amber-100 border border-amber-200 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 uppercase">
+                                        Pending Admin Verification
+                                    </span>
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-300">
-                                    Additional Payment Notes (Optional)
-                                </label>
-                                <textarea
-                                    rows={2}
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                    placeholder="e.g. Deposited via branch teller at campus branch / sender name"
-                                    className="mt-1.5 w-full rounded-xl border border-slate-700 bg-slate-900 py-2 px-3 text-xs text-white placeholder-slate-500 transition focus:border-purple-500 focus:outline-none"
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between border-t border-slate-800/80 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(3)}
-                                    className="cursor-pointer rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700"
+                            <div className="space-y-3">
+                                <Link
+                                    href={`/onboarding/status?email=${encodeURIComponent(submissionResult.email)}`}
+                                    className="block w-full rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
                                 >
-                                    Back
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={submitting}
-                                    className="flex cursor-pointer items-center gap-2 rounded-xl bg-purple-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-purple-600/30 transition hover:bg-purple-500 disabled:opacity-50"
+                                    Check Approval Status &rarr;
+                                </Link>
+
+                                <Link
+                                    href="/"
+                                    className="block w-full rounded-xl border border-slate-300 bg-white py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                                 >
-                                    {submitting ? (
-                                        <>
-                                            <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                            <span>Submitting for Verification...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <CheckCircle2 className="size-4" />
-                                            <span>Submit Payment for Approval</span>
-                                        </>
-                                    )}
-                                </button>
+                                    Return to Public Homepage
+                                </Link>
                             </div>
-                        </form>
-                    </div>
-                )}
 
-                {/* STEP 5: Confirmation / Pending Review Screen */}
-                {step === 5 && submissionResult && (
-                    <div className="mx-auto max-w-lg rounded-2xl border border-purple-500/30 bg-[#0B1220] p-8 text-center shadow-2xl">
-                        <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400">
-                            <Clock className="size-8" />
+                            <p className="mt-6 text-xs text-slate-500">
+                                Once approved, you will receive an automated email with your secure single-use token to set up your password and institution name.
+                            </p>
                         </div>
-
-                        <h2 className="mt-4 text-2xl font-bold text-white">
-                            Payment Awaiting Verification
-                        </h2>
-                        <p className="mt-2 text-xs leading-relaxed text-slate-400 sm:text-sm">
-                            Thank you! Your payment proof has been successfully received by our administration team.
-                            Your subscription and workspace will be activated upon manual finance review.
-                        </p>
-
-                        <div className="my-6 space-y-2 rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-left text-xs">
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Tracking Reference:</span>
-                                <span className="font-mono font-bold text-purple-300">{submissionResult.reference}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Applicant Email:</span>
-                                <span className="font-semibold text-white">{submissionResult.email}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Subscription Tier:</span>
-                                <span className="font-semibold text-white">{submissionResult.plan}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Submission Time:</span>
-                                <span className="text-slate-300">{submissionResult.submitted_at}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-500">Review Status:</span>
-                                <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-400 uppercase">
-                                    Pending Admin Verification
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-3">
-                            <Link
-                                href={`/onboarding/status?email=${encodeURIComponent(submissionResult.email)}`}
-                                className="block w-full rounded-xl bg-purple-600 py-3 text-xs font-bold text-white shadow-lg shadow-purple-600/30 transition hover:bg-purple-500"
-                            >
-                                Check Approval Status &rarr;
-                            </Link>
-
-                            <Link
-                                href="/"
-                                className="block w-full rounded-xl border border-slate-800 bg-slate-900 py-2.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-800"
-                            >
-                                Return to Public Homepage
-                            </Link>
-                        </div>
-
-                        <p className="mt-6 text-[11px] text-slate-500">
-                            Once approved, you will receive an automated email with your secure single-use token to set up your password and institution name.
-                        </p>
-                    </div>
-                )}
-            </main>
-        </div>
+                    )}
+                </div>
+            </div>
+        </PublicLayout>
     );
 }

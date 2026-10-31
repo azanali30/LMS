@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import PublicLayout from '@/layouts/public-layout';
 import {
     ArrowRight,
@@ -199,33 +199,26 @@ export default function PricingPage({
                     enterprise: true,
                 },
                 {
-                    name: 'Consolidated Executive Multi-School Dashboard',
-                    starter: false,
-                    growth: false,
+                    name: 'Custom Domain Subdomain Support',
+                    starter: true,
+                    growth: true,
                     professional: true,
                     enterprise: true,
                 },
             ],
         },
         {
-            title: 'Campus & School Governance',
+            title: 'Academic & Institutional Operations',
             items: [
                 {
-                    name: 'Classrooms, Sections & Academic Terms',
+                    name: 'Academic Years & Terms Configuration',
                     starter: true,
                     growth: true,
                     professional: true,
                     enterprise: true,
                 },
                 {
-                    name: 'Student Admission & Bio Documents',
-                    starter: true,
-                    growth: true,
-                    professional: true,
-                    enterprise: true,
-                },
-                {
-                    name: 'Daily Roll Call & Substitute Tracking',
+                    name: 'Grade Cohorts & Classroom Sections',
                     starter: true,
                     growth: true,
                     professional: true,
@@ -239,47 +232,28 @@ export default function PricingPage({
                     enterprise: true,
                 },
                 {
-                    name: 'Curriculum Syllabi, Units & Topic Progress',
+                    name: 'Curriculum Syllabi Progress Tracking',
                     starter: true,
                     growth: true,
                     professional: true,
                     enterprise: true,
                 },
                 {
-                    name: 'Cross-Campus Faculty Teaching Assignments',
-                    starter: false,
-                    growth: true,
-                    professional: true,
-                    enterprise: true,
-                },
-            ],
-        },
-        {
-            title: 'Tuition Fees & Financial Operations',
-            items: [
-                {
-                    name: 'Custom Fee Structures & Schedules',
+                    name: 'Rapid Daily Attendance Roll Call',
                     starter: true,
                     growth: true,
                     professional: true,
                     enterprise: true,
                 },
                 {
-                    name: 'Automated Invoice Generation',
+                    name: 'Gradebook & Student Term Marksheets',
                     starter: true,
                     growth: true,
                     professional: true,
                     enterprise: true,
                 },
                 {
-                    name: 'Printable / Downloadable PDF Invoices & Receipts',
-                    starter: true,
-                    growth: true,
-                    professional: true,
-                    enterprise: true,
-                },
-                {
-                    name: 'Multi-Campus Consolidated Financial Reconciliation',
+                    name: 'Cross-Campus Curriculum Templates',
                     starter: false,
                     growth: false,
                     professional: true,
@@ -288,25 +262,39 @@ export default function PricingPage({
             ],
         },
         {
-            title: 'Digital LMS & Course Authoring',
+            title: 'Fee Billing & Financial Invoicing',
             items: [
                 {
-                    name: 'Online Course Hub & Lesson Player',
+                    name: 'Custom Grade-Level Fee Structures',
                     starter: true,
                     growth: true,
                     professional: true,
                     enterprise: true,
                 },
                 {
-                    name: 'Video Lessons & Module Progress Tracking',
+                    name: 'Automated Batch Monthly Invoices',
                     starter: true,
                     growth: true,
                     professional: true,
                     enterprise: true,
                 },
                 {
-                    name: 'Digital Course Completion Certificates',
+                    name: 'Printable Fee Deposit Vouchers (PDF)',
                     starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
+                },
+                {
+                    name: 'Partial Payment & Arrears Ledgers',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
+                },
+                {
+                    name: 'Consolidated Portfolio Revenue Reports',
+                    starter: false,
                     growth: true,
                     professional: true,
                     enterprise: true,
@@ -314,35 +302,35 @@ export default function PricingPage({
             ],
         },
         {
-            title: 'Support, SLAs & Infrastructure',
+            title: 'Support, Security & Governance',
             items: [
                 {
-                    name: 'Free Trial Duration',
-                    starter: `${trialDays} Days`,
-                    growth: `${trialDays} Days`,
-                    professional: `${trialDays} Days`,
-                    enterprise: `${trialDays} Days`,
+                    name: 'Cryptographic Database Query Scoping',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
                 },
                 {
-                    name: 'Support Channel',
-                    starter: 'Standard Email & Portal',
-                    growth: 'Priority Ticketing & Email',
+                    name: 'Role-Based Access Control (Admin, Faculty, Student)',
+                    starter: true,
+                    growth: true,
+                    professional: true,
+                    enterprise: true,
+                },
+                {
+                    name: 'Support Level',
+                    starter: 'Standard Email',
+                    growth: 'Priority Ticketing',
                     professional: 'Dedicated Specialist',
-                    enterprise: '24/7 Telephone & Private Slack',
+                    enterprise: '24/7 Phone & SLA',
                 },
                 {
-                    name: 'Custom Domain & SSO Integrations',
+                    name: '99.9% Guaranteed Uptime SLA',
                     starter: false,
                     growth: false,
                     professional: false,
                     enterprise: true,
-                },
-                {
-                    name: 'Uptime SLA Guarantee',
-                    starter: '99.5%',
-                    growth: '99.8%',
-                    professional: '99.9%',
-                    enterprise: '99.95% Custom SLA',
                 },
             ],
         },
@@ -351,7 +339,7 @@ export default function PricingPage({
     const faqs = [
         {
             q: 'How does the 30-day free trial work?',
-            a: `Every new institution owner can start with an unrestricted 30-day free trial on our Starter, Growth, or Professional plans. A verified payment method is registered upfront to ensure uninterrupted continuity, but your card will never be charged during the trial period. You can modify or cancel your subscription at any time prior to day 30 with zero penalty.`,
+            a: 'Every new institution owner can start with an unrestricted 30-day free trial on our Starter, Growth, or Professional plans. A verified payment method is registered upfront to ensure uninterrupted continuity, but your payment is held without penalty during your trial. You can modify or cancel your subscription at any time prior to day 30 with zero penalty.',
         },
         {
             q: 'What is considered an "Institution" in InstitutoPropio?',
@@ -378,56 +366,53 @@ export default function PricingPage({
     return (
         <PublicLayout title="Transparent International SaaS Pricing — InstitutoPropio">
             {/* HERO SECTION */}
-            <section className="relative overflow-hidden bg-[#070b14] pt-20 pb-16 text-white sm:pt-28 sm:pb-20">
-                {/* Subtle radial glow */}
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
-
-                <div className="relative mx-auto w-full max-w-[1720px] px-6 text-center sm:px-8 md:px-12 lg:px-16 xl:px-20">
+            <section className="bg-white pt-16 pb-12 sm:pt-24 sm:pb-16 border-b border-slate-100 text-center">
+                <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold text-blue-300 backdrop-blur-md">
-                            <Sparkles className="size-4 text-blue-400" />
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
+                            <Sparkles className="size-3.5" />
                             <span>Transparent Global SaaS Pricing • USD</span>
                         </div>
 
-                        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl">
+                        <h1 className="text-4xl font-extrabold tracking-tight text-[#0B1528] sm:text-6xl lg:text-7xl">
                             Empower Every School with{' '}
-                            <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-sky-400 bg-clip-text text-transparent">
+                            <span className="text-[#1769E0]">
                                 InstitutoPropio
                             </span>
                         </h1>
 
-                        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-xl">
+                        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
                             World-class multi-tenant school governance and e-learning. Straightforward pricing based exclusively on the number of institutions you govern.
                         </p>
 
                         {/* Unlimited Students & Teachers Banner */}
-                        <div className="mx-auto mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl border border-slate-800 bg-slate-900/80 px-6 py-3 text-sm font-medium text-slate-200 shadow-xl backdrop-blur-md">
-                            <span className="flex items-center gap-2 text-emerald-400 font-semibold">
-                                <Users className="size-4" />
+                        <div className="mx-auto mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-[#F8FAFC] px-6 py-3 text-sm font-medium text-slate-700 shadow-xs">
+                            <span className="flex items-center gap-2 text-emerald-700 font-bold">
+                                <Users className="size-4 text-emerald-600" />
                                 Unlimited Students & Teachers
                             </span>
-                            <span className="hidden text-slate-600 sm:inline">•</span>
-                            <span className="flex items-center gap-2 text-blue-400 font-semibold">
+                            <span className="hidden text-slate-300 sm:inline">•</span>
+                            <span className="flex items-center gap-2 text-[#1769E0] font-bold">
                                 <Shield className="size-4" />
                                 30-Day Free Trial
                             </span>
-                            <span className="hidden text-slate-600 sm:inline">•</span>
-                            <span className="flex items-center gap-2 text-indigo-400 font-semibold">
-                                <CreditCard className="size-4" />
+                            <span className="hidden text-slate-300 sm:inline">•</span>
+                            <span className="flex items-center gap-2 text-indigo-700 font-bold">
+                                <CreditCard className="size-4 text-indigo-600" />
                                 Zero Setup Fees
                             </span>
                         </div>
 
                         {/* MONTHLY / ANNUAL TOGGLE */}
                         <div className="mt-10 flex items-center justify-center">
-                            <div className="relative flex items-center rounded-2xl border border-slate-800 bg-slate-900/90 p-1.5 shadow-2xl backdrop-blur-lg">
+                            <div className="flex items-center rounded-2xl border border-slate-200 bg-slate-100 p-1.5 shadow-xs">
                                 <button
                                     type="button"
                                     onClick={() => setBillingInterval('monthly')}
-                                    className={`relative z-10 cursor-pointer rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
+                                    className={`cursor-pointer rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
                                         billingInterval === 'monthly'
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                                            : 'text-slate-400 hover:text-white'
+                                            ? 'bg-[#1769E0] text-white shadow-xs'
+                                            : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
                                     Monthly Billing
@@ -435,14 +420,14 @@ export default function PricingPage({
                                 <button
                                     type="button"
                                     onClick={() => setBillingInterval('annual')}
-                                    className={`relative z-10 flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
+                                    className={`flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
                                         billingInterval === 'annual'
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                                            : 'text-slate-400 hover:text-white'
+                                            ? 'bg-[#1769E0] text-white shadow-xs'
+                                            : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
                                     <span>Annual Billing</span>
-                                    <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-extrabold text-emerald-400 border border-emerald-500/30">
+                                    <span className="rounded-full bg-emerald-100 border border-emerald-200 px-2.5 py-0.5 text-xs font-extrabold text-emerald-800">
                                         2 Months Free (~17% Off)
                                     </span>
                                 </button>
@@ -453,7 +438,7 @@ export default function PricingPage({
             </section>
 
             {/* PLAN CARDS GRID */}
-            <section className="relative z-10 -mt-8 bg-slate-950 pb-20 sm:pb-28">
+            <section className="bg-[#F7F9FC] py-16 sm:py-24 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
                         {displayPlans.map((plan) => {
@@ -485,15 +470,15 @@ export default function PricingPage({
                             return (
                                 <div
                                     key={plan.slug}
-                                    className={`group relative flex flex-col justify-between rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${
+                                    className={`group relative flex flex-col justify-between rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                                         plan.is_popular
-                                            ? 'border-blue-500 bg-gradient-to-b from-slate-900 via-slate-900/95 to-slate-950 shadow-xl shadow-blue-500/10 ring-2 ring-blue-500/30'
-                                            : 'border-slate-800 bg-slate-900/60 shadow-lg backdrop-blur-md hover:border-slate-700'
+                                            ? 'border-[#1769E0] ring-2 ring-[#1769E0]/20 bg-white shadow-xl'
+                                            : 'border-slate-200 bg-white shadow-xs hover:border-slate-300'
                                     }`}
                                 >
                                     {plan.is_popular && (
                                         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-4 py-1 text-xs font-extrabold text-white shadow-md shadow-blue-500/30">
+                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FF7A30] px-4 py-1 text-xs font-extrabold text-white shadow-md shadow-orange-500/20">
                                                 <Sparkles className="size-3.5" />
                                                 Most Popular Choice
                                             </span>
@@ -503,31 +488,31 @@ export default function PricingPage({
                                     <div>
                                         {/* Card Header */}
                                         <div className="flex items-center justify-between">
-                                            <h3 className="text-2xl font-black text-white">
+                                            <h3 className="text-2xl font-black text-[#0B1528]">
                                                 {plan.name}
                                             </h3>
-                                            <span className="rounded-lg border border-slate-700 bg-slate-800/80 px-2.5 py-1 text-xs font-semibold text-slate-300">
+                                            <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-[#1769E0]">
                                                 {plan.organization_limit}
                                             </span>
                                         </div>
 
-                                        <p className="mt-3 text-sm leading-relaxed text-slate-400">
+                                        <p className="mt-3 text-xs leading-relaxed text-slate-500 min-h-[36px]">
                                             {plan.description}
                                         </p>
 
                                         {/* Pricing Block */}
-                                        <div className="mt-6 border-y border-slate-800/80 py-5">
+                                        <div className="mt-6 border-y border-slate-100 py-5">
                                             <div className="flex items-baseline gap-1.5">
-                                                <span className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+                                                <span className="text-4xl font-extrabold tracking-tight text-[#0B1528] sm:text-5xl">
                                                     {displayPrice}
                                                 </span>
-                                                <span className="text-sm font-semibold text-slate-400">
+                                                <span className="text-sm font-semibold text-slate-500">
                                                     {pricePeriod}
                                                 </span>
                                             </div>
 
                                             {!isEnterprise && billingInterval === 'annual' && (
-                                                <p className="mt-1.5 text-xs font-medium text-emerald-400">
+                                                <p className="mt-1.5 text-xs font-bold text-emerald-700">
                                                     Equivalent to ${effectiveMonthlyFromAnnual}/mo • 2 months free!
                                                 </p>
                                             )}
@@ -539,32 +524,32 @@ export default function PricingPage({
                                             )}
 
                                             {isEnterprise && (
-                                                <p className="mt-1.5 text-xs text-slate-400">
+                                                <p className="mt-1.5 text-xs text-slate-500">
                                                     Bespoke pricing tailored to your multi-campus network.
                                                 </p>
                                             )}
                                         </div>
 
                                         {/* Unlimited Feature Highlights */}
-                                        <div className="mt-6 space-y-3">
-                                            <div className="flex items-center gap-2.5 text-xs font-bold text-emerald-400">
-                                                <Users className="size-4 shrink-0 text-emerald-400" />
+                                        <div className="mt-6 space-y-2.5">
+                                            <div className="flex items-center gap-2.5 text-xs font-bold text-emerald-700">
+                                                <Users className="size-4 shrink-0 text-emerald-600" />
                                                 <span>Unlimited Students & Teachers</span>
                                             </div>
-                                            <div className="flex items-center gap-2.5 text-xs font-bold text-blue-400">
-                                                <Building2 className="size-4 shrink-0 text-blue-400" />
+                                            <div className="flex items-center gap-2.5 text-xs font-bold text-[#1769E0]">
+                                                <Building2 className="size-4 shrink-0 text-[#1769E0]" />
                                                 <span>{plan.organization_limit}</span>
                                             </div>
                                         </div>
 
                                         {/* Features List */}
-                                        <ul className="mt-6 space-y-3 text-sm text-slate-300">
+                                        <ul className="mt-6 space-y-3 text-xs text-slate-600">
                                             {plan.features.map((feature, idx) => (
                                                 <li key={idx} className="flex items-start gap-3">
-                                                    <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
+                                                    <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[#1769E0]">
                                                         <Check className="size-3 stroke-[3]" />
                                                     </div>
-                                                    <span className="text-xs leading-relaxed text-slate-300">
+                                                    <span className="leading-relaxed">
                                                         {feature}
                                                     </span>
                                                 </li>
@@ -576,12 +561,12 @@ export default function PricingPage({
                                     <div className="mt-8 pt-4">
                                         <Link href={targetHref} className="block w-full">
                                             <Button
-                                                className={`w-full py-6 text-sm font-bold shadow-lg transition-all duration-200 cursor-pointer ${
+                                                className={`w-full py-6 text-xs font-bold shadow-xs transition-all duration-200 cursor-pointer ${
                                                     plan.is_popular
-                                                        ? 'bg-blue-600 text-white hover:bg-blue-500 shadow-blue-600/30'
+                                                        ? 'bg-[#FF7A30] text-white hover:bg-[#E5661E] shadow-md shadow-orange-500/20'
                                                         : isEnterprise
-                                                        ? 'bg-slate-800 text-white hover:bg-slate-700 border border-slate-700'
-                                                        : 'bg-white text-slate-900 hover:bg-slate-100'
+                                                        ? 'bg-[#1769E0] text-white hover:bg-[#1256B8]'
+                                                        : 'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 hover:text-[#1769E0]'
                                                 }`}
                                             >
                                                 <span>{ctaLabel}</span>
@@ -590,8 +575,8 @@ export default function PricingPage({
                                         </Link>
 
                                         {!isEnterprise && (
-                                            <p className="mt-2 text-center text-[11px] text-slate-500">
-                                                30 days free • Payment method required
+                                            <p className="mt-2 text-center text-[11px] text-slate-400">
+                                                30 days free • Zero setup charges
                                             </p>
                                         )}
                                     </div>
@@ -603,49 +588,52 @@ export default function PricingPage({
             </section>
 
             {/* 30-DAY TRIAL BANNER */}
-            <section className="bg-slate-900 border-y border-slate-800 py-12">
+            <section className="bg-blue-50/70 border-b border-blue-100 py-14">
                 <div className="mx-auto w-full max-w-5xl px-6 sm:px-8 text-center">
-                    <div className="inline-flex items-center justify-center size-14 rounded-2xl bg-blue-500/10 text-blue-400 mb-4 border border-blue-500/20">
+                    <div className="inline-flex items-center justify-center size-14 rounded-2xl bg-blue-100 text-[#1769E0] mb-4 border border-blue-200 shadow-xs">
                         <ShieldCheck className="size-7" />
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1528]">
                         Experience InstitutoPropio Free for 30 Days
                     </h2>
-                    <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base leading-relaxed text-slate-300">
+                    <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm leading-relaxed text-slate-600">
                         To protect our network integrity and ensure seamless uninterrupted service, an active payment method is verified upon registration. You will not be charged a single penny during your 30-day trial period, and you can cancel anytime.
                     </p>
                 </div>
             </section>
 
             {/* FULL FEATURE COMPARISON MATRIX */}
-            <section className="bg-slate-950 py-20 sm:py-28 text-white">
+            <section className="bg-white py-16 sm:py-24 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-                            Detailed Feature Comparison
+                    <div className="text-center mb-14">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                            Feature Breakdown
+                        </span>
+                        <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0B1528]">
+                            Detailed Capability Comparison
                         </h2>
-                        <p className="mt-4 text-base text-slate-400 max-w-2xl mx-auto">
+                        <p className="mt-3 text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto">
                             Examine every operational capability across all four tiers of InstitutoPropio.
                         </p>
                     </div>
 
-                    <div className="overflow-x-auto rounded-3xl border border-slate-800 bg-slate-900/60 shadow-2xl">
+                    <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-xs">
                         <table className="w-full min-w-[800px] border-collapse text-left">
                             <thead>
-                                <tr className="border-b border-slate-800 bg-slate-900">
-                                    <th className="py-5 px-6 text-sm font-extrabold text-white uppercase tracking-wider">
+                                <tr className="border-b border-slate-200 bg-[#F8FAFC]">
+                                    <th className="py-4 px-6 text-xs font-extrabold text-slate-900 uppercase tracking-wider">
                                         Features & Specifications
                                     </th>
-                                    <th className="py-5 px-6 text-sm font-extrabold text-white uppercase tracking-wider text-center">
+                                    <th className="py-4 px-6 text-xs font-extrabold text-slate-900 uppercase tracking-wider text-center">
                                         Starter
                                     </th>
-                                    <th className="py-5 px-6 text-sm font-extrabold text-blue-400 uppercase tracking-wider text-center">
+                                    <th className="py-4 px-6 text-xs font-extrabold text-[#1769E0] uppercase tracking-wider text-center">
                                         Growth
                                     </th>
-                                    <th className="py-5 px-6 text-sm font-extrabold text-white uppercase tracking-wider text-center">
+                                    <th className="py-4 px-6 text-xs font-extrabold text-slate-900 uppercase tracking-wider text-center">
                                         Professional
                                     </th>
-                                    <th className="py-5 px-6 text-sm font-extrabold text-purple-400 uppercase tracking-wider text-center">
+                                    <th className="py-4 px-6 text-xs font-extrabold text-purple-700 uppercase tracking-wider text-center">
                                         Enterprise
                                     </th>
                                 </tr>
@@ -653,10 +641,10 @@ export default function PricingPage({
                             <tbody>
                                 {comparisonCategories.map((category, catIdx) => (
                                     <React.Fragment key={catIdx}>
-                                        <tr className="bg-slate-800/60 border-t border-b border-slate-800">
+                                        <tr className="bg-slate-50 border-t border-b border-slate-200">
                                             <td
                                                 colSpan={5}
-                                                className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-slate-400"
+                                                className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-[#1769E0]"
                                             >
                                                 {category.title}
                                             </td>
@@ -664,9 +652,9 @@ export default function PricingPage({
                                         {category.items.map((item, itemIdx) => (
                                             <tr
                                                 key={itemIdx}
-                                                className="border-b border-slate-800/50 hover:bg-slate-900/40 transition-colors"
+                                                className="border-b border-slate-100 hover:bg-slate-50/60 transition-colors"
                                             >
-                                                <td className="py-4 px-6 text-sm font-medium text-slate-200">
+                                                <td className="py-4 px-6 text-xs font-semibold text-slate-800">
                                                     {item.name}
                                                 </td>
                                                 {['starter', 'growth', 'professional', 'enterprise'].map((col) => {
@@ -674,20 +662,20 @@ export default function PricingPage({
                                                     return (
                                                         <td
                                                             key={col}
-                                                            className="py-4 px-6 text-center text-sm font-medium text-slate-300"
+                                                            className="py-4 px-6 text-center text-xs font-medium text-slate-600"
                                                         >
                                                             {typeof val === 'boolean' ? (
                                                                 val ? (
-                                                                    <div className="inline-flex size-6 items-center justify-center rounded-full bg-blue-500/20 text-blue-400">
-                                                                        <Check className="size-4" />
+                                                                    <div className="inline-flex size-6 items-center justify-center rounded-full bg-blue-100 text-[#1769E0]">
+                                                                        <Check className="size-4 stroke-[3]" />
                                                                     </div>
                                                                 ) : (
-                                                                    <div className="inline-flex size-6 items-center justify-center rounded-full bg-slate-800 text-slate-500">
+                                                                    <div className="inline-flex size-6 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                                                                         <Minus className="size-4" />
                                                                     </div>
                                                                 )
                                                             ) : (
-                                                                <span className="font-semibold text-white">
+                                                                <span className="font-bold text-slate-900">
                                                                     {val}
                                                                 </span>
                                                             )}
@@ -705,14 +693,14 @@ export default function PricingPage({
             </section>
 
             {/* FREQUENTLY ASKED QUESTIONS */}
-            <section className="bg-slate-900 py-20 border-t border-slate-800">
+            <section className="bg-[#F7F9FC] py-16 sm:py-24 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1 text-xs font-semibold text-blue-400">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
                             <HelpCircle className="size-3.5" />
                             <span>Frequently Asked Questions</span>
                         </div>
-                        <h2 className="mt-4 text-3xl sm:text-4xl font-extrabold text-white">
+                        <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-[#0B1528]">
                             Everything You Need to Know
                         </h2>
                     </div>
@@ -723,24 +711,24 @@ export default function PricingPage({
                             return (
                                 <div
                                     key={idx}
-                                    className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 transition-all"
+                                    className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition-all"
                                 >
                                     <button
                                         type="button"
                                         onClick={() => setActiveFaq(isOpen ? null : idx)}
-                                        className="flex w-full cursor-pointer items-center justify-between p-6 text-left transition hover:bg-slate-900"
+                                        className="flex w-full cursor-pointer items-center justify-between p-6 text-left transition hover:bg-slate-50"
                                     >
-                                        <span className="text-base font-bold text-white pr-4">
+                                        <span className="text-sm sm:text-base font-bold text-[#0B1528] pr-4">
                                             {faq.q}
                                         </span>
                                         <ChevronDown
                                             className={`size-5 shrink-0 text-slate-400 transition-transform duration-200 ${
-                                                isOpen ? 'rotate-180 text-blue-400' : ''
+                                                isOpen ? 'rotate-180 text-[#1769E0]' : ''
                                             }`}
                                         />
                                     </button>
                                     {isOpen && (
-                                        <div className="border-t border-slate-800/80 p-6 pt-4 text-sm leading-relaxed text-slate-300">
+                                        <div className="border-t border-slate-100 p-6 pt-4 text-xs sm:text-sm leading-relaxed text-slate-600">
                                             {faq.a}
                                         </div>
                                     )}
@@ -751,26 +739,26 @@ export default function PricingPage({
                 </div>
             </section>
 
-            {/* CTA SECTION */}
-            <section className="bg-gradient-to-b from-slate-900 to-[#070b14] py-20 border-t border-slate-800 text-center">
+            {/* BOTTOM CTA SECTION */}
+            <section className="bg-white py-16 sm:py-24 text-center">
                 <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
-                    <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+                    <h2 className="text-3xl sm:text-5xl font-black text-[#0B1528] tracking-tight">
                         Ready to Transform Your Educational System?
                     </h2>
-                    <p className="mx-auto mt-4 max-w-2xl text-base text-slate-300 sm:text-lg">
+                    <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-slate-600 leading-relaxed">
                         Start your 30-day free trial today or consult our enterprise team for customized campus network rollouts.
                     </p>
                     <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                         <Link href="/register?journey=school&plan=growth">
-                            <Button className="bg-blue-600 px-8 py-6 text-base font-bold text-white hover:bg-blue-500 shadow-xl shadow-blue-600/30 cursor-pointer">
+                            <Button className="h-12 bg-[#FF7A30] px-8 text-sm font-bold text-white hover:bg-[#E5661E] shadow-md shadow-orange-500/20 cursor-pointer">
                                 <span>Get Started with 30-Day Free Trial</span>
-                                <ArrowRight className="ml-2 size-5" />
+                                <ArrowRight className="ml-2 size-4" />
                             </Button>
                         </Link>
                         <Link href="/contact?subject=Sales+Inquiry">
-                            <Button variant="outline" className="border-slate-700 bg-slate-800/60 px-8 py-6 text-base font-bold text-white hover:bg-slate-800 cursor-pointer">
-                                <PhoneCall className="mr-2 size-5" />
-                                <span>Talk to an Expert</span>
+                            <Button variant="outline" className="h-12 border-slate-300 bg-white px-8 text-sm font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">
+                                <PhoneCall className="mr-2 size-4 text-[#1769E0]" />
+                                <span>Talk to Sales</span>
                             </Button>
                         </Link>
                     </div>
@@ -779,6 +767,3 @@ export default function PricingPage({
         </PublicLayout>
     );
 }
-
-// React import needed for React.Fragment in JSX
-import React from 'react';

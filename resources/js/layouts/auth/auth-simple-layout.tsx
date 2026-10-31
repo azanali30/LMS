@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
@@ -9,6 +10,14 @@ export default function AuthSimpleLayout({
     title,
     description,
 }: AuthLayoutProps) {
+    // Enforce consistent light theme for auth pages matching public website
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+        }
+    }, []);
+
     const { name, tenant } = usePage().props as {
         name?: string;
         tenant?: {

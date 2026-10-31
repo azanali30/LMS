@@ -290,9 +290,9 @@ export default function TenantLayout({
     const roleBadge = getRoleBadge(role);
 
     return (
-        <div className="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-900 selection:bg-purple-500 selection:text-white md:flex-row dark:bg-[#070b14] dark:text-slate-100">
+        <div className="flex h-screen h-[100dvh] w-full flex-col overflow-hidden bg-slate-50 font-sans text-slate-900 selection:bg-purple-500 selection:text-white md:flex-row dark:bg-[#070b14] dark:text-slate-100">
             {/* Mobile Header */}
-            <div className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur-md md:hidden dark:border-slate-800 dark:bg-[#0B1220]/95">
+            <div className="sticky top-0 z-50 flex shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur-md md:hidden dark:border-slate-800 dark:bg-[#0B1220]/95">
                 <Link href="/dashboard" className="flex items-center gap-2.5">
                     {currentOrg?.logo_path ? (
                         <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white p-0.5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
@@ -353,12 +353,12 @@ export default function TenantLayout({
 
             {/* Sidebar Navigation */}
             <aside
-                className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out md:static md:translate-x-0 dark:border-slate-800/80 dark:bg-[#0B1220] ${
+                className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out md:static md:h-full md:translate-x-0 dark:border-slate-800/80 dark:bg-[#0B1220] ${
                     mobileOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 {/* School Brand & Workspace Header */}
-                <div className="border-b border-slate-200 p-4 dark:border-slate-800/80">
+                <div className="shrink-0 border-b border-slate-200 p-4 dark:border-slate-800/80">
                     {currentOrg ? (
                         <div className="relative">
                             <div className="flex items-center justify-between gap-2">
@@ -506,7 +506,7 @@ export default function TenantLayout({
                 </div>
 
                 {/* Navigation Items */}
-                <div className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+                <div className="flex-1 min-h-0 space-y-1 overflow-y-auto px-3 py-4 overscroll-contain">
                     <div className="px-3 pb-2 text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
                         Main Menu
                     </div>
@@ -550,7 +550,7 @@ export default function TenantLayout({
                 </div>
 
                 {/* Sidebar Footer User Card */}
-                <div className="relative border-t border-slate-200 p-3 dark:border-slate-800/80">
+                <div className="relative shrink-0 border-t border-slate-200 p-3 dark:border-slate-800/80">
                     <button
                         onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                         className={`flex w-full items-center justify-between rounded-xl border p-2 text-left transition ${
@@ -613,9 +613,9 @@ export default function TenantLayout({
             )}
 
             {/* Main Content Area */}
-            <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+            <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
                 {/* Top Desktop Bar */}
-                <header className="sticky top-0 z-20 hidden items-center justify-between border-b border-slate-200 bg-white/80 px-8 py-3.5 backdrop-blur-md md:flex dark:border-slate-800/80 dark:bg-[#0B1220]/80">
+                <header className="relative z-20 hidden shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-8 py-3.5 backdrop-blur-md md:flex dark:border-slate-800/80 dark:bg-[#0B1220]/95">
                     <div className="flex items-center gap-4">
                         <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
                             {title}
@@ -865,24 +865,27 @@ export default function TenantLayout({
                     </div>
                 </header>
 
-                {/* Flash Messages */}
-                {flash?.success && (
-                    <div className="mx-6 mt-4 flex animate-in items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs text-emerald-700 shadow-lg fade-in dark:text-emerald-300">
-                        <CheckCircle2 className="size-4 shrink-0" />
-                        <span>{flash.success}</span>
-                    </div>
-                )}
-                {flash?.error && (
-                    <div className="mx-6 mt-4 flex animate-in items-center gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-700 shadow-lg fade-in dark:text-rose-300">
-                        <AlertCircle className="size-4 shrink-0" />
-                        <span>{flash.error}</span>
-                    </div>
-                )}
+                {/* Scrollable Content Container */}
+                <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+                    {/* Flash Messages */}
+                    {flash?.success && (
+                        <div className="mx-6 mt-4 flex animate-in items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 text-xs text-emerald-700 shadow-lg fade-in dark:text-emerald-300">
+                            <CheckCircle2 className="size-4 shrink-0" />
+                            <span>{flash.success}</span>
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="mx-6 mt-4 flex animate-in items-center gap-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3.5 text-xs text-rose-700 shadow-lg fade-in dark:text-rose-300">
+                            <AlertCircle className="size-4 shrink-0" />
+                            <span>{flash.error}</span>
+                        </div>
+                    )}
 
-                {/* Page Content */}
-                <main className="mx-auto w-full max-w-7xl flex-1 p-6 md:p-8">
-                    {children}
-                </main>
+                    {/* Page Content */}
+                    <main className="mx-auto w-full max-w-7xl flex-1 p-6 md:p-8">
+                        {children}
+                    </main>
+                </div>
             </div>
         </div>
     );

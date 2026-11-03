@@ -21,18 +21,17 @@ return [
     |--------------------------------------------------------------------------
     | Annual Pricing Status
     |--------------------------------------------------------------------------
-    | Yearly prices are not finalized. When false, UI explicitly communicates
-    | that annual billing is pending finalization and prompts Monthly selection.
+    | Annual billing is available with ~16.67% savings (2 months free / 10x monthly).
     */
-    'yearly_pricing_available' => env('MANUAL_PAYMENT_YEARLY_AVAILABLE', false),
+    'yearly_pricing_available' => env('MANUAL_PAYMENT_YEARLY_AVAILABLE', true),
 
     /*
     |--------------------------------------------------------------------------
     | Supported Subscription Plans for Manual Onboarding
     |--------------------------------------------------------------------------
-    | Starter: $19/mo
-    | Growth: $49/mo
-    | Professional: $99/mo
+    | Starter: $19/mo ($190/yr)
+    | Growth: $49/mo ($490/yr)
+    | Professional: $99/mo ($990/yr)
     | Unlimited students and teachers across all tiers.
     */
     'plans' => [
@@ -42,8 +41,8 @@ return [
             'headline' => 'Essential Digital Campus',
             'target' => 'Single Independent Institution / Academy',
             'monthly_cents' => 1900,
-            'yearly_cents' => null, // Not finalized
-            'yearly_available' => false,
+            'yearly_cents' => 19000,
+            'yearly_available' => true,
             'max_organizations' => 1,
             'features' => [
                 '1 Isolated institution workspace',
@@ -62,8 +61,8 @@ return [
             'headline' => 'Multi-Campus Expansion',
             'target' => 'Expanding Multi-Campus Systems',
             'monthly_cents' => 4900,
-            'yearly_cents' => null, // Not finalized
-            'yearly_available' => false,
+            'yearly_cents' => 49000,
+            'yearly_available' => true,
             'is_popular' => true,
             'max_organizations' => 5,
             'features' => [
@@ -84,8 +83,8 @@ return [
             'headline' => 'Regional Campus Network',
             'target' => 'Regional Education Groups & Chains',
             'monthly_cents' => 9900,
-            'yearly_cents' => null, // Not finalized
-            'yearly_available' => false,
+            'yearly_cents' => 99000,
+            'yearly_available' => true,
             'max_organizations' => 10,
             'features' => [
                 'Up to 10 Isolated institution workspaces',

@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import React from 'react';
 import { CheckCircle2, Building2, LogIn, Sparkles, ArrowRight } from 'lucide-react';
-import PublicLayout from '@/layouts/public-layout';
+import OnboardingLayout from '@/layouts/onboarding-layout';
 
 interface Props {
     email: string;
@@ -15,7 +15,7 @@ export default function CompleteSuccess({
     subdomain,
 }: Props) {
     return (
-        <PublicLayout title="Workspace Activated — InstitutoPropio">
+        <OnboardingLayout title="Workspace Activated — InstitutoPropio">
             <div className="bg-[#F8FAFC] py-16 sm:py-20 md:py-24 border-b border-slate-100 min-h-[75vh] flex items-center justify-center">
                 <div className="mx-auto w-full max-w-md px-4">
                     <div className="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
@@ -71,6 +71,6 @@ export default function CompleteSuccess({
                     </div>
                 </div>
             </div>
-        </PublicLayout>
+        </OnboardingLayout>
     );
 }

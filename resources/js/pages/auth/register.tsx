@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { login } from '@/routes';
-import PublicLayout from '@/layouts/public-layout';
+import OnboardingLayout from '@/layouts/onboarding-layout';
 import {
     Building2,
     KeyRound,
@@ -131,7 +131,7 @@ export default function Register({
     };
 
     return (
-        <PublicLayout title="Get Started with InstitutoPropio — Choose Registration Journey">
+        <OnboardingLayout title="Get Started with InstitutoPropio — Choose Registration Journey">
             <div className="bg-[#F8FAFC] py-10 sm:py-14 md:py-16 border-b border-slate-100 min-h-[80vh]">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     {/* Top Navigation Row */}
@@ -1054,6 +1054,6 @@ export default function Register({
                     </div>
                 </div>
             </div>
-        </PublicLayout>
+        </OnboardingLayout>
     );
 }

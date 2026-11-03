@@ -136,6 +136,7 @@ class AdminPaymentApprovalController extends Controller
 
             $req->update([
                 'status' => PaymentApprovalRequest::STATUS_APPROVED,
+                'pending_email' => null,
                 'approved_by' => $user->id,
                 'approved_at' => now(),
                 'completion_token' => $token,
@@ -181,6 +182,7 @@ class AdminPaymentApprovalController extends Controller
 
             $req->update([
                 'status' => PaymentApprovalRequest::STATUS_REJECTED,
+                'pending_email' => null,
                 'rejection_reason' => trim($validated['rejection_reason']),
                 'rejected_by' => $user->id,
                 'rejected_at' => now(),

@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Mail,
     CheckCircle2,
@@ -21,8 +21,9 @@ import {
     HelpCircle,
     Lock,
     ExternalLink,
+    RefreshCw,
 } from 'lucide-react';
-import PublicLayout from '@/layouts/public-layout';
+import OnboardingLayout from '@/layouts/onboarding-layout';
 
 interface Plan {
     name: string;
@@ -32,6 +33,7 @@ interface Plan {
     monthly_cents: number;
     monthly_formatted: string;
     yearly_cents: number | null;
+    yearly_formatted?: string | null;
     yearly_available: boolean;
     is_popular?: boolean;
     max_organizations: number;
@@ -52,45 +54,63 @@ interface PaymentMethod {
     instructions?: string;
 }
 
+interface SubmissionResult {
+    reference: string;
+    email: string;
+    plan: string;
+    submitted_at: string;
+}
+
 interface Props {
     plans: Plan[];
     paymentMethods: PaymentMethod[];
-    currency: string;
-    trialDays: number;
-    yearlyPricingAvailable: boolean;
+    currency?: string;
+    trialDays?: number;
+    yearlyPricingAvailable?: boolean;
+    initialStep?: number;
     initialEmail?: string;
     initialPlan?: string;
-    initialInterval?: string;
+    initialInterval?: 'monthly' | 'annual';
+    initialMethod?: string;
+    registrationToken?: string | null;
+    submissionResult?: SubmissionResult | null;
 }
 
 export default function RegisterOnboarding({
-    plans,
-    paymentMethods,
+    plans = [],
+    paymentMethods = [],
     currency = 'USD',
     trialDays = 30,
-    yearlyPricingAvailable = false,
+    yearlyPricingAvailable = true,
+    initialStep = 1,
     initialEmail = '',
     initialPlan = 'growth',
     initialInterval = 'monthly',
+    initialMethod = 'bank_transfer',
+    registrationToken = null,
+    submissionResult = null,
 }: Props) {
-    // Current Step: 1 = Email, 2 = Plan, 3 = Instructions, 4 = Proof, 5 = Submitted Confirmation
-    const [step, setStep] = useState<number>(1);
+    // Current Step: 1 = Email, 2 = Plan, 3 = Payment Instructions, 4 = Proof, 5 = Submitted Confirmation
+    const [step, setStep] = useState<number>(initialStep || 1);
+    const [token, setToken] = useState<string | null>(registrationToken || null);
 
     // Step 1: Email State
-    const [email, setEmail] = useState<string>(initialEmail);
+    const [email, setEmail] = useState<string>(initialEmail || '');
     const [emailLoading, setEmailLoading] = useState<boolean>(false);
     const [emailError, setEmailError] = useState<string | null>(null);
+    const [emailActionUrl, setEmailActionUrl] = useState<string | null>(null);
+    const [emailActionLabel, setEmailActionLabel] = useState<string | null>(null);
     const [emailNotice, setEmailNotice] = useState<string | null>(null);
 
     // Step 2: Plan & Interval State
-    const [selectedPlanSlug, setSelectedPlanSlug] = useState<string>(initialPlan);
+    const [selectedPlanSlug, setSelectedPlanSlug] = useState<string>(initialPlan || 'growth');
     const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>(
         initialInterval === 'annual' && yearlyPricingAvailable ? 'annual' : 'monthly'
     );
 
     // Step 3: Payment Method
     const [selectedMethodId, setSelectedMethodId] = useState<string>(
-        paymentMethods[0]?.id || 'bank_transfer'
+        initialMethod || paymentMethods[0]?.id || 'bank_transfer'
     );
     const [copiedField, setCopiedField] = useState<string | null>(null);
 
@@ -103,15 +123,29 @@ export default function RegisterOnboarding({
     const [submitError, setSubmitError] = useState<string | null>(null);
 
     // Step 5: Success Response
-    const [submissionResult, setSubmissionResult] = useState<{
-        reference: string;
-        email: string;
-        plan: string;
-        submitted_at: string;
-    } | null>(null);
+    const [result, setResult] = useState<SubmissionResult | null>(submissionResult || null);
 
-    const selectedPlan = plans.find((p) => p.slug === selectedPlanSlug) || plans[0];
-    const selectedMethod = paymentMethods.find((m) => m.id === selectedMethodId) || paymentMethods[0];
+    // Helpers
+    const selectedPlan = plans.find((p) => p.slug === selectedPlanSlug) || plans[0] || {
+        name: 'Starter',
+        slug: 'starter',
+        headline: 'Essential Digital Campus',
+        monthly_cents: 1900,
+        yearly_cents: 19000,
+        yearly_available: true,
+        max_organizations: 1,
+        features: [],
+    };
+
+    const selectedMethod = paymentMethods.find((m) => m.id === selectedMethodId) || paymentMethods[0] || {
+        id: 'bank_transfer',
+        name: 'Bank Wire / ACH Transfer',
+    };
+
+    // Calculate price for selected interval
+    const isAnnual = billingInterval === 'annual' && selectedPlan.yearly_available && selectedPlan.yearly_cents;
+    const currentPriceCents = isAnnual ? selectedPlan.yearly_cents! : selectedPlan.monthly_cents;
+    const currentPriceDisplay = `$${(currentPriceCents / 100).toFixed(0)}`;
 
     const copyToClipboard = (text: string, field: string) => {
         navigator.clipboard.writeText(text);
@@ -119,13 +153,68 @@ export default function RegisterOnboarding({
         setTimeout(() => setCopiedField(null), 2000);
     };
 
-    // Step 1: Check Email
+    // Sync browser URL query string without page reload
+    const syncBrowserUrl = (newStep: number) => {
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href);
+            if (newStep === 1) {
+                url.searchParams.delete('step');
+            } else {
+                url.searchParams.set('step', String(newStep));
+            }
+            window.history.replaceState({}, '', url.toString());
+        }
+    };
+
+    // Server-side progress update helper
+    const persistProgress = async (
+        targetStep: number,
+        extraData: Record<string, any> = {}
+    ) => {
+        try {
+            const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content;
+            const res = await fetch('/onboarding/save-progress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken || '',
+                },
+                body: JSON.stringify({
+                    step: targetStep,
+                    registration_token: token,
+                    email: email.trim(),
+                    plan_slug: selectedPlanSlug,
+                    billing_interval: billingInterval,
+                    payment_method: selectedMethodId,
+                    ...extraData,
+                }),
+            });
+            const data = await res.json();
+            if (data.registration_token) {
+                setToken(data.registration_token);
+            }
+        } catch {
+            // Silently allow local progression if background save has transient network issue
+        }
+    };
+
+    // Navigate to step
+    const goToStep = async (newStep: number, extraData: Record<string, any> = {}) => {
+        setStep(newStep);
+        syncBrowserUrl(newStep);
+        await persistProgress(newStep, extraData);
+    };
+
+    // Step 1: Check Email and initiate/resume draft application
     const handleCheckEmail = async (e: React.FormEvent) => {
         e.preventDefault();
         setEmailError(null);
+        setEmailActionUrl(null);
+        setEmailActionLabel(null);
         setEmailNotice(null);
 
-        const trimmed = email.trim();
+        const trimmed = email.trim().toLowerCase();
         if (!trimmed || !trimmed.includes('@')) {
             setEmailError('Please enter a valid administrative email address.');
             return;
@@ -146,32 +235,66 @@ export default function RegisterOnboarding({
 
             const data = await res.json();
 
-            if (res.status === 422) {
-                setEmailError(data.message || 'An active account already exists with this email.');
+            // Strict duplicate prevention: 422 returned for existing user or pending application
+            if (res.status === 422 || !res.ok) {
+                setEmailError(
+                    data.message ||
+                    'This email address is already registered or has a pending application. Please sign in or track your existing application.'
+                );
+
+                if (data.status === 'registered' || data.action === 'login') {
+                    setEmailActionUrl('/login');
+                    setEmailActionLabel('Sign In to Your Institution Account →');
+                } else if (data.status === 'pending_approval' || data.action === 'track') {
+                    setEmailActionUrl(data.action_url || `/onboarding/status?email=${encodeURIComponent(trimmed)}`);
+                    setEmailActionLabel('Track Your Pending Application Status →');
+                } else if (data.status === 'approved_ready' || data.action === 'complete') {
+                    setEmailActionUrl(data.completion_url || '/register');
+                    setEmailActionLabel('Complete Your Approved Account Setup →');
+                }
                 return;
             }
 
-            if (!res.ok) {
-                setEmailError(data.message || 'Could not verify email. Please try again.');
-                return;
+            // Available: Save token and step
+            if (data.registration_token) {
+                setToken(data.registration_token);
+            }
+            if (data.notice) {
+                setEmailNotice(data.notice);
+            }
+            if (data.plan_slug) {
+                setSelectedPlanSlug(data.plan_slug);
+            }
+            if (data.billing_interval) {
+                setBillingInterval(data.billing_interval);
             }
 
-            if (data.status === 'pending_approval') {
-                setEmailNotice('You already have a pending verification request. You can check its live status or continue.');
-            } else if (data.status === 'previously_rejected') {
-                setEmailNotice(`Notice: A previous submission was rejected (${data.rejection_reason || 'See details'}). You may submit updated payment proof.`);
-            }
-
-            // Proceed to Step 2
+            // Advance to Step 2
             setStep(2);
+            syncBrowserUrl(2);
         } catch {
-            setEmailError('Network error checking email. Please try again.');
+            setEmailError('Network error checking email availability. Please check your connection and try again.');
         } finally {
             setEmailLoading(false);
         }
     };
 
-    // Handle File Selection
+    // Step 2 Continue: Save plan & advance to Step 3
+    const handleContinueToStep3 = async () => {
+        await goToStep(3, {
+            plan_slug: selectedPlanSlug,
+            billing_interval: billingInterval,
+        });
+    };
+
+    // Step 3 Continue: Save method & advance to Step 4
+    const handleContinueToStep4 = async () => {
+        await goToStep(4, {
+            payment_method: selectedMethodId,
+        });
+    };
+
+    // Handle File Selection with validation
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -216,12 +339,15 @@ export default function RegisterOnboarding({
 
         setSubmitting(true);
         const formData = new FormData();
-        formData.append('email', email.trim());
+        formData.append('email', email.trim().toLowerCase());
         formData.append('plan_slug', selectedPlanSlug);
         formData.append('billing_interval', billingInterval);
         formData.append('payment_method', selectedMethodId);
         formData.append('transaction_reference', txnReference.trim());
         formData.append('receipt', receiptFile);
+        if (token) {
+            formData.append('registration_token', token);
+        }
         if (notes.trim()) {
             formData.append('notes', notes.trim());
         }
@@ -242,32 +368,33 @@ export default function RegisterOnboarding({
             if (!res.ok) {
                 if (data.errors) {
                     const firstErr = Object.values(data.errors)[0] as string[];
-                    setSubmitError(firstErr[0] || 'Validation failed.');
+                    setSubmitError(firstErr[0] || 'Validation failed. Please review your entries.');
                 } else {
                     setSubmitError(data.message || 'Submission failed. Please check your inputs.');
                 }
                 return;
             }
 
-            setSubmissionResult({
+            setResult({
                 reference: data.reference,
                 email: data.email,
                 plan: data.plan,
                 submitted_at: data.submitted_at,
             });
             setStep(5);
+            syncBrowserUrl(5);
         } catch {
-            setSubmitError('Network failure during submission. Please try again.');
+            setSubmitError('Network failure during submission. Please check your connection and try again.');
         } finally {
             setSubmitting(false);
         }
     };
 
     return (
-        <PublicLayout title="Get Started with InstitutoPropio — SaaS Registration & Onboarding">
-            <div className="bg-[#F8FAFC] py-10 sm:py-14 md:py-16 border-b border-slate-100">
+        <OnboardingLayout title="Get Started with InstitutoPropio — SaaS Registration & Onboarding">
+            <div className="py-10 sm:py-14 md:py-16">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                    {/* Step Indicator Header */}
+                    {/* Step Indicator Header (Steps 1 to 4) */}
                     {step < 5 && (
                         <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-12">
                             <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/90 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
@@ -281,7 +408,7 @@ export default function RegisterOnboarding({
                                 Join modern educational institutions worldwide. Complete our verified 4-step onboarding to activate your isolated school workspace with zero upfront setup fees.
                             </p>
 
-                            {/* Clean Horizontal Progress Stepper */}
+                            {/* Clean Horizontal Progress Stepper with Step Navigation */}
                             <div className="mx-auto mt-8 max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs">
                                 <div className="flex items-center justify-between">
                                     {[
@@ -289,47 +416,58 @@ export default function RegisterOnboarding({
                                         { num: 2, label: 'Select Plan' },
                                         { num: 3, label: 'Payment Details' },
                                         { num: 4, label: 'Upload Proof' },
-                                    ].map((s, idx) => (
-                                        <React.Fragment key={s.num}>
-                                            <div className="flex flex-col items-center flex-1">
+                                    ].map((s, idx) => {
+                                        const isCompleted = step > s.num;
+                                        const isCurrent = step === s.num;
+                                        const isClickable = isCompleted && step < 5;
+
+                                        return (
+                                            <React.Fragment key={s.num}>
                                                 <div
-                                                    className={`flex size-8 sm:size-9 items-center justify-center rounded-full text-xs font-extrabold transition-all ${
-                                                        step === s.num
-                                                            ? 'border-2 border-[#1769E0] bg-[#1769E0] text-white shadow-md shadow-blue-600/25'
-                                                            : step > s.num
-                                                            ? 'border border-emerald-500 bg-emerald-50 text-emerald-600'
-                                                            : 'border border-slate-200 bg-slate-100 text-slate-400'
+                                                    onClick={() => isClickable && goToStep(s.num)}
+                                                    className={`flex flex-col items-center flex-1 transition-all ${
+                                                        isClickable ? 'cursor-pointer hover:opacity-85' : ''
                                                     }`}
                                                 >
-                                                    {step > s.num ? <Check className="size-4 stroke-[3]" /> : s.num}
+                                                    <div
+                                                        className={`flex size-8 sm:size-9 items-center justify-center rounded-full text-xs font-extrabold transition-all ${
+                                                            isCurrent
+                                                                ? 'border-2 border-[#1769E0] bg-[#1769E0] text-white shadow-md shadow-blue-600/25 ring-2 ring-blue-500/20'
+                                                                : isCompleted
+                                                                ? 'border border-emerald-500 bg-emerald-50 text-emerald-600'
+                                                                : 'border border-slate-200 bg-slate-100 text-slate-400'
+                                                        }`}
+                                                    >
+                                                        {isCompleted ? <Check className="size-4 stroke-[3]" /> : s.num}
+                                                    </div>
+                                                    <span
+                                                        className={`mt-1.5 text-[11px] sm:text-xs font-bold ${
+                                                            isCurrent
+                                                                ? 'text-[#1769E0]'
+                                                                : isCompleted
+                                                                ? 'text-emerald-700'
+                                                                : 'text-slate-400'
+                                                        }`}
+                                                    >
+                                                        {s.label}
+                                                    </span>
                                                 </div>
-                                                <span
-                                                    className={`mt-1.5 text-[11px] sm:text-xs font-bold ${
-                                                        step === s.num
-                                                            ? 'text-[#1769E0]'
-                                                            : step > s.num
-                                                            ? 'text-emerald-700'
-                                                            : 'text-slate-400'
-                                                    }`}
-                                                >
-                                                    {s.label}
-                                                </span>
-                                            </div>
-                                            {idx < 3 && (
-                                                <div
-                                                    className={`h-0.5 w-6 sm:w-12 md:w-16 -mt-5 transition-colors ${
-                                                        step > s.num ? 'bg-emerald-500' : 'bg-slate-200'
-                                                    }`}
-                                                />
-                                            )}
-                                        </React.Fragment>
-                                    ))}
+                                                {idx < 3 && (
+                                                    <div
+                                                        className={`h-0.5 w-6 sm:w-12 md:w-16 -mt-5 transition-colors ${
+                                                            step > s.num ? 'bg-emerald-500' : 'bg-slate-200'
+                                                        }`}
+                                                    />
+                                                )}
+                                            </React.Fragment>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* STEP 1: Enter Email Only (Two-Column Spacious SaaS Card) */}
+                    {/* STEP 1: Enter Administrative Email */}
                     {step === 1 && (
                         <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white shadow-xs overflow-hidden">
                             <div className="grid grid-cols-1 lg:grid-cols-12">
@@ -348,22 +486,32 @@ export default function RegisterOnboarding({
                                             </div>
                                         </div>
 
+                                        {/* Duplicate Email Warning Alert */}
                                         {emailError && (
-                                            <div className="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/80 p-4 text-xs text-rose-800">
-                                                <AlertCircle className="size-4.5 shrink-0 text-rose-600 mt-0.5" />
-                                                <div>
-                                                    <p className="font-semibold">{emailError}</p>
-                                                    {emailError.includes('already exists') && (
-                                                        <Link href="/login" className="mt-1.5 inline-block font-bold text-[#1769E0] underline hover:text-[#1256B8]">
-                                                            Log in to your account &rarr;
-                                                        </Link>
-                                                    )}
+                                            <div className="mb-6 rounded-2xl border border-rose-200 bg-rose-50/90 p-4 text-xs text-rose-900 shadow-xs">
+                                                <div className="flex items-start gap-3">
+                                                    <AlertCircle className="size-5 shrink-0 text-rose-600 mt-0.5" />
+                                                    <div className="space-y-2">
+                                                        <p className="font-bold text-sm text-rose-950">Registration Notice</p>
+                                                        <p className="leading-relaxed text-rose-800">{emailError}</p>
+
+                                                        {emailActionUrl && emailActionLabel && (
+                                                            <div className="pt-1">
+                                                                <Link
+                                                                    href={emailActionUrl}
+                                                                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#1769E0] px-3.5 py-1.5 font-bold text-white shadow-xs transition hover:bg-[#1256B8]"
+                                                                >
+                                                                    <span>{emailActionLabel}</span>
+                                                                </Link>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
 
                                         {emailNotice && (
-                                            <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/80 p-4 text-xs text-amber-800">
+                                            <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/90 p-4 text-xs text-amber-900">
                                                 <Clock className="size-4.5 shrink-0 text-amber-600 mt-0.5" />
                                                 <span>{emailNotice}</span>
                                             </div>
@@ -381,7 +529,11 @@ export default function RegisterOnboarding({
                                                         required
                                                         autoFocus
                                                         value={email}
-                                                        onChange={(e) => setEmail(e.target.value)}
+                                                        onChange={(e) => {
+                                                            setEmail(e.target.value);
+                                                            setEmailError(null);
+                                                            setEmailActionUrl(null);
+                                                        }}
                                                         placeholder="director@schoolname.edu"
                                                         className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
                                                     />
@@ -398,8 +550,8 @@ export default function RegisterOnboarding({
                                             >
                                                 {emailLoading ? (
                                                     <>
-                                                        <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                                        <span>Checking Email Availability...</span>
+                                                        <RefreshCw className="size-4 animate-spin" />
+                                                        <span>Verifying Work Email...</span>
                                                     </>
                                                 ) : (
                                                     <>
@@ -419,9 +571,9 @@ export default function RegisterOnboarding({
                                             </Link>
                                         </span>
                                         <span>
-                                            Joining with invite?{' '}
-                                            <Link href="/register?journey=join" className="font-bold text-[#1769E0] hover:underline">
-                                                Join existing campus
+                                            Have an application?{' '}
+                                            <Link href="/onboarding/status" className="font-bold text-[#1769E0] hover:underline">
+                                                Track Status
                                             </Link>
                                         </span>
                                     </div>
@@ -499,10 +651,10 @@ export default function RegisterOnboarding({
                                     </span>
                                     <button
                                         type="button"
-                                        onClick={() => setStep(1)}
+                                        onClick={() => goToStep(1)}
                                         className="ml-2 text-xs font-semibold text-[#1769E0] underline hover:text-[#1256B8]"
                                     >
-                                        Change
+                                        Change Email
                                     </button>
                                 </div>
 
@@ -510,7 +662,10 @@ export default function RegisterOnboarding({
                                 <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1">
                                     <button
                                         type="button"
-                                        onClick={() => setBillingInterval('monthly')}
+                                        onClick={() => {
+                                            setBillingInterval('monthly');
+                                            persistProgress(2, { billing_interval: 'monthly' });
+                                        }}
                                         className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${
                                             billingInterval === 'monthly'
                                                 ? 'bg-[#1769E0] text-white shadow-xs'
@@ -521,7 +676,10 @@ export default function RegisterOnboarding({
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setBillingInterval('annual')}
+                                        onClick={() => {
+                                            setBillingInterval('annual');
+                                            persistProgress(2, { billing_interval: 'annual' });
+                                        }}
                                         className={`relative rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${
                                             billingInterval === 'annual'
                                                 ? 'bg-[#1769E0] text-white shadow-xs'
@@ -530,30 +688,29 @@ export default function RegisterOnboarding({
                                     >
                                         <span>Annual Billing</span>
                                         <span className="ml-1.5 rounded-full bg-emerald-100 border border-emerald-200 px-1.5 py-0.2 text-[9px] font-extrabold text-emerald-800">
-                                            2 Mos Free
+                                            2 Mos Free (~17% Off)
                                         </span>
                                     </button>
                                 </div>
                             </div>
-
-                            {billingInterval === 'annual' && !yearlyPricingAvailable && (
-                                <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
-                                    <AlertCircle className="size-4 shrink-0 text-amber-600" />
-                                    <span>
-                                        <strong>Notice:</strong> Yearly billing packages are currently being finalized. Please continue with Monthly billing to start your 30-day trial immediately, or contact sales for custom terms.
-                                    </span>
-                                </div>
-                            )}
 
                             {/* Plan Cards Grid */}
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                                 {plans.map((p) => {
                                     const isSelected = selectedPlanSlug === p.slug;
                                     const isPopular = p.is_popular;
+                                    const displayPrice = billingInterval === 'annual' && p.yearly_cents
+                                        ? `$${(p.yearly_cents / 100).toFixed(0)}`
+                                        : `$${(p.monthly_cents / 100).toFixed(0)}`;
+                                    const displayInterval = billingInterval === 'annual' ? '/ year' : '/ month';
+
                                     return (
                                         <div
                                             key={p.slug}
-                                            onClick={() => setSelectedPlanSlug(p.slug)}
+                                            onClick={() => {
+                                                setSelectedPlanSlug(p.slug);
+                                                persistProgress(2, { plan_slug: p.slug });
+                                            }}
                                             className={`relative flex cursor-pointer flex-col justify-between rounded-3xl border p-7 transition-all duration-200 ${
                                                 isSelected
                                                     ? 'border-[#1769E0] ring-2 ring-[#1769E0]/20 bg-white shadow-lg'
@@ -585,10 +742,15 @@ export default function RegisterOnboarding({
                                                 <div className="my-5 border-y border-slate-100 py-4">
                                                     <div className="flex items-baseline gap-1">
                                                         <span className="text-3xl font-extrabold text-[#0B1528]">
-                                                            ${p.monthly_cents / 100}
+                                                            {displayPrice}
                                                         </span>
-                                                        <span className="text-xs text-slate-500 font-medium">/ month</span>
+                                                        <span className="text-xs text-slate-500 font-medium">{displayInterval}</span>
                                                     </div>
+                                                    {billingInterval === 'annual' && p.yearly_cents && (
+                                                        <p className="text-[11px] text-emerald-700 font-semibold mt-1">
+                                                            Equivalent to ${(p.yearly_cents / 1200).toFixed(2)}/mo
+                                                        </p>
+                                                    )}
                                                     <span className="mt-2 inline-block rounded-md border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-[#1769E0]">
                                                         {p.max_organizations} {p.max_organizations === 1 ? 'Campus Workspace' : 'Campuses Included'}
                                                     </span>
@@ -607,7 +769,10 @@ export default function RegisterOnboarding({
 
                                             <button
                                                 type="button"
-                                                onClick={() => setSelectedPlanSlug(p.slug)}
+                                                onClick={() => {
+                                                    setSelectedPlanSlug(p.slug);
+                                                    persistProgress(2, { plan_slug: p.slug });
+                                                }}
                                                 className={`mt-6 w-full rounded-xl py-2.5 text-xs font-bold transition ${
                                                     isSelected
                                                         ? 'bg-[#1769E0] text-white shadow-md shadow-blue-500/20'
@@ -629,7 +794,7 @@ export default function RegisterOnboarding({
                                     </div>
                                     <div>
                                         <h4 className="text-xs font-bold text-emerald-950 sm:text-sm">
-                                            30-Day Free Trial Terms & Policy
+                                            30-Day Free Trial Included
                                         </h4>
                                         <p className="text-xs text-emerald-800">
                                             Your 30-day trial begins immediately once payment proof is approved. Unlimited students and teachers across all tiers.
@@ -639,14 +804,14 @@ export default function RegisterOnboarding({
                                 <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                                     <button
                                         type="button"
-                                        onClick={() => setStep(1)}
+                                        onClick={() => goToStep(1)}
                                         className="cursor-pointer rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                                     >
                                         Back
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setStep(3)}
+                                        onClick={handleContinueToStep3}
                                         className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#FF7A30] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
                                     >
                                         <span>Continue to Payment Instructions</span>
@@ -667,7 +832,7 @@ export default function RegisterOnboarding({
                                         Selected Subscription Order
                                     </span>
                                     <h2 className="text-lg font-bold text-[#0B1528]">
-                                        {selectedPlan.name} Plan — ${selectedPlan.monthly_cents / 100}.00 {currency}
+                                        {selectedPlan.name} Plan — {currentPriceDisplay}.00 {currency} ({billingInterval === 'annual' ? 'Annual Billing' : 'Monthly Billing'})
                                     </h2>
                                     <p className="text-xs text-slate-600 mt-0.5">
                                         Order registered for: <strong className="text-slate-900">{email}</strong>
@@ -679,7 +844,7 @@ export default function RegisterOnboarding({
                                     </span>
                                     <button
                                         type="button"
-                                        onClick={() => setStep(2)}
+                                        onClick={() => goToStep(2)}
                                         className="text-xs font-semibold text-[#1769E0] underline hover:text-[#1256B8]"
                                     >
                                         Change Plan
@@ -703,7 +868,10 @@ export default function RegisterOnboarding({
                                             <button
                                                 key={m.id}
                                                 type="button"
-                                                onClick={() => setSelectedMethodId(m.id)}
+                                                onClick={() => {
+                                                    setSelectedMethodId(m.id);
+                                                    persistProgress(3, { payment_method: m.id });
+                                                }}
                                                 className={`flex cursor-pointer flex-col items-start rounded-2xl border p-4 text-left transition-all ${
                                                     active
                                                         ? 'border-[#1769E0] bg-blue-50/80 ring-2 ring-[#1769E0]/20 shadow-xs'
@@ -733,7 +901,7 @@ export default function RegisterOnboarding({
                                             </span>
                                         </div>
                                         <span className="text-xs font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1">
-                                            Amount Payable: ${selectedPlan.monthly_cents / 100}.00 {currency}
+                                            Amount Payable: {currentPriceDisplay}.00 {currency}
                                         </span>
                                     </div>
 
@@ -741,20 +909,20 @@ export default function RegisterOnboarding({
                                         <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                                             <div className="rounded-xl border border-slate-200 bg-white p-3.5">
                                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bank Name</span>
-                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.bank_name}</div>
+                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.bank_name || 'Standard Chartered Bank'}</div>
                                             </div>
                                             <div className="rounded-xl border border-slate-200 bg-white p-3.5">
                                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Title</span>
-                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.account_title}</div>
+                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.account_title || 'InstitutoPropio Technologies Inc.'}</div>
                                             </div>
                                             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
                                                 <div>
                                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Number</span>
-                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.account_number}</div>
+                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.account_number || '01-8934201-01'}</div>
                                                 </div>
                                                 <button
                                                     type="button"
-                                                    onClick={() => copyToClipboard(selectedMethod.account_number || '', 'acc')}
+                                                    onClick={() => copyToClipboard(selectedMethod.account_number || '01-8934201-01', 'acc')}
                                                     className="cursor-pointer rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition"
                                                     title="Copy account number"
                                                 >
@@ -764,11 +932,11 @@ export default function RegisterOnboarding({
                                             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
                                                 <div>
                                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">IBAN</span>
-                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.iban}</div>
+                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.iban || 'PK36SCBL0000001893420101'}</div>
                                                 </div>
                                                 <button
                                                     type="button"
-                                                    onClick={() => copyToClipboard(selectedMethod.iban || '', 'iban')}
+                                                    onClick={() => copyToClipboard(selectedMethod.iban || 'PK36SCBL0000001893420101', 'iban')}
                                                     className="cursor-pointer rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition"
                                                     title="Copy IBAN"
                                                 >
@@ -794,16 +962,16 @@ export default function RegisterOnboarding({
                                         <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                                             <div className="rounded-xl border border-slate-200 bg-white p-3.5">
                                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Account Title</span>
-                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.account_title}</div>
+                                                <div className="mt-0.5 text-xs font-bold text-slate-900">{selectedMethod.account_title || 'InstitutoPropio Finance'}</div>
                                             </div>
                                             <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3.5">
                                                 <div>
                                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mobile Account Number</span>
-                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.account_number}</div>
+                                                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-900">{selectedMethod.account_number || '0300-1234567'}</div>
                                                 </div>
                                                 <button
                                                     type="button"
-                                                    onClick={() => copyToClipboard(selectedMethod.account_number || '', 'mobile')}
+                                                    onClick={() => copyToClipboard(selectedMethod.account_number || '0300-1234567', 'mobile')}
                                                     className="cursor-pointer rounded-lg border border-slate-200 p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition"
                                                     title="Copy mobile number"
                                                 >
@@ -831,27 +999,29 @@ export default function RegisterOnboarding({
 
                                     {selectedMethod.id === 'other' && (
                                         <div className="rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-700 leading-relaxed">
-                                            <p>{selectedMethod.instructions}</p>
+                                            <p>{selectedMethod.instructions || 'Please contact our finance desk for bespoke wire or invoice instructions.'}</p>
                                         </div>
                                     )}
 
                                     <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-slate-700">
                                         <div className="font-bold text-[#1769E0]">Important Payment Instructions:</div>
-                                        <p className="mt-1 text-slate-600 leading-relaxed">{selectedMethod.instructions}</p>
+                                        <p className="mt-1 text-slate-600 leading-relaxed">
+                                            {selectedMethod.instructions || 'Please use your institution email address as the payment transfer remarks. Save your transaction receipt or reference ID to upload in the next step.'}
+                                        </p>
                                     </div>
                                 </div>
 
                                 <div className="mt-8 flex items-center justify-between">
                                     <button
                                         type="button"
-                                        onClick={() => setStep(2)}
+                                        onClick={() => goToStep(2)}
                                         className="cursor-pointer rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                                     >
                                         Back
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setStep(4)}
+                                        onClick={handleContinueToStep4}
                                         className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#FF7A30] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
                                     >
                                         <span>I Have Completed Payment &rarr; Upload Proof</span>
@@ -895,7 +1065,7 @@ export default function RegisterOnboarding({
                                             <div className="flex justify-between text-xs">
                                                 <span className="text-slate-500">Amount Due:</span>
                                                 <span className="font-extrabold text-slate-900">
-                                                    ${selectedPlan.monthly_cents / 100}.00 {currency}
+                                                    {currentPriceDisplay}.00 {currency}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between text-xs">
@@ -936,7 +1106,7 @@ export default function RegisterOnboarding({
                                                     type="text"
                                                     readOnly
                                                     disabled
-                                                    value={`${selectedPlan.name} Plan ($${selectedPlan.monthly_cents / 100}.00 ${currency})`}
+                                                    value={`${selectedPlan.name} Plan (${currentPriceDisplay}.00 ${currency})`}
                                                     className="mt-1.5 h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs font-bold text-[#1769E0]"
                                                 />
                                             </div>
@@ -946,7 +1116,10 @@ export default function RegisterOnboarding({
                                                 </label>
                                                 <select
                                                     value={selectedMethodId}
-                                                    onChange={(e) => setSelectedMethodId(e.target.value)}
+                                                    onChange={(e) => {
+                                                        setSelectedMethodId(e.target.value);
+                                                        persistProgress(4, { payment_method: e.target.value });
+                                                    }}
                                                     className="mt-1.5 h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
                                                 >
                                                     {paymentMethods.map((m) => (
@@ -1056,7 +1229,7 @@ export default function RegisterOnboarding({
                                         <div className="flex items-center justify-between border-t border-slate-100 pt-5">
                                             <button
                                                 type="button"
-                                                onClick={() => setStep(3)}
+                                                onClick={() => goToStep(3)}
                                                 className="cursor-pointer rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                                             >
                                                 Back
@@ -1068,7 +1241,7 @@ export default function RegisterOnboarding({
                                             >
                                                 {submitting ? (
                                                     <>
-                                                        <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                                        <RefreshCw className="size-4 animate-spin" />
                                                         <span>Submitting for Verification...</span>
                                                     </>
                                                 ) : (
@@ -1086,7 +1259,7 @@ export default function RegisterOnboarding({
                     )}
 
                     {/* STEP 5: Confirmation / Pending Review Screen */}
-                    {step === 5 && submissionResult && (
+                    {step === 5 && result && (
                         <div className="mx-auto max-w-xl rounded-3xl border border-slate-200 bg-white p-8 sm:p-10 text-center shadow-sm">
                             <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200">
                                 <Clock className="size-8" />
@@ -1103,19 +1276,19 @@ export default function RegisterOnboarding({
                             <div className="my-6 space-y-3 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 text-left text-xs">
                                 <div className="flex justify-between border-b border-slate-200/80 pb-2">
                                     <span className="text-slate-500">Tracking Reference:</span>
-                                    <span className="font-mono font-bold text-[#1769E0]">{submissionResult.reference}</span>
+                                    <span className="font-mono font-bold text-[#1769E0]">{result.reference}</span>
                                 </div>
                                 <div className="flex justify-between border-b border-slate-200/80 pb-2">
                                     <span className="text-slate-500">Applicant Email:</span>
-                                    <span className="font-bold text-slate-900">{submissionResult.email}</span>
+                                    <span className="font-bold text-slate-900">{result.email}</span>
                                 </div>
                                 <div className="flex justify-between border-b border-slate-200/80 pb-2">
                                     <span className="text-slate-500">Subscription Tier:</span>
-                                    <span className="font-bold text-slate-900">{submissionResult.plan}</span>
+                                    <span className="font-bold text-slate-900">{result.plan}</span>
                                 </div>
                                 <div className="flex justify-between border-b border-slate-200/80 pb-2">
                                     <span className="text-slate-500">Submission Time:</span>
-                                    <span className="text-slate-700">{submissionResult.submitted_at}</span>
+                                    <span className="text-slate-700">{result.submitted_at}</span>
                                 </div>
                                 <div className="flex justify-between items-center pt-1">
                                     <span className="text-slate-500">Review Status:</span>
@@ -1127,10 +1300,10 @@ export default function RegisterOnboarding({
 
                             <div className="space-y-3">
                                 <Link
-                                    href={`/onboarding/status?email=${encodeURIComponent(submissionResult.email)}`}
+                                    href={`/onboarding/status?email=${encodeURIComponent(result.email)}`}
                                     className="block w-full rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
                                 >
-                                    Check Approval Status &rarr;
+                                    Check Live Approval Status &rarr;
                                 </Link>
 
                                 <Link
@@ -1141,13 +1314,13 @@ export default function RegisterOnboarding({
                                 </Link>
                             </div>
 
-                            <p className="mt-6 text-xs text-slate-500">
+                            <p className="mt-6 text-xs text-slate-500 leading-relaxed">
                                 Once approved, you will receive an automated email with your secure single-use token to set up your password and institution name.
                             </p>
                         </div>
                     )}
                 </div>
             </div>
-        </PublicLayout>
+        </OnboardingLayout>
     );
 }

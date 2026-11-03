@@ -28,7 +28,7 @@ use Inertia\Response;
 class SaaSOnboardingController extends Controller
 {
     /**
-     * Display the new multi-step SaaS registration onboarding flow.
+     * Display the multi-step SaaS registration onboarding flow with server-side progress restoration.
      */
     public function show(Request $request): Response|RedirectResponse
     {
@@ -39,15 +39,19 @@ class SaaSOnboardingController extends Controller
 
         $configPlans = config('manual_payment.plans', []);
         $plans = collect($configPlans)->map(function ($plan, $key) {
+            $monthlyCents = (int) ($plan['monthly_cents'] ?? 1900);
+            $yearlyCents = isset($plan['yearly_cents']) ? (int) $plan['yearly_cents'] : null;
+
             return [
                 'name' => $plan['name'],
                 'slug' => $plan['slug'] ?? $key,
                 'headline' => $plan['headline'] ?? '',
                 'target' => $plan['target'] ?? '',
-                'monthly_cents' => $plan['monthly_cents'],
-                'monthly_formatted' => '$'.number_format($plan['monthly_cents'] / 100, 0).'/mo',
-                'yearly_cents' => $plan['yearly_cents'],
-                'yearly_available' => $plan['yearly_available'] ?? false,
+                'monthly_cents' => $monthlyCents,
+                'monthly_formatted' => '$'.number_format($monthlyCents / 100, 0).'/mo',
+                'yearly_cents' => $yearlyCents,
+                'yearly_formatted' => $yearlyCents ? '$'.number_format($yearlyCents / 100, 0).'/yr' : null,
+                'yearly_available' => $plan['yearly_available'] ?? ($yearlyCents !== null),
                 'is_popular' => $plan['is_popular'] ?? false,
                 'max_organizations' => $plan['max_organizations'] ?? 1,
                 'features' => $plan['features'] ?? [],
@@ -56,15 +60,77 @@ class SaaSOnboardingController extends Controller
 
         $methods = collect(config('manual_payment.methods', []))->values();
 
+        // 1. Retrieve draft by session token or query token
+        $sessionToken = $request->session()->get('onboarding_token') ?: $request->query('reg_token');
+        $draft = null;
+
+        if ($sessionToken) {
+            $draft = PaymentApprovalRequest::where('registration_token', $sessionToken)->first();
+        }
+
+        // 2. Fallback: match by email query param if draft exists for email
+        if (! $draft && $reqEmail = $request->query('email')) {
+            $normEmail = strtolower(trim($reqEmail));
+            $draft = PaymentApprovalRequest::where('email', $normEmail)
+                ->where('status', PaymentApprovalRequest::STATUS_DRAFT)
+                ->latest()
+                ->first();
+
+            if ($draft && $draft->registration_token) {
+                $request->session()->put('onboarding_token', $draft->registration_token);
+            }
+        }
+
+        // Defaults
+        $initialStep = 1;
+        $initialEmail = $request->query('email', '');
+        $initialPlan = $request->query('plan', 'growth');
+        $initialInterval = $request->query('interval', 'monthly');
+        $initialMethod = 'bank_transfer';
+        $submissionResult = null;
+
+        if ($draft) {
+            $initialEmail = $draft->email;
+            $initialPlan = $draft->plan_slug ?: $initialPlan;
+            $initialInterval = $draft->billing_interval ?: $initialInterval;
+            $initialMethod = $draft->payment_method ?: $initialMethod;
+
+            if ($draft->status === PaymentApprovalRequest::STATUS_PENDING) {
+                // Application already submitted and pending review
+                $initialStep = 5;
+                $submissionResult = [
+                    'reference' => $draft->transaction_reference,
+                    'email' => $draft->email,
+                    'plan' => $draft->planDisplayName(),
+                    'submitted_at' => $draft->created_at->format('M d, Y h:i A'),
+                ];
+            } else {
+                // Draft status: restore highest unlocked step (1 to 4)
+                $initialStep = max(1, min(4, (int) ($draft->current_step ?: 1)));
+            }
+        }
+
+        // Allow stepping back via ?step= param if already unlocked
+        if ($request->has('step')) {
+            $reqStep = (int) $request->query('step');
+            if ($reqStep >= 1 && $reqStep <= $initialStep) {
+                $initialStep = $reqStep;
+            }
+        }
+
         return Inertia::render('auth/register-onboarding', [
             'plans' => $plans,
             'paymentMethods' => $methods,
             'currency' => config('manual_payment.currency', 'USD'),
             'trialDays' => (int) config('manual_payment.trial_days', 30),
-            'yearlyPricingAvailable' => (bool) config('manual_payment.yearly_pricing_available', false),
-            'initialEmail' => $request->query('email', ''),
-            'initialPlan' => $request->query('plan', 'starter'),
-            'initialInterval' => $request->query('interval', 'monthly'),
+            'yearlyPricingAvailable' => (bool) config('manual_payment.yearly_pricing_available', true),
+            'initialStep' => $initialStep,
+            'initialEmail' => $initialEmail,
+            'initialPlan' => $initialPlan,
+            'initialInterval' => $initialInterval,
+            'initialMethod' => $initialMethod,
+            'registrationToken' => $draft?->registration_token,
+            'submissionResult' => $submissionResult,
         ]);
     }
 
@@ -83,7 +149,9 @@ class SaaSOnboardingController extends Controller
         if (User::where('email', $email)->exists()) {
             return response()->json([
                 'status' => 'registered',
-                'message' => 'An active user account with this email address already exists. Please log in to access your portal.',
+                'message' => 'This email address is already registered or has a pending application. Please sign in or track your existing application.',
+                'action' => 'login',
+                'action_url' => route('login'),
             ], 422);
         }
 
@@ -96,11 +164,12 @@ class SaaSOnboardingController extends Controller
         if ($pending) {
             return response()->json([
                 'status' => 'pending_approval',
-                'request_id' => $pending->id,
+                'message' => 'This email address is already registered or has a pending application. Please sign in or track your existing application.',
+                'action' => 'track',
+                'action_url' => route('onboarding.status', ['email' => $email]),
                 'transaction_reference' => $pending->transaction_reference,
                 'submitted_at' => $pending->created_at->toIso8601String(),
-                'message' => 'A payment approval request for this email is currently awaiting admin verification.',
-            ]);
+            ], 422);
         }
 
         // 3. Check for approved request awaiting account completion
@@ -113,29 +182,211 @@ class SaaSOnboardingController extends Controller
         if ($approved && $approved->isTokenValid()) {
             return response()->json([
                 'status' => 'approved_ready',
-                'completion_url' => url("/onboarding/complete/{$approved->completion_token}"),
                 'message' => 'Your payment has already been approved! Click below to complete your account setup.',
-            ]);
+                'action' => 'complete',
+                'completion_url' => url("/onboarding/complete/{$approved->completion_token}"),
+            ], 422);
         }
 
-        // 4. Check for rejected request (allow resubmission)
+        // 4. Check for rejected request (allow resubmission with helpful notice and create draft)
         $rejected = PaymentApprovalRequest::where('email', $email)
             ->where('status', PaymentApprovalRequest::STATUS_REJECTED)
             ->latest()
             ->first();
 
         if ($rejected) {
+            $token = $request->session()->get('onboarding_token') ?: Str::random(40);
+            $draft = PaymentApprovalRequest::where('registration_token', $token)->first();
+
+            if (! $draft) {
+                $draft = PaymentApprovalRequest::create([
+                    'email' => $email,
+                    'plan_slug' => $request->input('plan_slug', 'growth'),
+                    'billing_interval' => $request->input('billing_interval', 'monthly'),
+                    'current_step' => 2,
+                    'status' => PaymentApprovalRequest::STATUS_DRAFT,
+                    'registration_token' => $token,
+                    'ip_address' => $request->ip(),
+                ]);
+            } else {
+                $draft->update([
+                    'email' => $email,
+                    'current_step' => max(2, (int) ($draft->current_step ?: 1)),
+                    'registration_token' => $token,
+                ]);
+            }
+
+            $request->session()->put('onboarding_token', $token);
+
             return response()->json([
                 'status' => 'previously_rejected',
                 'rejection_reason' => $rejected->rejection_reason,
                 'message' => 'A previous payment attempt was rejected: '.($rejected->rejection_reason ?: 'Unable to verify payment.').' You may submit corrected payment proof.',
+                'registration_token' => $token,
+                'step' => 2,
+                'email' => $draft->email,
+                'plan_slug' => $draft->plan_slug,
+                'billing_interval' => $draft->billing_interval,
             ]);
         }
 
+        // 5. Persist or update draft application record on the server
+        $token = $request->session()->get('onboarding_token') ?: Str::random(40);
+        $draft = PaymentApprovalRequest::where('registration_token', $token)->first();
+
+        if (! $draft) {
+            $draft = PaymentApprovalRequest::where('email', $email)
+                ->where('status', PaymentApprovalRequest::STATUS_DRAFT)
+                ->latest()
+                ->first();
+        }
+
+        if (! $draft) {
+            $draft = PaymentApprovalRequest::create([
+                'email' => $email,
+                'plan_slug' => $request->input('plan_slug', 'growth'),
+                'billing_interval' => $request->input('billing_interval', 'monthly'),
+                'current_step' => 2,
+                'status' => PaymentApprovalRequest::STATUS_DRAFT,
+                'registration_token' => $token,
+                'ip_address' => $request->ip(),
+            ]);
+        } else {
+            $draft->update([
+                'email' => $email,
+                'current_step' => max(2, (int) ($draft->current_step ?: 1)),
+                'registration_token' => $token,
+            ]);
+        }
+
+        $request->session()->put('onboarding_token', $token);
+
         return response()->json([
             'status' => 'available',
-            'message' => 'Email is available. Proceed to plan selection.',
+            'message' => 'Email is available. Proceeding to plan selection.',
+            'notice' => null,
+            'registration_token' => $token,
+            'step' => 2,
+            'email' => $draft->email,
+            'plan_slug' => $draft->plan_slug,
+            'billing_interval' => $draft->billing_interval,
         ]);
+    }
+
+    /**
+     * Persist current step and selections on the server to survive reloads.
+     */
+    public function saveProgress(Request $request): JsonResponse
+    {
+        $token = $request->session()->get('onboarding_token') ?: $request->input('registration_token');
+        if (! $token) {
+            $token = Str::random(40);
+            $request->session()->put('onboarding_token', $token);
+        }
+
+        $step = max(1, min(4, (int) $request->input('step', 1)));
+        $draft = PaymentApprovalRequest::where('registration_token', $token)->first();
+
+        // If email is provided, normalize and enforce duplicate restrictions
+        if ($request->has('email') && ! empty($request->input('email'))) {
+            $email = strtolower(trim($request->input('email')));
+
+            // 1. Check User table
+            if (User::where('email', $email)->exists()) {
+                return response()->json([
+                    'status' => 'registered',
+                    'message' => 'This email address is already registered or has a pending application. Please sign in or track your existing application.',
+                ], 422);
+            }
+
+            // 2. Check pending applications
+            $existingPending = PaymentApprovalRequest::where('email', $email)
+                ->where('status', PaymentApprovalRequest::STATUS_PENDING)
+                ->when($draft, fn ($q) => $q->where('id', '!=', $draft->id))
+                ->exists();
+
+            if ($existingPending) {
+                return response()->json([
+                    'status' => 'pending_approval',
+                    'message' => 'This email address is already registered or has a pending application. Please sign in or track your existing application.',
+                    'tracking_url' => route('onboarding.status', ['email' => $email]),
+                ], 422);
+            }
+
+            if (! $draft) {
+                $draft = PaymentApprovalRequest::create([
+                    'email' => $email,
+                    'plan_slug' => $request->input('plan_slug', 'growth'),
+                    'billing_interval' => $request->input('billing_interval', 'monthly'),
+                    'current_step' => $step,
+                    'status' => PaymentApprovalRequest::STATUS_DRAFT,
+                    'registration_token' => $token,
+                    'ip_address' => $request->ip(),
+                ]);
+            } else {
+                $draft->update([
+                    'email' => $email,
+                    'current_step' => max((int) $draft->current_step, $step),
+                ]);
+            }
+        }
+
+        // Apply attribute updates to draft
+        if ($draft && $draft->status === PaymentApprovalRequest::STATUS_DRAFT) {
+            $updates = [];
+
+            if ($request->has('step')) {
+                $updates['current_step'] = $step;
+            }
+
+            if ($request->has('plan_slug') && in_array($request->input('plan_slug'), ['starter', 'growth', 'professional'], true)) {
+                $updates['plan_slug'] = $request->input('plan_slug');
+            }
+
+            if ($request->has('billing_interval') && in_array($request->input('billing_interval'), ['monthly', 'annual'], true)) {
+                $updates['billing_interval'] = $request->input('billing_interval');
+            }
+
+            if ($request->has('payment_method') && in_array($request->input('payment_method'), ['bank_transfer', 'jazzcash', 'easypaisa', 'other'], true)) {
+                $updates['payment_method'] = $request->input('payment_method');
+            }
+
+            if (! empty($updates)) {
+                $draft->update($updates);
+            }
+        }
+
+        $request->session()->put('onboarding_token', $token);
+
+        return response()->json([
+            'success' => true,
+            'step' => $draft ? $draft->current_step : $step,
+            'registration_token' => $token,
+            'email' => $draft?->email,
+            'plan_slug' => $draft?->plan_slug,
+            'billing_interval' => $draft?->billing_interval,
+            'payment_method' => $draft?->payment_method,
+        ]);
+    }
+
+    /**
+     * Reset the active draft session and allow user to start fresh.
+     */
+    public function resetDraft(Request $request): JsonResponse
+    {
+        $token = $request->session()->get('onboarding_token') ?: $request->input('registration_token');
+        if ($token) {
+            $draft = PaymentApprovalRequest::where('registration_token', $token)
+                ->where('status', PaymentApprovalRequest::STATUS_DRAFT)
+                ->first();
+            if ($draft) {
+                $draft->delete();
+            }
+        }
+
+        $request->session()->forget('onboarding_token');
+
+        return response()->json(['success' => true]);
     }
 
     /**
@@ -151,18 +402,21 @@ class SaaSOnboardingController extends Controller
             'transaction_reference' => ['required', 'string', 'max:120'],
             'receipt' => ['required', 'file', 'mimes:jpeg,png,jpg,webp,pdf', 'max:5120'], // 5MB max
             'notes' => ['nullable', 'string', 'max:1000'],
+            'registration_token' => ['nullable', 'string', 'max:64'],
         ]);
 
         $email = strtolower(trim($validated['email']));
 
-        // Check again that email is not already registered as an active user
+        // 1. Check again that email is not already registered as an active user
         if (User::where('email', $email)->exists()) {
-            throw ValidationException::withMessages([
-                'email' => 'This email is already registered. Please sign in.',
-            ]);
+            return response()->json([
+                'status' => 'registered',
+                'message' => 'This email address is already registered or has a pending application. Please sign in or track your existing application.',
+                'action_url' => route('login'),
+            ], 422);
         }
 
-        // Prevent duplicate transaction references across active requests
+        // 2. Prevent duplicate transaction references across active requests
         $existingTxn = PaymentApprovalRequest::where('transaction_reference', trim($validated['transaction_reference']))
             ->whereIn('status', [PaymentApprovalRequest::STATUS_PENDING, PaymentApprovalRequest::STATUS_APPROVED])
             ->exists();
@@ -173,15 +427,32 @@ class SaaSOnboardingController extends Controller
             ]);
         }
 
-        // Prevent multiple pending requests for same email
+        // 3. Retrieve draft if token or session exists
+        $token = $request->session()->get('onboarding_token') ?: $request->input('registration_token');
+        $draft = null;
+        if ($token) {
+            $draft = PaymentApprovalRequest::where('registration_token', $token)
+                ->where('status', PaymentApprovalRequest::STATUS_DRAFT)
+                ->first();
+        }
+        if (! $draft) {
+            $draft = PaymentApprovalRequest::where('email', $email)
+                ->where('status', PaymentApprovalRequest::STATUS_DRAFT)
+                ->latest()
+                ->first();
+        }
+
+        // 4. Prevent multiple pending requests for same email
         $existingPending = PaymentApprovalRequest::where('email', $email)
             ->where('status', PaymentApprovalRequest::STATUS_PENDING)
             ->first();
 
         if ($existingPending) {
-            throw ValidationException::withMessages([
-                'email' => 'A payment approval request is already pending verification for this email address.',
-            ]);
+            return response()->json([
+                'status' => 'pending_approval',
+                'message' => 'This email address is already registered or has a pending application. Please sign in or track your existing application.',
+                'tracking_url' => route('onboarding.status', ['email' => $email]),
+            ], 422);
         }
 
         // Store receipt in private storage (local disk root = storage/app/private)
@@ -190,27 +461,73 @@ class SaaSOnboardingController extends Controller
 
         // Determine price
         $planConfig = config("manual_payment.plans.{$validated['plan_slug']}", []);
-        $amountCents = $planConfig['monthly_cents'] ?? 1900;
+        $amountCents = (int) ($planConfig['monthly_cents'] ?? 1900);
         if ($validated['billing_interval'] === 'annual' && ! empty($planConfig['yearly_cents'])) {
-            $amountCents = $planConfig['yearly_cents'];
+            $amountCents = (int) $planConfig['yearly_cents'];
         }
 
-        $approvalRequest = PaymentApprovalRequest::create([
-            'email' => $email,
-            'plan_slug' => $validated['plan_slug'],
-            'billing_interval' => $validated['billing_interval'],
-            'amount_cents' => $amountCents,
-            'currency' => config('manual_payment.currency', 'USD'),
-            'payment_method' => $validated['payment_method'],
-            'transaction_reference' => trim($validated['transaction_reference']),
-            'receipt_path' => $storedPath,
-            'receipt_original_name' => $file->getClientOriginalName(),
-            'receipt_mime' => $file->getClientMimeType(),
-            'receipt_size_bytes' => $file->getSize(),
-            'notes' => $validated['notes'] ?? null,
-            'status' => PaymentApprovalRequest::STATUS_PENDING,
-            'ip_address' => $request->ip(),
-        ]);
+        try {
+            DB::beginTransaction();
+
+            $token = $token ?: Str::random(40);
+
+            if ($draft) {
+                $draft->update([
+                    'email' => $email,
+                    'pending_email' => $email,
+                    'registration_token' => $token,
+                    'current_step' => 5,
+                    'plan_slug' => $validated['plan_slug'],
+                    'billing_interval' => $validated['billing_interval'],
+                    'amount_cents' => $amountCents,
+                    'currency' => config('manual_payment.currency', 'USD'),
+                    'payment_method' => $validated['payment_method'],
+                    'transaction_reference' => trim($validated['transaction_reference']),
+                    'receipt_path' => $storedPath,
+                    'receipt_original_name' => $file->getClientOriginalName(),
+                    'receipt_mime' => $file->getClientMimeType(),
+                    'receipt_size_bytes' => $file->getSize(),
+                    'notes' => $validated['notes'] ?? null,
+                    'status' => PaymentApprovalRequest::STATUS_PENDING,
+                    'ip_address' => $request->ip(),
+                ]);
+                $approvalRequest = $draft;
+            } else {
+                $approvalRequest = PaymentApprovalRequest::create([
+                    'email' => $email,
+                    'pending_email' => $email,
+                    'registration_token' => $token,
+                    'current_step' => 5,
+                    'plan_slug' => $validated['plan_slug'],
+                    'billing_interval' => $validated['billing_interval'],
+                    'amount_cents' => $amountCents,
+                    'currency' => config('manual_payment.currency', 'USD'),
+                    'payment_method' => $validated['payment_method'],
+                    'transaction_reference' => trim($validated['transaction_reference']),
+                    'receipt_path' => $storedPath,
+                    'receipt_original_name' => $file->getClientOriginalName(),
+                    'receipt_mime' => $file->getClientMimeType(),
+                    'receipt_size_bytes' => $file->getSize(),
+                    'notes' => $validated['notes'] ?? null,
+                    'status' => PaymentApprovalRequest::STATUS_PENDING,
+                    'ip_address' => $request->ip(),
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            if ($e->getCode() === '23000') {
+                return response()->json([
+                    'status' => 'pending_approval',
+                    'message' => 'This email address is already registered or has a pending application. Please sign in or track your existing application.',
+                    'tracking_url' => route('onboarding.status', ['email' => $email]),
+                ], 422);
+            }
+            throw $e;
+        }
+
+        $request->session()->put('onboarding_token', $token);
 
         return response()->json([
             'success' => true,
@@ -237,10 +554,10 @@ class SaaSOnboardingController extends Controller
         } elseif ($email) {
             $query->where('email', $email);
         } else {
-            return Inertia::render('auth/onboarding-status', ['request' => null]);
+            return Inertia::render('auth/onboarding-status', ['approvalRequest' => null, 'searchEmail' => '']);
         }
 
-        $approvalRequest = $query->latest()->first();
+        $approvalRequest = $query->latest('id')->first();
 
         if ($request->wantsJson()) {
             if (! $approvalRequest) {
@@ -269,7 +586,7 @@ class SaaSOnboardingController extends Controller
                 'completion_url' => $approvalRequest->isTokenValid() ? url("/onboarding/complete/{$approvalRequest->completion_token}") : null,
                 'created_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
             ] : null,
-            'searchEmail' => $email,
+            'searchEmail' => $email ?? '',
         ]);
     }
 
@@ -467,6 +784,7 @@ class SaaSOnboardingController extends Controller
                 'created_user_id' => $user->id,
                 'created_organization_id' => $organization->id,
                 'created_subscription_id' => $subscription->id,
+                'pending_email' => null,
                 'completion_token' => null, // single-use invalidation
             ]);
 

@@ -13,7 +13,7 @@ import {
     ShieldCheck,
     Sparkles,
 } from 'lucide-react';
-import PublicLayout from '@/layouts/public-layout';
+import OnboardingLayout from '@/layouts/onboarding-layout';
 
 interface RequestItem {
     id: number;
@@ -93,7 +93,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '' }: 
     };
 
     return (
-        <PublicLayout title="Track Payment Approval Status — InstitutoPropio">
+        <OnboardingLayout title="Track Payment Approval Status — InstitutoPropio">
             <div className="bg-[#F8FAFC] py-12 sm:py-16 md:py-20 border-b border-slate-100 min-h-[75vh]">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="mx-auto max-w-2xl text-center">
@@ -237,6 +237,6 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '' }: 
                     </div>
                 </div>
             </div>
-        </PublicLayout>
+        </OnboardingLayout>
     );
 }

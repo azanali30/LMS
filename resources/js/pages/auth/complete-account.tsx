@@ -11,7 +11,7 @@ import {
     ArrowRight,
     Sparkles,
 } from 'lucide-react';
-import PublicLayout from '@/layouts/public-layout';
+import OnboardingLayout from '@/layouts/onboarding-layout';
 
 interface OrgType {
     value: string;
@@ -71,7 +71,7 @@ export default function CompleteAccount({
     };
 
     return (
-        <PublicLayout title="Complete Account & Setup Institution — InstitutoPropio">
+        <OnboardingLayout title="Complete Account & Setup Institution — InstitutoPropio">
             <div className="bg-[#F8FAFC] py-12 sm:py-16 md:py-20 border-b border-slate-100 min-h-[75vh]">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="mx-auto max-w-2xl text-center mb-8">
@@ -266,6 +266,6 @@ export default function CompleteAccount({
                     </div>
                 </div>
             </div>
-        </PublicLayout>
+        </OnboardingLayout>
     );
 }

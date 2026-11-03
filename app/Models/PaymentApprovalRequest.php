@@ -12,12 +12,16 @@ class PaymentApprovalRequest extends Model
 {
     use HasFactory;
 
+    public const STATUS_DRAFT = 'draft';
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
 
     protected $fillable = [
         'email',
+        'pending_email',
+        'registration_token',
+        'current_step',
         'plan_slug',
         'billing_interval',
         'amount_cents',
@@ -45,6 +49,7 @@ class PaymentApprovalRequest extends Model
     ];
 
     protected $casts = [
+        'current_step' => 'integer',
         'amount_cents' => 'integer',
         'receipt_size_bytes' => 'integer',
         'approved_at' => 'datetime',
@@ -78,6 +83,11 @@ class PaymentApprovalRequest extends Model
         return $this->belongsTo(OrganizationSubscription::class, 'created_subscription_id');
     }
 
+    public function scopeDraft(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_DRAFT);
+    }
+
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_PENDING);
@@ -91,6 +101,11 @@ class PaymentApprovalRequest extends Model
     public function scopeRejected(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_REJECTED);
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->status === self::STATUS_DRAFT;
     }
 
     public function isPending(): bool

@@ -42,6 +42,8 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', [SaaSOnboardingController::class, 'show'])->name('register');
     Route::get('/onboarding', [SaaSOnboardingController::class, 'show'])->name('onboarding');
     Route::post('/onboarding/check-email', [SaaSOnboardingController::class, 'checkEmail'])->name('onboarding.check-email');
+    Route::post('/onboarding/save-progress', [SaaSOnboardingController::class, 'saveProgress'])->name('onboarding.save-progress');
+    Route::post('/onboarding/reset-draft', [SaaSOnboardingController::class, 'resetDraft'])->name('onboarding.reset-draft');
     Route::post('/onboarding/submit-payment', [SaaSOnboardingController::class, 'submitPayment'])->name('onboarding.submit-payment');
 
     // Post-Approval Account & Institution Setup (single-use token)

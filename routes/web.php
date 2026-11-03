@@ -37,6 +37,9 @@ Route::get('/courses/{course:slug}', [CourseController::class, 'show'])->name('c
 
 // Multi-step SaaS Registration & Manual Payment Approval Onboarding Flow
 Route::get('/onboarding/status', [SaaSOnboardingController::class, 'status'])->name('onboarding.status');
+Route::post('/onboarding/status/request-otp', [SaaSOnboardingController::class, 'requestTrackingOtp'])->name('onboarding.status.request-otp');
+Route::post('/onboarding/status/verify-otp', [SaaSOnboardingController::class, 'verifyTrackingOtp'])->name('onboarding.status.verify-otp');
+Route::get('/onboarding/status/verify-link', [SaaSOnboardingController::class, 'verifyTrackingLink'])->name('onboarding.status.verify-link');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [SaaSOnboardingController::class, 'show'])->name('register');

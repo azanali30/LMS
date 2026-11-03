@@ -2,6 +2,7 @@ import { Link } from '@inertiajs/react';
 import {
     ArrowRight,
     ChevronDown,
+    ClipboardCheck,
     Laptop,
     LogIn,
     Sparkles,
@@ -88,7 +89,29 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                         <ArrowRight className="size-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#1769E0]" />
                     </Link>
 
-                    {/* Item 2: Download Desktop App */}
+                    {/* Item 2: Track Payment Application */}
+                    <Link
+                        href="/onboarding/status"
+                        onClick={handleSelect}
+                        className="group flex items-center justify-between p-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0] transition-colors group-hover:bg-[#1769E0] group-hover:text-white dark:bg-blue-950/50 dark:text-blue-400">
+                                <ClipboardCheck className="size-4" />
+                            </div>
+                            <div>
+                                <span className="text-sm font-bold text-slate-900 group-hover:text-[#1769E0] dark:text-white">
+                                    Track Payment Application
+                                </span>
+                                <p className="text-xs text-slate-500 line-clamp-1 dark:text-slate-400">
+                                    Check your payment verification and registration status.
+                                </p>
+                            </div>
+                        </div>
+                        <ArrowRight className="size-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#1769E0]" />
+                    </Link>
+
+                    {/* Item 3: Download Desktop App */}
                     <Link
                         href="/download"
                         onClick={handleSelect}
@@ -190,7 +213,32 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                             <ArrowRight className="size-3.5 shrink-0 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-[#1769E0] group-hover:opacity-100" />
                         </Link>
 
-                        {/* 2. Download Desktop App Item */}
+                        {/* 2. Track Payment Application Item */}
+                        <Link
+                            href="/onboarding/status"
+                            role="menuitem"
+                            onClick={handleSelect}
+                            className="group flex items-center justify-between rounded-xl p-2.5 transition-all duration-150 hover:bg-slate-50 focus-visible:bg-slate-50 focus-visible:outline-none dark:hover:bg-slate-800/60"
+                        >
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0] shadow-2xs ring-1 ring-blue-100 transition-all group-hover:bg-[#1769E0] group-hover:text-white dark:bg-blue-950/60 dark:text-blue-400 dark:ring-blue-900/60">
+                                    <ClipboardCheck className="size-4.5" />
+                                </div>
+                                <div className="min-w-0">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-xs font-bold text-slate-900 group-hover:text-[#1769E0] dark:text-white dark:group-hover:text-blue-400">
+                                            Track Payment Application
+                                        </span>
+                                    </div>
+                                    <p className="text-[11px] text-slate-500 truncate dark:text-slate-400">
+                                        Check your payment verification and registration status.
+                                    </p>
+                                </div>
+                            </div>
+                            <ArrowRight className="size-3.5 shrink-0 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-[#1769E0] group-hover:opacity-100" />
+                        </Link>
+
+                        {/* 3. Download Desktop App Item */}
                         <Link
                             href="/download"
                             role="menuitem"

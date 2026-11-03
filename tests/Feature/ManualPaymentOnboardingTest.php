@@ -244,8 +244,9 @@ class ManualPaymentOnboardingTest extends TestCase
         $this->assertEquals('Transaction ID not matching any JazzCash merchant logs.', $request->rejection_reason);
         $this->assertNull($request->completion_token);
 
-        // Applicant checks status
-        $statusRes = $this->getJson('/onboarding/status?email=invalid-proof@example.com');
+        // Applicant checks status with verified tracking session
+        $statusRes = $this->withSession(['tracking_verified_email' => 'invalid-proof@example.com'])
+            ->getJson('/onboarding/status?email=invalid-proof@example.com');
         $statusRes->assertOk()
             ->assertJson([
                 'found' => true,

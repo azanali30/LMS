@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TrackingVerificationCodeMail;
 use App\Models\AcademicTerm;
 use App\Models\AcademicYear;
 use App\Models\Organization;
@@ -16,9 +17,13 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -541,53 +546,321 @@ class SaaSOnboardingController extends Controller
     }
 
     /**
-     * Check Request Status page.
+     * Track Payment Application Status (Securely gated behind email OTP or signed link).
      */
     public function status(Request $request): Response|JsonResponse
     {
         $email = $request->query('email') ? strtolower(trim($request->query('email'))) : null;
-        $id = $request->query('id');
+        $sessionVerifiedEmail = $request->session()->get('tracking_verified_email');
 
-        $query = PaymentApprovalRequest::query();
-        if ($id) {
-            $query->where('id', $id);
-        } elseif ($email) {
-            $query->where('email', $email);
-        } else {
-            return Inertia::render('auth/onboarding-status', ['approvalRequest' => null, 'searchEmail' => '']);
+        $isVerified = false;
+        $approvalRequest = null;
+
+        if ($email && $sessionVerifiedEmail && $email === strtolower(trim($sessionVerifiedEmail))) {
+            $isVerified = true;
+            $approvalRequest = PaymentApprovalRequest::where('email', $email)
+                ->orWhere('pending_email', $email)
+                ->latest('id')
+                ->first();
         }
 
-        $approvalRequest = $query->latest('id')->first();
-
         if ($request->wantsJson()) {
-            if (! $approvalRequest) {
-                return response()->json(['found' => false], 404);
+            if (! $isVerified) {
+                return response()->json([
+                    'verified' => false,
+                    'message' => 'Verification required before application details can be viewed.',
+                ], 403);
             }
+
+            if (! $approvalRequest) {
+                return response()->json([
+                    'verified' => true,
+                    'found' => false,
+                    'message' => 'No registration records found for this email.',
+                ], 404);
+            }
+
+            $details = $this->formatTrackingDetails($approvalRequest);
             return response()->json([
+                'verified' => true,
                 'found' => true,
                 'id' => $approvalRequest->id,
                 'email' => $approvalRequest->email,
                 'status' => $approvalRequest->status,
                 'rejection_reason' => $approvalRequest->rejection_reason,
-                'completion_url' => $approvalRequest->isTokenValid() ? url("/onboarding/complete/{$approvalRequest->completion_token}") : null,
+                'completion_url' => $details['completion_url'] ?? null,
+                'application' => $details,
             ]);
         }
 
         return Inertia::render('auth/onboarding-status', [
-            'approvalRequest' => $approvalRequest ? [
+            'verified' => $isVerified,
+            'searchEmail' => $email ?? '',
+            'approvalRequest' => ($isVerified && $approvalRequest) ? $this->formatTrackingDetails($approvalRequest) : null,
+        ]);
+    }
+
+    /**
+     * Request a 6-digit OTP code to securely track an application.
+     */
+    public function requestTrackingOtp(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email', 'max:255'],
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+
+        // Rate limit: 5 requests per 10 minutes per IP
+        $rateLimitKey = 'tracking-otp:' . $request->ip() . ':' . $email;
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+            $seconds = RateLimiter::availableIn($rateLimitKey);
+            return response()->json([
+                'message' => "Too many verification requests. Please wait {$seconds} seconds before trying again.",
+            ], 429);
+        }
+        RateLimiter::hit($rateLimitKey, 600);
+
+        // Check if an application exists for this email
+        $exists = PaymentApprovalRequest::where('email', $email)
+            ->orWhere('pending_email', $email)
+            ->exists();
+
+        if (! $exists) {
+            return response()->json([
+                'found' => false,
+                'message' => 'No registration or payment application was found for this email address. Please make sure you entered the administrative work email used during signup.',
+            ], 404);
+        }
+
+        // Generate 6-digit OTP
+        $otp = (string) random_int(100000, 999999);
+
+        // Store OTP in cache for 15 minutes
+        Cache::put("tracking_otp_{$email}", [
+            'code' => $otp,
+            'attempts' => 0,
+        ], now()->addMinutes(15));
+
+        // Generate one-time signed verification link
+        $verificationUrl = URL::temporarySignedRoute(
+            'onboarding.status.verify-link',
+            now()->addMinutes(15),
+            ['email' => $email]
+        );
+
+        // Send Email
+        rescue(function () use ($email, $otp, $verificationUrl) {
+            Mail::to($email)->send(new TrackingVerificationCodeMail($otp, $verificationUrl, $email, 15));
+        }, report: false);
+
+        return response()->json([
+            'sent' => true,
+            'email' => $email,
+            'message' => 'A 6-digit verification code has been sent to your email address.',
+        ]);
+    }
+
+    /**
+     * Verify the 6-digit OTP code and unlock the application details.
+     */
+    public function verifyTrackingOtp(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'code' => ['required', 'string', 'size:6'],
+        ]);
+
+        $email = strtolower(trim($validated['email']));
+        $code = trim($validated['code']);
+
+        $cached = Cache::get("tracking_otp_{$email}");
+
+        if (! $cached) {
+            return response()->json([
+                'message' => 'The verification code has expired or was not requested. Please request a new code.',
+            ], 422);
+        }
+
+        if (($cached['attempts'] ?? 0) >= 5) {
+            Cache::forget("tracking_otp_{$email}");
+            return response()->json([
+                'message' => 'Too many invalid attempts. For your security, this code has been invalidated. Please request a new code.',
+            ], 422);
+        }
+
+        if ($cached['code'] !== $code) {
+            $cached['attempts'] = ($cached['attempts'] ?? 0) + 1;
+            Cache::put("tracking_otp_{$email}", $cached, now()->addMinutes(15));
+
+            $remaining = 5 - $cached['attempts'];
+            return response()->json([
+                'message' => "Invalid verification code. Please check your email and try again ({$remaining} attempts remaining).",
+            ], 422);
+        }
+
+        // Verified successfully!
+        Cache::forget("tracking_otp_{$email}");
+        $request->session()->put('tracking_verified_email', $email);
+
+        $approvalRequest = PaymentApprovalRequest::where('email', $email)
+            ->orWhere('pending_email', $email)
+            ->latest('id')
+            ->first();
+
+        if (! $approvalRequest) {
+            return response()->json([
+                'found' => false,
+                'message' => 'No registration records found for this email.',
+            ], 404);
+        }
+
+        $details = $this->formatTrackingDetails($approvalRequest);
+        return response()->json([
+            'verified' => true,
+            'found' => true,
+            'id' => $approvalRequest->id,
+            'email' => $approvalRequest->email,
+            'status' => $approvalRequest->status,
+            'rejection_reason' => $approvalRequest->rejection_reason,
+            'completion_url' => $details['completion_url'] ?? null,
+            'application' => $details,
+        ]);
+    }
+
+    /**
+     * One-time signed link verification entrypoint.
+     */
+    public function verifyTrackingLink(Request $request): RedirectResponse
+    {
+        if (! $request->hasValidSignature()) {
+            return redirect()->route('onboarding.status')
+                ->with('error', 'This tracking verification link is invalid or has expired. Please enter your email to request a new code.');
+        }
+
+        $email = strtolower(trim($request->query('email', '')));
+        if (! empty($email)) {
+            $request->session()->put('tracking_verified_email', $email);
+        }
+
+        return redirect()->route('onboarding.status', ['email' => $email]);
+    }
+
+    /**
+     * Format tracking details for applicant status view across all 5 states.
+     */
+    protected function formatTrackingDetails(PaymentApprovalRequest $approvalRequest): array
+    {
+        $isCompleted = $approvalRequest->isCompleted();
+        $isApproved = $approvalRequest->isApproved();
+        $isPending = $approvalRequest->isPending();
+        $isRejected = $approvalRequest->isRejected();
+
+        if ($isCompleted) {
+            return [
                 'id' => $approvalRequest->id,
                 'email' => $approvalRequest->email,
                 'plan_name' => $approvalRequest->planDisplayName(),
-                'billing_interval' => $approvalRequest->billing_interval,
-                'status' => $approvalRequest->status,
+                'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
                 'amount_formatted' => $approvalRequest->formattedAmount(),
-                'transaction_reference' => $approvalRequest->transaction_reference,
-                'rejection_reason' => $approvalRequest->rejection_reason,
-                'completion_url' => $approvalRequest->isTokenValid() ? url("/onboarding/complete/{$approvalRequest->completion_token}") : null,
-                'created_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
-            ] : null,
-            'searchEmail' => $email ?? '',
-        ]);
+                'transaction_reference' => $approvalRequest->transaction_reference ?: 'N/A',
+                'status' => 'completed',
+                'status_label' => 'Workspace Activated',
+                'badge_style' => 'emerald',
+                'title' => 'Your institution workspace is fully active.',
+                'description' => 'Your campus account has been provisioned. You can sign in using your administrative work credentials.',
+                'action' => 'login',
+                'action_url' => route('login'),
+                'action_label' => 'Sign In to Your Workspace',
+                'submitted_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
+                'approved_at' => $approvalRequest->approved_at?->format('M d, Y h:i A'),
+                'completed_at' => $approvalRequest->completed_at?->format('M d, Y h:i A'),
+            ];
+        }
+
+        if ($isApproved) {
+            $token = $approvalRequest->ensureValidCompletionToken();
+            return [
+                'id' => $approvalRequest->id,
+                'email' => $approvalRequest->email,
+                'plan_name' => $approvalRequest->planDisplayName(),
+                'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
+                'amount_formatted' => $approvalRequest->formattedAmount(),
+                'transaction_reference' => $approvalRequest->transaction_reference ?: 'N/A',
+                'status' => 'awaiting_institution_details',
+                'status_label' => 'Approved — Awaiting Institution Setup',
+                'badge_style' => 'emerald',
+                'title' => 'Congratulations! Your payment proof has been approved.',
+                'description' => 'Your 30-day free trial has been unlocked. Click the button below to choose your password, school name, and custom campus subdomain.',
+                'action' => 'complete_account',
+                'action_url' => url("/onboarding/complete/{$token}"),
+                'action_label' => 'Complete Account & Setup Institution',
+                'completion_url' => url("/onboarding/complete/{$token}"),
+                'submitted_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
+                'approved_at' => $approvalRequest->approved_at?->format('M d, Y h:i A'),
+            ];
+        }
+
+        if ($isPending) {
+            return [
+                'id' => $approvalRequest->id,
+                'email' => $approvalRequest->email,
+                'plan_name' => $approvalRequest->planDisplayName(),
+                'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
+                'amount_formatted' => $approvalRequest->formattedAmount(),
+                'transaction_reference' => $approvalRequest->transaction_reference ?: 'N/A',
+                'status' => 'under_review',
+                'status_label' => 'Under Review / Pending Verification',
+                'badge_style' => 'amber',
+                'title' => 'Your payment proof is under active verification.',
+                'description' => 'Our finance desk is matching your transaction reference with bank deposit logs. Once verified, you will be able to complete your workspace setup.',
+                'action' => null,
+                'action_url' => null,
+                'action_label' => null,
+                'submitted_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
+            ];
+        }
+
+        if ($isRejected) {
+            return [
+                'id' => $approvalRequest->id,
+                'email' => $approvalRequest->email,
+                'plan_name' => $approvalRequest->planDisplayName(),
+                'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
+                'amount_formatted' => $approvalRequest->formattedAmount(),
+                'transaction_reference' => $approvalRequest->transaction_reference ?: 'N/A',
+                'status' => 'rejected',
+                'status_label' => 'Payment Proof Rejected',
+                'badge_style' => 'rose',
+                'title' => 'Payment Verification Notice',
+                'description' => 'Our finance desk could not verify your payment proof with bank deposit logs.',
+                'rejection_reason' => $approvalRequest->rejection_reason ?: 'Unable to verify payment reference with bank records.',
+                'action' => 'resubmit',
+                'action_url' => url('/register?email=' . urlencode($approvalRequest->email)),
+                'action_label' => 'Submit Corrected Payment Proof',
+                'submitted_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
+                'rejected_at' => $approvalRequest->rejected_at?->format('M d, Y h:i A'),
+            ];
+        }
+
+        // Draft / Pending Payment
+        return [
+            'id' => $approvalRequest->id,
+            'email' => $approvalRequest->email,
+            'plan_name' => $approvalRequest->planDisplayName(),
+            'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
+            'amount_formatted' => $approvalRequest->formattedAmount(),
+            'transaction_reference' => $approvalRequest->transaction_reference ?: 'Unsubmitted',
+            'status' => 'pending_payment',
+            'status_label' => 'Pending Payment Proof',
+            'badge_style' => 'amber',
+            'title' => 'Payment Proof Required',
+            'description' => 'You started registration for the ' . $approvalRequest->planDisplayName() . ' plan, but payment proof has not yet been submitted. Please upload your deposit slip or transfer screenshot to submit your application.',
+            'action' => 'resume_registration',
+            'action_url' => url('/register?email=' . urlencode($approvalRequest->email) . '&step=' . max(2, (int) ($approvalRequest->current_step ?: 4))),
+            'action_label' => 'Resume Application & Submit Proof',
+            'submitted_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
+        ];
     }
 
     /**

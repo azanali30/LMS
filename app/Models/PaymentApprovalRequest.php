@@ -145,6 +145,46 @@ class PaymentApprovalRequest extends Model
         return true;
     }
 
+    public function ensureValidCompletionToken(): string
+    {
+        if (! $this->isApproved() || $this->isCompleted()) {
+            return '';
+        }
+
+        if (empty($this->completion_token) || ($this->token_expires_at && Carbon::now()->isAfter($this->token_expires_at))) {
+            $token = \Illuminate\Support\Str::random(64);
+            $this->update([
+                'completion_token' => $token,
+                'token_expires_at' => Carbon::now()->addDays(7),
+            ]);
+            $this->completion_token = $token;
+            return $token;
+        }
+
+        return $this->completion_token;
+    }
+
+    public function trackingStatus(): string
+    {
+        if ($this->isCompleted()) {
+            return 'completed';
+        }
+
+        if ($this->isApproved()) {
+            return 'awaiting_institution_details';
+        }
+
+        if ($this->isPending()) {
+            return 'under_review';
+        }
+
+        if ($this->isRejected()) {
+            return 'rejected';
+        }
+
+        return 'pending_payment';
+    }
+
     public function formattedAmount(): string
     {
         $dollars = number_format($this->amount_cents / 100, 2);

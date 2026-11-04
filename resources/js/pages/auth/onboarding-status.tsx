@@ -16,6 +16,8 @@ import {
     Lock,
     ArrowLeft,
     Check,
+    FileText,
+    CreditCard,
 } from 'lucide-react';
 import OnboardingLayout from '@/layouts/onboarding-layout';
 
@@ -25,14 +27,17 @@ interface RequestItem {
     plan_name: string;
     billing_interval: string;
     amount_formatted: string;
+    payment_method?: string;
     transaction_reference: string;
-    status: 'pending_payment' | 'under_review' | 'awaiting_institution_details' | 'completed' | 'rejected' | string;
+    status: 'payment_pending_review' | 'approved' | 'rejected' | 'additional_info_required' | 'completed' | 'pending_payment' | string;
     status_label: string;
     badge_style: 'amber' | 'emerald' | 'rose' | 'blue';
     title: string;
     description: string;
+    admin_feedback?: string;
     rejection_reason?: string;
-    action?: 'resume_registration' | 'complete_account' | 'login' | 'resubmit' | null;
+    notes?: string;
+    action?: 'resume_registration' | 'complete_account' | 'login' | 'resubmit' | 'provide_info' | null;
     action_url?: string | null;
     action_label?: string | null;
     completion_url?: string | null;
@@ -159,6 +164,28 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
         }
     };
 
+    // 3. Clear session and check another application
+    const handleResetSession = async () => {
+        try {
+            await fetch('/onboarding/status/reset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                },
+            });
+        } catch {
+            // Ignored
+        }
+        setStep('email');
+        setEmail('');
+        setOtp('');
+        setItem(null);
+        setError(null);
+        setNotice(null);
+    };
+
     return (
         <OnboardingLayout title="Track Payment Application Status — InstitutoPropio">
             <div className="bg-[#F8FAFC] py-12 sm:py-16 md:py-20 border-b border-slate-100 min-h-[75vh]">
@@ -192,6 +219,9 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                 <Check className="size-4.5 shrink-0 text-emerald-600 mt-0.5" />
                                 <div>
                                     <p className="font-semibold">{notice}</p>
+                                    <p className="mt-1 text-[11px] text-emerald-700">
+                                        For local testing, check your Mailpit inbox at <span className="font-mono font-bold">http://127.0.0.1:8025</span> or storage logs.
+                                    </p>
                                 </div>
                             </div>
                         )}
@@ -207,7 +237,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     Enter Your Work Email
                                 </h2>
                                 <p className="mt-1 text-xs text-slate-500">
-                                    For your security, application details are protected. We will email you a 6-digit one-time code to confirm ownership.
+                                    For your privacy and security, application details are only revealed to verified applicants. We will email you a 6-digit one-time code valid for 10 minutes.
                                 </p>
 
                                 <form onSubmit={handleRequestOtp} className="mt-6 space-y-4">
@@ -237,7 +267,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                         {loading ? (
                                             <>
                                                 <RefreshCw className="size-4 animate-spin" />
-                                                <span>Sending Security Code...</span>
+                                                <span>Sending Verification Code...</span>
                                             </>
                                         ) : (
                                             <>
@@ -283,7 +313,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     Enter 6-Digit Code
                                 </h2>
                                 <p className="mt-1 text-xs text-slate-500">
-                                    We sent a verification code to <span className="font-semibold text-slate-800">{email}</span>. Enter the code below or click the direct verification link in your email.
+                                    We sent a 10-minute verification code to <span className="font-semibold text-slate-800">{email}</span>. Enter the code below or click the direct verification link in your email.
                                 </p>
 
                                 <form onSubmit={handleVerifyOtp} className="mt-6 space-y-4">
@@ -355,24 +385,17 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
 
                                     {/* Status Badge */}
                                     <div>
-                                        {item.status === 'pending_payment' && (
+                                        {(item.status === 'payment_pending_review' || item.status === 'under_review') && (
                                             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-1 text-xs font-bold text-amber-800 uppercase tracking-wider">
-                                                <Clock className="size-3.5 text-amber-600" />
-                                                Pending Payment Proof
+                                                <Clock className="size-3.5 animate-pulse text-amber-600" />
+                                                Payment Pending Review
                                             </span>
                                         )}
 
-                                        {item.status === 'under_review' && (
-                                            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1 text-xs font-bold text-[#1769E0] uppercase tracking-wider">
-                                                <Clock className="size-3.5 animate-pulse text-[#1769E0]" />
-                                                Under Review / In Verification
-                                            </span>
-                                        )}
-
-                                        {item.status === 'awaiting_institution_details' && (
+                                        {item.status === 'approved' && (
                                             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-xs font-bold text-emerald-800 uppercase tracking-wider">
                                                 <CheckCircle2 className="size-3.5 text-emerald-600" />
-                                                Approved & Ready
+                                                Approved
                                             </span>
                                         )}
 
@@ -386,7 +409,14 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                         {item.status === 'rejected' && (
                                             <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3.5 py-1 text-xs font-bold text-rose-800 uppercase tracking-wider">
                                                 <AlertCircle className="size-3.5 text-rose-600" />
-                                                Payment Proof Rejected
+                                                Rejected
+                                            </span>
+                                        )}
+
+                                        {(item.status === 'additional_info_required' || item.status === 'pending_payment') && (
+                                            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3.5 py-1 text-xs font-bold text-amber-800 uppercase tracking-wider">
+                                                <Clock className="size-3.5 text-amber-600" />
+                                                Additional Information Required
                                             </span>
                                         )}
                                     </div>
@@ -407,40 +437,19 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                         <p className="font-bold text-slate-800 mt-0.5">{item.amount_formatted}</p>
                                     </div>
                                     <div>
-                                        <span className="text-slate-400 font-medium">Transaction Ref</span>
+                                        <span className="text-slate-400 font-medium">Application Reference</span>
                                         <p className="font-mono font-bold text-slate-800 mt-0.5 truncate">{item.transaction_reference}</p>
                                     </div>
                                 </div>
 
                                 {/* Dynamic Status Box & Call-to-Action */}
                                 <div className="mt-6 space-y-4">
-                                    {/* 1. Pending Payment */}
-                                    {item.status === 'pending_payment' && (
-                                        <div className="space-y-4">
-                                            <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-5 text-xs text-amber-900 leading-relaxed">
-                                                <p className="font-bold text-amber-950 text-sm">Payment Proof Required</p>
-                                                <p className="mt-1">
-                                                    You have started onboarding for the <strong>{item.plan_name}</strong> plan, but manual payment proof has not yet been submitted. Upload your deposit voucher or transfer receipt to submit your application for review.
-                                                </p>
-                                            </div>
-
-                                            {item.action_url && (
-                                                <a
-                                                    href={item.action_url}
-                                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
-                                                >
-                                                    <span>{item.action_label || 'Resume Application & Submit Proof &rarr;'}</span>
-                                                </a>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {/* 2. Under Review */}
-                                    {item.status === 'under_review' && (
+                                    {/* 1. Payment Pending Review */}
+                                    {(item.status === 'payment_pending_review' || item.status === 'under_review') && (
                                         <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 text-xs leading-relaxed text-slate-600">
                                             <p className="font-bold text-[#0B1528] text-sm">Your payment proof is under active verification.</p>
                                             <p className="mt-1 text-slate-500">
-                                                Our finance desk is matching your transaction reference with bank deposit logs. Once verified, you will be able to complete your workspace setup directly from this screen or via the email confirmation link.
+                                                Our finance desk is matching your transaction reference with bank deposit logs. Once verified, you will be able to complete your workspace setup directly from this screen.
                                             </p>
                                             <div className="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
                                                 <Clock className="size-3 text-slate-400" />
@@ -449,8 +458,8 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                         </div>
                                     )}
 
-                                    {/* 3. Approved & Awaiting Institution Details */}
-                                    {item.status === 'awaiting_institution_details' && (
+                                    {/* 2. Approved (Awaiting Institution Setup) */}
+                                    {item.status === 'approved' && (
                                         <div className="space-y-4">
                                             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 text-xs leading-relaxed text-emerald-900">
                                                 <p className="font-extrabold text-[#0B1528] text-sm">Congratulations! Your payment proof has been approved.</p>
@@ -475,7 +484,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                         </div>
                                     )}
 
-                                    {/* 4. Completed / Workspace Activated */}
+                                    {/* 3. Completed (Workspace Activated) */}
                                     {item.status === 'completed' && (
                                         <div className="space-y-4">
                                             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 text-xs leading-relaxed text-emerald-900">
@@ -494,14 +503,17 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                         </div>
                                     )}
 
-                                    {/* 5. Rejected */}
+                                    {/* 4. Rejected */}
                                     {item.status === 'rejected' && (
                                         <div className="space-y-4">
                                             <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-5 text-xs text-rose-900">
-                                                <p className="font-bold text-[#0B1528] text-sm">Payment Proof Rejected by Finance Desk:</p>
-                                                <p className="mt-1.5 font-mono text-rose-800 bg-white/70 p-3 rounded-xl border border-rose-200">
-                                                    {item.rejection_reason || 'Could not verify transaction reference with bank records. Please provide a clear official deposit slip or revised transaction ID.'}
+                                                <p className="font-bold text-[#0B1528] text-sm">Payment Verification Rejected</p>
+                                                <p className="mt-1 text-xs text-rose-800">
+                                                    Our finance desk could not verify your payment proof. Please review the feedback below and submit corrected proof:
                                                 </p>
+                                                <div className="mt-2.5 font-mono text-rose-900 bg-white/80 p-3.5 rounded-xl border border-rose-200">
+                                                    {item.admin_feedback || item.rejection_reason || 'Could not verify transaction reference with bank records. Please provide a clear official deposit slip or revised transaction ID.'}
+                                                </div>
                                             </div>
 
                                             <a
@@ -512,20 +524,39 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                             </a>
                                         </div>
                                     )}
+
+                                    {/* 5. Additional Information Required */}
+                                    {(item.status === 'additional_info_required' || item.status === 'pending_payment') && (
+                                        <div className="space-y-4">
+                                            <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-5 text-xs text-amber-900 leading-relaxed">
+                                                <p className="font-bold text-amber-950 text-sm">Additional Information Required</p>
+                                                <p className="mt-1">
+                                                    The finance desk reviewed your application and requires additional documentation, clarification, or a legible deposit voucher before activation.
+                                                </p>
+                                                {(item.admin_feedback || item.notes || item.rejection_reason) && (
+                                                    <div className="mt-2.5 font-mono text-amber-950 bg-white/80 p-3.5 rounded-xl border border-amber-200">
+                                                        {item.admin_feedback || item.notes || item.rejection_reason}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {item.action_url && (
+                                                <a
+                                                    href={item.action_url}
+                                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                                >
+                                                    <span>{item.action_label || 'Provide Requested Information &rarr;'}</span>
+                                                </a>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Check Another Application Button */}
                                 <div className="mt-6 border-t border-slate-100 pt-4 text-center">
                                     <button
                                         type="button"
-                                        onClick={() => {
-                                            setStep('email');
-                                            setEmail('');
-                                            setOtp('');
-                                            setItem(null);
-                                            setError(null);
-                                            setNotice(null);
-                                        }}
+                                        onClick={handleResetSession}
                                         className="text-xs font-semibold text-slate-500 hover:text-[#1769E0]"
                                     >
                                         &larr; Check a different application

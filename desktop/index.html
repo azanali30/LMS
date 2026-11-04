@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InstitutoPropio Desktop</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --cta: #f97316;
+      --cta-hover: #ea580c;
+      --slate-50: #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+      --emerald-500: #10b981;
+      --emerald-50: #ecfdf5;
+      --emerald-600: #059669;
+      --amber-500: #f59e0b;
+      --amber-50: #fffbeb;
+      --radius: 12px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+      color: var(--slate-800);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow-x: hidden;
+    }
+
+    /* Window Header / Titlebar */
+    .titlebar {
+      height: 48px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .titlebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--slate-900);
+      letter-spacing: -0.01em;
+    }
+
+    .titlebar-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      border: 1px solid #bfdbfe;
+    }
+
+    .titlebar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-icon-subtle {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--slate-600);
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-icon-subtle:hover {
+      background: var(--slate-100);
+      color: var(--slate-900);
+      border-color: var(--slate-200);
+    }
+
+    /* Main Container */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-xl);
+      max-width: 580px;
+      width: 100%;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo-container {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.35);
+      margin-bottom: 24px;
+      color: white;
+    }
+
+    .logo-container svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    p.subtitle {
+      font-size: 15px;
+      color: var(--slate-600);
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    /* Buttons */
+    .button-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, var(--primary) 0%, #1d4ed8 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%);
+      box-shadow: 0 6px 16px -2px rgba(37, 99, 235, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--slate-700);
+      border-color: var(--slate-300);
+    }
+
+    .btn-secondary:hover {
+      background: var(--slate-50);
+      color: var(--slate-900);
+      border-color: var(--slate-400);
+    }
+
+    .btn-subtle {
+      background: transparent;
+      color: var(--slate-500);
+      font-size: 13px;
+      padding: 8px 12px;
+    }
+
+    .btn-subtle:hover {
+      color: var(--slate-800);
+      text-decoration: underline;
+    }
+
+    /* State Panels */
+    .state-box {
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: left;
+      font-size: 13px;
+      display: none;
+    }
+
+    .state-box.active {
+      display: block;
+    }
+
+    .state-waiting {
+      background: var(--amber-50);
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+
+    .state-success {
+      background: var(--emerald-50);
+      border: 1px solid #a7f3d0;
+      color: var(--emerald-600);
+    }
+
+    .state-error {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Manual Fallback Accordion */
+    .manual-toggle {
+      background: transparent;
+      border: none;
+      color: var(--slate-500);
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 8px;
+      display: inline-block;
+    }
+
+    .manual-panel {
+      display: none;
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      text-align: left;
+    }
+
+    .manual-panel.open {
+      display: block;
+    }
+
+    .manual-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate-700);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .manual-input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--slate-300);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: monospace;
+      margin-bottom: 10px;
+    }
+
+    .manual-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-soft);
+    }
+
+    /* Footer */
+    .card-footer {
+      border-top: 1px solid var(--slate-100);
+      padding-top: 18px;
+      font-size: 12px;
+      color: var(--slate-400);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .card-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Titlebar -->
+  <header class="titlebar">
+    <div class="titlebar-brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+      <span>InstitutoPropio</span>
+      <span class="titlebar-badge">Windows Client</span>
+    </div>
+    <div class="titlebar-actions">
+      <button id="btnOpenWeb" class="btn-icon-subtle" title="Open InstitutoPropio in Default Browser">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/>
+          <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        <span>Open Website</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-wrapper">
+    <div class="card">
+      <div class="logo-container">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+      </div>
+
+      <h1>Welcome to InstitutoPropio</h1>
+      <p class="subtitle">
+        The modern operating system for educational campuses. Sign in through your default browser to launch your secure institution workspace.
+      </p>
+
+      <!-- Waiting Status Banner -->
+      <div id="stateWaiting" class="state-box state-waiting">
+        <div style="font-weight: 700; margin-bottom: 4px;">
+          <span class="spinner"></span> Awaiting Authentication in Browser
+        </div>
+        <div>
+          Please complete sign-in in the browser window that just opened. Once authorized, InstitutoPropio Desktop will automatically connect.
+        </div>
+        <div style="margin-top: 10px; display: flex; gap: 8px;">
+          <button id="btnRetryBrowser" class="btn-icon-subtle" style="background: white; border: 1px solid #fde68a;">
+            Re-open Browser
+          </button>
+          <button id="btnCancelAuth" class="btn-icon-subtle" style="color: #92400e;">
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- Success Banner -->
+      <div id="stateSuccess" class="state-box state-success">
+        <strong>✓ Authorization verified!</strong> Launching your institution workspace...
+      </div>
+
+      <!-- Error Banner -->
+      <div id="stateError" class="state-box state-error">
+        <strong id="errorTitle">Authentication Error</strong>: <span id="errorMessage">Something went wrong. Please try again.</span>
+      </div>
+
+      <!-- Primary Action Buttons -->
+      <div class="button-stack">
+        <button id="btnLogin" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          <span>Sign In via Web Browser</span>
+        </button>
+
+        <button id="btnRegister" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/>
+            <line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+          <span>Register Your Institution</span>
+        </button>
+      </div>
+
+      <!-- Manual Code Fallback -->
+      <div>
+        <button id="btnToggleManual" class="manual-toggle">
+          Having trouble with the browser callback? Enter authorization code manually
+        </button>
+
+        <div id="manualPanel" class="manual-panel">
+          <label class="manual-label" for="manualCode">Single-Use Authorization Code (64 characters):</label>
+          <input type="text" id="manualCode" class="manual-input" placeholder="Paste your 64-character authorization code here" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <button id="btnSubmitManual" class="btn btn-primary" style="padding: 10px; font-size: 13px;">
+            Verify Code & Connect LMS
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="card-footer" style="margin-top: 28px;">
+        <span>Multi-Tenant Campus Isolation</span>
+        <span>Version 1.0.0 (Tauri 2)</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Centralized Base Web URL (Configurable for Custom Domain)
+    const APP_WEB_URL = "https://institutopropio-production-nkljkm.laravel.cloud";
+
+    // DOM Elements
+    const btnLogin = document.getElementById('btnLogin');
+    const btnRegister = document.getElementById('btnRegister');
+    const btnOpenWeb = document.getElementById('btnOpenWeb');
+    const btnRetryBrowser = document.getElementById('btnRetryBrowser');
+    const btnCancelAuth = document.getElementById('btnCancelAuth');
+    const btnToggleManual = document.getElementById('btnToggleManual');
+    const manualPanel = document.getElementById('manualPanel');
+    const manualCode = document.getElementById('manualCode');
+    const btnSubmitManual = document.getElementById('btnSubmitManual');
+    const stateWaiting = document.getElementById('stateWaiting');
+    const stateSuccess = document.getElementById('stateSuccess');
+    const stateError = document.getElementById('stateError');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // PKCE Helper Functions (RFC 7636 compliant S256)
+    function generateRandomString(length) {
+      const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+      const values = new Uint8Array(length);
+      window.crypto.getRandomValues(values);
+      return Array.from(values, val => charset[val % charset.length]).join('');
+    }
+
+    async function sha256(plain) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(plain);
+      return window.crypto.subtle.digest('SHA-256', data);
+    }
+
+    function base64UrlEncode(buffer) {
+      let str = '';
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.byteLength; i++) {
+        str += String.fromCharCode(bytes[i]);
+      }
+      return btoa(str)
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+    }
+
+    async function createPkceChallenge(verifier) {
+      const hashed = await sha256(verifier);
+      return base64UrlEncode(hashed);
+    }
+
+    // External URL Opener (Works via Tauri Opener or fallback to window.open)
+    async function openExternalUrl(url) {
+      try {
+        if (window.__TAURI__ && window.__TAURI__.opener && window.__TAURI__.opener.openUrl) {
+          await window.__TAURI__.opener.openUrl(url);
+          return;
+        }
+        if (window.__TAURI__ && window.__TAURI__.shell && window.__TAURI__.shell.open) {
+          await window.__TAURI__.shell.open(url);
+          return;
+        }
+      } catch (e) {
+        console.warn("Tauri opener failed, falling back to window.open", e);
+      }
+      window.open(url, '_blank');
+    }
+
+    // State Display Helpers
+    function showError(msg) {
+      stateWaiting.classList.remove('active');
+      stateSuccess.classList.remove('active');
+      errorMessage.textContent = msg;
+      stateError.classList.add('active');
+    }
+
+    function showWaiting() {
+      stateError.classList.remove('active');
+      stateSuccess.classList.remove('active');
+      stateWaiting.classList.add('active');
+    }
+
+    function showSuccess() {
+      stateError.classList.remove('active');
+      stateWaiting.classList.remove('active');
+      stateSuccess.classList.add('active');
+    }
+
+    // Initiate PKCE Login
+    async function startLoginFlow() {
+      try {
+        const verifier = generateRandomString(64);
+        const challenge = await createPkceChallenge(verifier);
+        const state = generateRandomString(32);
+
+        // Store PKCE verifier and state
+        sessionStorage.setItem('pkce_verifier', verifier);
+        sessionStorage.setItem('pkce_state', state);
+        localStorage.setItem('pkce_verifier', verifier);
+        localStorage.setItem('pkce_state', state);
+
+        const connectUrl = `${APP_WEB_URL}/desktop/connect?code_challenge=${encodeURIComponent(challenge)}&state=${encodeURIComponent(state)}`;
+        
+        sessionStorage.setItem('last_connect_url', connectUrl);
+        showWaiting();
+
+        // Launch external browser
+        await openExternalUrl(connectUrl);
+      } catch (err) {
+        showError("Failed to initiate login flow: " + err.message);
+      }
+    }
+
+    // Consume Authorization Code & Establish Genuine Web Session
+    async function consumeAuthCode(code, state) {
+      const storedState = sessionStorage.getItem('pkce_state') || localStorage.getItem('pkce_state');
+      const verifier = sessionStorage.getItem('pkce_verifier') || localStorage.getItem('pkce_verifier');
+
+      if (!verifier) {
+        showError("Session verifier not found. Please click 'Sign In via Web Browser' again.");
+        return;
+      }
+
+      if (state && storedState && state !== storedState) {
+        showError("State validation mismatch. Potential CSRF detected. Please retry login.");
+        return;
+      }
+
+      showSuccess();
+
+      // Establish session inside WebView by navigating directly to consume endpoint
+      const consumeUrl = `${APP_WEB_URL}/desktop/consume?code=${encodeURIComponent(code)}&code_verifier=${encodeURIComponent(verifier)}&state=${encodeURIComponent(state || storedState)}`;
+
+      // Clear one-time verifier from storage
+      sessionStorage.removeItem('pkce_verifier');
+      sessionStorage.removeItem('pkce_state');
+      localStorage.removeItem('pkce_verifier');
+      localStorage.removeItem('pkce_state');
+
+      setTimeout(() => {
+        window.location.href = consumeUrl;
+      }, 500);
+    }
+
+    // Deep Link & URL Callback Handler
+    function handleDeepLinkUrl(urlStr) {
+      if (!urlStr) return;
+      try {
+        // e.g. institutopropio://auth/callback?code=...&state=...
+        const parsed = new URL(urlStr.replace('institutopropio://', 'https://placeholder.internal/'));
+        const code = parsed.searchParams.get('code');
+        const state = parsed.searchParams.get('state');
+
+        if (code) {
+          consumeAuthCode(code, state);
+        }
+      } catch (err) {
+        console.error("Failed to parse deep link URL:", urlStr, err);
+      }
+    }
+
+    // Setup Tauri Deep Link Listener if available
+    if (window.__TAURI__ && window.__TAURI__.deepLink) {
+      window.__TAURI__.deepLink.onOpenUrl((urls) => {
+        if (Array.isArray(urls)) {
+          urls.forEach(handleDeepLinkUrl);
+        } else {
+          handleDeepLinkUrl(urls);
+        }
+      });
+    }
+
+    // Event Listeners
+    btnLogin.addEventListener('click', startLoginFlow);
+    
+    btnRegister.addEventListener('click', () => {
+      openExternalUrl(`${APP_WEB_URL}/register`);
+    });
+
+    btnOpenWeb.addEventListener('click', () => {
+      openExternalUrl(APP_WEB_URL);
+    });
+
+    btnRetryBrowser.addEventListener('click', () => {
+      const lastUrl = sessionStorage.getItem('last_connect_url');
+      if (lastUrl) {
+        openExternalUrl(lastUrl);
+      } else {
+        startLoginFlow();
+      }
+    });
+
+    btnCancelAuth.addEventListener('click', () => {
+      stateWaiting.classList.remove('active');
+    });
+
+    btnToggleManual.addEventListener('click', () => {
+      manualPanel.classList.toggle('open');
+    });
+
+    btnSubmitManual.addEventListener('click', () => {
+      const code = manualCode.value.trim();
+      if (!code || code.length < 32) {
+        showError("Please enter a valid authorization code.");
+        return;
+      }
+      const storedState = sessionStorage.getItem('pkce_state') || localStorage.getItem('pkce_state');
+      consumeAuthCode(code, storedState);
+    });
+
+    // Check if deep link params were passed in the current window URL (e.g., custom protocol invocation)
+    const currentParams = new URLSearchParams(window.location.search);
+    if (currentParams.has('code')) {
+      consumeAuthCode(currentParams.get('code'), currentParams.get('state'));
+    }
+  </script>
+</body>
+</html>

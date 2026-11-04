@@ -56,6 +56,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Canonical Web Production URL
+    |--------------------------------------------------------------------------
+    |
+    | Centralized production URL for external links, desktop app handoffs,
+    | and notifications. When a custom domain is configured, update APP_WEB_URL.
+    |
+    */
+
+    'web_url' => env('APP_WEB_URL', 'https://institutopropio-production-nkljkm.laravel.cloud'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Base Domain & Reserved Subdomains
     |--------------------------------------------------------------------------
     |

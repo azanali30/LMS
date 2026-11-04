@@ -28,6 +28,8 @@ void createInertiaApp({
             'auth/onboarding-status',
             'auth/complete-account',
             'auth/complete-success',
+            'auth/desktop-connect',
+            'auth/desktop-authorized',
         ];
 
         if (

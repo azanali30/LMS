@@ -66,19 +66,26 @@ class OnboardingTrackingSecurityTest extends TestCase
         );
     }
 
-    public function test_requesting_otp_for_unregistered_email_returns_404(): void
+    public function test_requesting_otp_does_not_reveal_application_existence_user_enumeration(): void
     {
+        Mail::fake();
+
+        // 1. Unregistered email receives generic success without sending mail
         $response = $this->postJson('/onboarding/status/request-otp', [
-            'email' => 'unknown@nowhere.com',
+            'email' => 'nonexistent@nowhere.com',
         ]);
 
-        $response->assertStatus(404);
+        $response->assertOk();
         $response->assertJson([
-            'found' => false,
+            'sent' => true,
+            'email' => 'nonexistent@nowhere.com',
         ]);
+
+        Mail::assertNothingSent();
+        $this->assertNull(Cache::get('tracking_otp_nonexistent@nowhere.com'));
     }
 
-    public function test_requesting_otp_generates_code_and_sends_email(): void
+    public function test_requesting_otp_generates_code_and_sends_email_for_registered_application(): void
     {
         Mail::fake();
 
@@ -103,7 +110,9 @@ class OnboardingTrackingSecurityTest extends TestCase
         ]);
 
         Mail::assertSent(TrackingVerificationCodeMail::class, function ($mail) {
-            return $mail->hasTo('director@academy.org') && strlen($mail->code) === 6;
+            return $mail->hasTo('director@academy.org')
+                && strlen($mail->code) === 6
+                && $mail->expiresInMinutes === 10;
         });
 
         $cached = Cache::get('tracking_otp_director@academy.org');
@@ -111,12 +120,33 @@ class OnboardingTrackingSecurityTest extends TestCase
         $this->assertSame(6, strlen($cached['code']));
     }
 
+    public function test_otp_expires_after_ten_minutes(): void
+    {
+        Cache::put('tracking_otp_timed@school.com', [
+            'code' => '123456',
+            'attempts' => 0,
+        ], now()->addMinutes(10));
+
+        // Travel 11 minutes into the future
+        $this->travel(11)->minutes();
+
+        $response = $this->postJson('/onboarding/status/verify-otp', [
+            'email' => 'timed@school.com',
+            'code' => '123456',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonFragment([
+            'message' => 'The verification code has expired (valid for 10 minutes) or was not requested. Please request a new code.',
+        ]);
+    }
+
     public function test_verifying_with_invalid_otp_fails(): void
     {
         Cache::put('tracking_otp_applicant@school.com', [
             'code' => '654321',
             'attempts' => 0,
-        ], now()->addMinutes(15));
+        ], now()->addMinutes(10));
 
         $response = $this->postJson('/onboarding/status/verify-otp', [
             'email' => 'applicant@school.com',
@@ -144,7 +174,7 @@ class OnboardingTrackingSecurityTest extends TestCase
         Cache::put('tracking_otp_valid@school.com', [
             'code' => '888999',
             'attempts' => 0,
-        ], now()->addMinutes(15));
+        ], now()->addMinutes(10));
 
         $response = $this->postJson('/onboarding/status/verify-otp', [
             'email' => 'valid@school.com',
@@ -157,8 +187,8 @@ class OnboardingTrackingSecurityTest extends TestCase
             'found' => true,
             'application' => [
                 'email' => 'valid@school.com',
-                'status' => 'under_review',
-                'status_label' => 'Under Review / Pending Verification',
+                'status' => 'pending_review',
+                'status_label' => 'Payment Pending Review',
                 'transaction_reference' => 'TX-PROOF-777',
             ],
         ]);
@@ -166,10 +196,31 @@ class OnboardingTrackingSecurityTest extends TestCase
         // Session now has tracking_verified_email
         $this->assertEquals('valid@school.com', session('tracking_verified_email'));
 
-        // Subsequent status request succeeds
-        $statusRes = $this->getJson('/onboarding/status?email=valid@school.com');
+        // Refreshing page without ?email= in URL retains verified application!
+        $statusRes = $this->get('/onboarding/status');
         $statusRes->assertOk();
-        $statusRes->assertJsonFragment(['transaction_reference' => 'TX-PROOF-777']);
+        $statusRes->assertInertia(fn ($page) => $page
+            ->component('auth/onboarding-status')
+            ->where('verified', true)
+            ->where('approvalRequest.email', 'valid@school.com')
+            ->where('approvalRequest.transaction_reference', 'TX-PROOF-777')
+        );
+    }
+
+    public function test_reset_session_endpoint_clears_verification(): void
+    {
+        $this->withSession(['tracking_verified_email' => 'verified@school.com']);
+
+        $resetRes = $this->postJson('/onboarding/status/reset');
+        $resetRes->assertOk();
+        $this->assertNull(session('tracking_verified_email'));
+
+        $checkRes = $this->get('/onboarding/status');
+        $checkRes->assertInertia(fn ($page) => $page
+            ->component('auth/onboarding-status')
+            ->where('verified', false)
+            ->where('approvalRequest', null)
+        );
     }
 
     public function test_signed_magic_link_authorizes_session_and_redirects(): void
@@ -186,7 +237,7 @@ class OnboardingTrackingSecurityTest extends TestCase
 
         $signedUrl = URL::temporarySignedRoute(
             'onboarding.status.verify-link',
-            now()->addMinutes(15),
+            now()->addMinutes(10),
             ['email' => 'magic@school.com']
         );
 
@@ -206,7 +257,7 @@ class OnboardingTrackingSecurityTest extends TestCase
             'currency' => 'USD',
             'status' => PaymentApprovalRequest::STATUS_APPROVED,
             'transaction_reference' => 'TX-APPROVED-111',
-            'completion_token' => null, // NULL token from manual DB edit
+            'completion_token' => null,
             'token_expires_at' => null,
             'completed_at' => null,
         ]);
@@ -221,56 +272,78 @@ class OnboardingTrackingSecurityTest extends TestCase
         $this->assertTrue($app->isTokenValid());
 
         $data = $response->json('application');
-        $this->assertSame('awaiting_institution_details', $data['status']);
-        $this->assertSame('Approved — Awaiting Institution Setup', $data['status_label']);
+        $this->assertSame('approved', $data['status']);
+        $this->assertSame('Approved', $data['status_label']);
         $this->assertStringContainsString('/onboarding/complete/'.$app->completion_token, $data['action_url']);
     }
 
-    public function test_all_five_tracking_statuses_format_correctly(): void
+    public function test_all_four_application_statuses_format_accurately_with_details(): void
     {
-        // 1. Pending payment (draft)
-        $draft = PaymentApprovalRequest::create([
-            'email' => 'draft@school.com',
-            'plan_slug' => 'growth',
-            'current_step' => 3,
-            'status' => PaymentApprovalRequest::STATUS_DRAFT,
-        ]);
-        $this->assertSame('pending_payment', $draft->trackingStatus());
-
-        // 2. Under review (pending)
+        // 1. Payment Pending Review
         $pending = PaymentApprovalRequest::create([
             'email' => 'pending@school.com',
             'plan_slug' => 'growth',
+            'billing_interval' => 'monthly',
+            'amount_cents' => 4900,
+            'currency' => 'USD',
+            'transaction_reference' => 'TX-PENDING-001',
             'status' => PaymentApprovalRequest::STATUS_PENDING,
         ]);
-        $this->assertSame('under_review', $pending->trackingStatus());
+        $this->withSession(['tracking_verified_email' => 'pending@school.com']);
+        $res1 = $this->getJson('/onboarding/status');
+        $res1->assertOk();
+        $this->assertSame('Payment Pending Review', $res1->json('application.status_label'));
+        $this->assertSame('TX-PENDING-001', $res1->json('application.transaction_reference'));
 
-        // 3. Awaiting institution details (approved, completed_at null)
+        // 2. Approved
         $approved = PaymentApprovalRequest::create([
             'email' => 'approved2@school.com',
             'plan_slug' => 'growth',
+            'billing_interval' => 'monthly',
+            'amount_cents' => 4900,
+            'currency' => 'USD',
+            'transaction_reference' => 'TX-APPROVED-002',
             'status' => PaymentApprovalRequest::STATUS_APPROVED,
             'completed_at' => null,
         ]);
-        $this->assertSame('awaiting_institution_details', $approved->trackingStatus());
+        $this->withSession(['tracking_verified_email' => 'approved2@school.com']);
+        $res2 = $this->getJson('/onboarding/status');
+        $res2->assertOk();
+        $this->assertSame('Approved', $res2->json('application.status_label'));
+        $this->assertNotNull($res2->json('application.action_url'));
 
-        // 4. Completed (completed_at set)
-        $completed = PaymentApprovalRequest::create([
-            'email' => 'completed@school.com',
-            'plan_slug' => 'growth',
-            'status' => PaymentApprovalRequest::STATUS_APPROVED,
-            'completed_at' => now(),
-        ]);
-        $this->assertSame('completed', $completed->trackingStatus());
-
-        // 5. Rejected
+        // 3. Rejected
         $rejected = PaymentApprovalRequest::create([
             'email' => 'rejected@school.com',
             'plan_slug' => 'growth',
+            'billing_interval' => 'monthly',
+            'amount_cents' => 4900,
+            'currency' => 'USD',
+            'transaction_reference' => 'TX-REJECTED-003',
             'status' => PaymentApprovalRequest::STATUS_REJECTED,
-            'rejection_reason' => 'Invalid bank slip.',
+            'rejection_reason' => 'Invalid bank slip receipt image.',
         ]);
-        $this->assertSame('rejected', $rejected->trackingStatus());
+        $this->withSession(['tracking_verified_email' => 'rejected@school.com']);
+        $res3 = $this->getJson('/onboarding/status');
+        $res3->assertOk();
+        $this->assertSame('Rejected', $res3->json('application.status_label'));
+        $this->assertSame('Invalid bank slip receipt image.', $res3->json('application.admin_feedback'));
+
+        // 4. Additional Information Required
+        $addInfo = PaymentApprovalRequest::create([
+            'email' => 'addinfo@school.com',
+            'plan_slug' => 'growth',
+            'billing_interval' => 'monthly',
+            'amount_cents' => 4900,
+            'currency' => 'USD',
+            'transaction_reference' => 'TX-ADDINFO-004',
+            'status' => PaymentApprovalRequest::STATUS_ADDITIONAL_INFO,
+            'rejection_reason' => 'Please provide a clearer photo of the bank transfer stamped voucher.',
+        ]);
+        $this->withSession(['tracking_verified_email' => 'addinfo@school.com']);
+        $res4 = $this->getJson('/onboarding/status');
+        $res4->assertOk();
+        $this->assertSame('Additional Information Required', $res4->json('application.status_label'));
+        $this->assertSame('Please provide a clearer photo of the bank transfer stamped voucher.', $res4->json('application.admin_feedback'));
     }
 }
-

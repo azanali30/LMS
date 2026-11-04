@@ -550,18 +550,23 @@ class SaaSOnboardingController extends Controller
      */
     public function status(Request $request): Response|JsonResponse
     {
-        $email = $request->query('email') ? strtolower(trim($request->query('email'))) : null;
         $sessionVerifiedEmail = $request->session()->get('tracking_verified_email');
+        $queryEmail = $request->query('email') ? strtolower(trim($request->query('email'))) : null;
 
         $isVerified = false;
         $approvalRequest = null;
+        $displayEmail = $queryEmail;
 
-        if ($email && $sessionVerifiedEmail && $email === strtolower(trim($sessionVerifiedEmail))) {
-            $isVerified = true;
-            $approvalRequest = PaymentApprovalRequest::where('email', $email)
-                ->orWhere('pending_email', $email)
-                ->latest('id')
-                ->first();
+        if (! empty($sessionVerifiedEmail)) {
+            $normalizedSessionEmail = strtolower(trim($sessionVerifiedEmail));
+            if (! $queryEmail || $queryEmail === $normalizedSessionEmail) {
+                $isVerified = true;
+                $displayEmail = $normalizedSessionEmail;
+                $approvalRequest = PaymentApprovalRequest::where('email', $normalizedSessionEmail)
+                    ->orWhere('pending_email', $normalizedSessionEmail)
+                    ->latest('id')
+                    ->first();
+            }
         }
 
         if ($request->wantsJson()) {
@@ -595,7 +600,7 @@ class SaaSOnboardingController extends Controller
 
         return Inertia::render('auth/onboarding-status', [
             'verified' => $isVerified,
-            'searchEmail' => $email ?? '',
+            'searchEmail' => $displayEmail ?? '',
             'approvalRequest' => ($isVerified && $approvalRequest) ? $this->formatTrackingDetails($approvalRequest) : null,
         ]);
     }
@@ -626,38 +631,40 @@ class SaaSOnboardingController extends Controller
             ->orWhere('pending_email', $email)
             ->exists();
 
-        if (! $exists) {
-            return response()->json([
-                'found' => false,
-                'message' => 'No registration or payment application was found for this email address. Please make sure you entered the administrative work email used during signup.',
-            ], 404);
+        if ($exists) {
+            // Generate 6-digit OTP
+            $otp = (string) random_int(100000, 999999);
+
+            // Store OTP in cache for 10 minutes
+            Cache::put("tracking_otp_{$email}", [
+                'code' => $otp,
+                'attempts' => 0,
+            ], now()->addMinutes(10));
+
+            // Generate one-time signed verification link expiring in 10 minutes
+            $verificationUrl = URL::temporarySignedRoute(
+                'onboarding.status.verify-link',
+                now()->addMinutes(10),
+                ['email' => $email]
+            );
+
+            // Send Email
+            rescue(function () use ($email, $otp, $verificationUrl) {
+                Mail::to($email)->send(new TrackingVerificationCodeMail($otp, $verificationUrl, $email, 10));
+            }, function ($e) use ($email) {
+                \Illuminate\Support\Facades\Log::warning("Failed sending tracking OTP to {$email}: " . $e->getMessage());
+            });
+
+            if (app()->environment('local', 'testing')) {
+                \Illuminate\Support\Facades\Log::info("Tracking OTP generated for {$email}: [{$otp}] (Link: {$verificationUrl})");
+            }
         }
 
-        // Generate 6-digit OTP
-        $otp = (string) random_int(100000, 999999);
-
-        // Store OTP in cache for 15 minutes
-        Cache::put("tracking_otp_{$email}", [
-            'code' => $otp,
-            'attempts' => 0,
-        ], now()->addMinutes(15));
-
-        // Generate one-time signed verification link
-        $verificationUrl = URL::temporarySignedRoute(
-            'onboarding.status.verify-link',
-            now()->addMinutes(15),
-            ['email' => $email]
-        );
-
-        // Send Email
-        rescue(function () use ($email, $otp, $verificationUrl) {
-            Mail::to($email)->send(new TrackingVerificationCodeMail($otp, $verificationUrl, $email, 15));
-        }, report: false);
-
+        // Return enumeration-safe response (does not leak application existence)
         return response()->json([
             'sent' => true,
             'email' => $email,
-            'message' => 'A 6-digit verification code has been sent to your email address.',
+            'message' => 'If a registration or payment application exists for this email address, a 6-digit verification code has been sent to your inbox.',
         ]);
     }
 
@@ -678,7 +685,7 @@ class SaaSOnboardingController extends Controller
 
         if (! $cached) {
             return response()->json([
-                'message' => 'The verification code has expired or was not requested. Please request a new code.',
+                'message' => 'The verification code has expired (valid for 10 minutes) or was not requested. Please request a new code.',
             ], 422);
         }
 
@@ -691,7 +698,7 @@ class SaaSOnboardingController extends Controller
 
         if ($cached['code'] !== $code) {
             $cached['attempts'] = ($cached['attempts'] ?? 0) + 1;
-            Cache::put("tracking_otp_{$email}", $cached, now()->addMinutes(15));
+            Cache::put("tracking_otp_{$email}", $cached, now()->addMinutes(10));
 
             $remaining = 5 - $cached['attempts'];
             return response()->json([
@@ -711,7 +718,7 @@ class SaaSOnboardingController extends Controller
         if (! $approvalRequest) {
             return response()->json([
                 'found' => false,
-                'message' => 'No registration records found for this email.',
+                'message' => 'No registration records found for this verified email address.',
             ], 404);
         }
 
@@ -726,6 +733,15 @@ class SaaSOnboardingController extends Controller
             'completion_url' => $details['completion_url'] ?? null,
             'application' => $details,
         ]);
+    }
+
+    /**
+     * Clear verified tracking session so user can verify a different email.
+     */
+    public function resetTrackingSession(Request $request): JsonResponse
+    {
+        $request->session()->forget('tracking_verified_email');
+        return response()->json(['ok' => true]);
     }
 
     /**
@@ -747,7 +763,7 @@ class SaaSOnboardingController extends Controller
     }
 
     /**
-     * Format tracking details for applicant status view across all 5 states.
+     * Format tracking details for applicant status view across all 4 core states.
      */
     protected function formatTrackingDetails(PaymentApprovalRequest $approvalRequest): array
     {
@@ -763,9 +779,10 @@ class SaaSOnboardingController extends Controller
                 'plan_name' => $approvalRequest->planDisplayName(),
                 'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
                 'amount_formatted' => $approvalRequest->formattedAmount(),
+                'payment_method' => $approvalRequest->payment_method ?: 'manual_bank_transfer',
                 'transaction_reference' => $approvalRequest->transaction_reference ?: 'N/A',
                 'status' => 'completed',
-                'status_label' => 'Workspace Activated',
+                'status_label' => 'Approved & Workspace Activated',
                 'badge_style' => 'emerald',
                 'title' => 'Your institution workspace is fully active.',
                 'description' => 'Your campus account has been provisioned. You can sign in using your administrative work credentials.',
@@ -786,9 +803,10 @@ class SaaSOnboardingController extends Controller
                 'plan_name' => $approvalRequest->planDisplayName(),
                 'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
                 'amount_formatted' => $approvalRequest->formattedAmount(),
+                'payment_method' => $approvalRequest->payment_method ?: 'manual_bank_transfer',
                 'transaction_reference' => $approvalRequest->transaction_reference ?: 'N/A',
-                'status' => 'awaiting_institution_details',
-                'status_label' => 'Approved — Awaiting Institution Setup',
+                'status' => 'approved',
+                'status_label' => 'Approved',
                 'badge_style' => 'emerald',
                 'title' => 'Congratulations! Your payment proof has been approved.',
                 'description' => 'Your 30-day free trial has been unlocked. Click the button below to choose your password, school name, and custom campus subdomain.',
@@ -808,15 +826,18 @@ class SaaSOnboardingController extends Controller
                 'plan_name' => $approvalRequest->planDisplayName(),
                 'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
                 'amount_formatted' => $approvalRequest->formattedAmount(),
+                'payment_method' => $approvalRequest->payment_method ?: 'manual_bank_transfer',
                 'transaction_reference' => $approvalRequest->transaction_reference ?: 'N/A',
-                'status' => 'under_review',
-                'status_label' => 'Under Review / Pending Verification',
+                'status' => 'pending_review',
+                'status_label' => 'Payment Pending Review',
                 'badge_style' => 'amber',
                 'title' => 'Your payment proof is under active verification.',
                 'description' => 'Our finance desk is matching your transaction reference with bank deposit logs. Once verified, you will be able to complete your workspace setup.',
                 'action' => null,
                 'action_url' => null,
                 'action_label' => null,
+                'notes' => $approvalRequest->notes,
+                'admin_feedback' => $approvalRequest->notes,
                 'submitted_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
             ];
         }
@@ -828,13 +849,15 @@ class SaaSOnboardingController extends Controller
                 'plan_name' => $approvalRequest->planDisplayName(),
                 'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
                 'amount_formatted' => $approvalRequest->formattedAmount(),
+                'payment_method' => $approvalRequest->payment_method ?: 'manual_bank_transfer',
                 'transaction_reference' => $approvalRequest->transaction_reference ?: 'N/A',
                 'status' => 'rejected',
-                'status_label' => 'Payment Proof Rejected',
+                'status_label' => 'Rejected',
                 'badge_style' => 'rose',
-                'title' => 'Payment Verification Notice',
+                'title' => 'Payment Verification Rejected',
                 'description' => 'Our finance desk could not verify your payment proof with bank deposit logs.',
-                'rejection_reason' => $approvalRequest->rejection_reason ?: 'Unable to verify payment reference with bank records.',
+                'admin_feedback' => $approvalRequest->rejection_reason ?: 'Unable to verify payment reference with bank records.',
+                'rejection_reason' => $approvalRequest->rejection_reason,
                 'action' => 'resubmit',
                 'action_url' => url('/register?email=' . urlencode($approvalRequest->email)),
                 'action_label' => 'Submit Corrected Payment Proof',
@@ -843,22 +866,25 @@ class SaaSOnboardingController extends Controller
             ];
         }
 
-        // Draft / Pending Payment
+        // Additional Information Required (or Draft / Incomplete)
         return [
             'id' => $approvalRequest->id,
             'email' => $approvalRequest->email,
             'plan_name' => $approvalRequest->planDisplayName(),
             'billing_interval' => $approvalRequest->billing_interval ?: 'monthly',
             'amount_formatted' => $approvalRequest->formattedAmount(),
+            'payment_method' => $approvalRequest->payment_method ?: 'manual_bank_transfer',
             'transaction_reference' => $approvalRequest->transaction_reference ?: 'Unsubmitted',
-            'status' => 'pending_payment',
-            'status_label' => 'Pending Payment Proof',
+            'status' => 'additional_info_required',
+            'status_label' => 'Additional Information Required',
             'badge_style' => 'amber',
-            'title' => 'Payment Proof Required',
-            'description' => 'You started registration for the ' . $approvalRequest->planDisplayName() . ' plan, but payment proof has not yet been submitted. Please upload your deposit slip or transfer screenshot to submit your application.',
-            'action' => 'resume_registration',
+            'title' => 'Additional Verification Information Needed',
+            'description' => 'The finance desk requires additional documentation, clarification, or a legible deposit slip before your workspace can be activated.',
+            'admin_feedback' => $approvalRequest->rejection_reason ?: $approvalRequest->notes ?: 'Please provide a clear deposit receipt or revised transaction reference.',
+            'rejection_reason' => $approvalRequest->rejection_reason,
+            'action' => 'provide_info',
             'action_url' => url('/register?email=' . urlencode($approvalRequest->email) . '&step=' . max(2, (int) ($approvalRequest->current_step ?: 4))),
-            'action_label' => 'Resume Application & Submit Proof',
+            'action_label' => 'Provide Requested Information',
             'submitted_at' => $approvalRequest->created_at->format('M d, Y h:i A'),
         ];
     }

@@ -16,7 +16,7 @@ class TrackingVerificationCodeMail extends Mailable
         public string $code,
         public string $verificationUrl,
         public string $email,
-        public int $expiresInMinutes = 15
+        public int $expiresInMinutes = 10
     ) {}
 
     public function envelope(): Envelope

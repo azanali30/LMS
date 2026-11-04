@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminPaymentApprovalController;
+use App\Http\Controllers\Auth\DesktopAuthenticationController;
 use App\Http\Controllers\Auth\RegistrationJourneyController;
 use App\Http\Controllers\Auth\SaaSOnboardingController;
 use App\Http\Controllers\DashboardController;
@@ -40,6 +41,19 @@ Route::get('/onboarding/status', [SaaSOnboardingController::class, 'status'])->n
 Route::post('/onboarding/status/request-otp', [SaaSOnboardingController::class, 'requestTrackingOtp'])->name('onboarding.status.request-otp');
 Route::post('/onboarding/status/verify-otp', [SaaSOnboardingController::class, 'verifyTrackingOtp'])->name('onboarding.status.verify-otp');
 Route::get('/onboarding/status/verify-link', [SaaSOnboardingController::class, 'verifyTrackingLink'])->name('onboarding.status.verify-link');
+Route::post('/onboarding/status/reset', [SaaSOnboardingController::class, 'resetTrackingSession'])->name('onboarding.status.reset');
+
+// Windows Desktop Application Authentication Handoff (PKCE)
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/desktop/connect', [DesktopAuthenticationController::class, 'connect'])->name('desktop.connect');
+    Route::post('/desktop/authorize', [DesktopAuthenticationController::class, 'authorizeApp'])->name('desktop.authorize');
+});
+
+Route::middleware('web')->group(function () {
+    Route::get('/desktop/consume', [DesktopAuthenticationController::class, 'consume'])->name('desktop.consume');
+    Route::post('/api/desktop/exchange', [DesktopAuthenticationController::class, 'consume'])->name('desktop.exchange');
+    Route::post('/desktop/logout', [DesktopAuthenticationController::class, 'logout'])->name('desktop.logout');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [SaaSOnboardingController::class, 'show'])->name('register');

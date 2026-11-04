@@ -16,6 +16,7 @@ class PaymentApprovalRequest extends Model
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
+    public const STATUS_ADDITIONAL_INFO = 'additional_info_required';
 
     protected $fillable = [
         'email',
@@ -166,6 +167,10 @@ class PaymentApprovalRequest extends Model
 
     public function trackingStatus(): string
     {
+        if ($this->status === self::STATUS_ADDITIONAL_INFO) {
+            return 'additional_info_required';
+        }
+
         if ($this->isCompleted()) {
             return 'completed';
         }

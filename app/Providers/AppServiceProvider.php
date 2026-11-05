@@ -56,7 +56,8 @@ class AppServiceProvider extends ServiceProvider
             try {
                 if (! \Illuminate\Support\Facades\Schema::hasTable('notifications') ||
                     ! \Illuminate\Support\Facades\Schema::hasTable('organization_subscriptions') ||
-                    ! \Illuminate\Support\Facades\Schema::hasTable('academic_years')) {
+                    ! \Illuminate\Support\Facades\Schema::hasTable('academic_years') ||
+                    ! \Illuminate\Support\Facades\Schema::hasTable('platform_audit_logs')) {
                     \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
                 }
 

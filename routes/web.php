@@ -243,4 +243,75 @@ Route::middleware(['auth'])->group(function () {
     Route::post('courses/{course}/lessons/{lesson}/complete', [LessonController::class, 'complete'])->name('lessons.complete');
 });
 
+// =========================================================================
+// C. Dedicated Platform Super Admin Portal (Platform Owner / Super Admin)
+// =========================================================================
+
+// Super Admin Authentication
+Route::middleware('guest')->group(function () {
+    Route::get('/platform-admin/login', [\App\Http\Controllers\PlatformAdmin\PlatformAuthController::class, 'showLogin'])->name('platform-admin.login');
+    Route::post('/platform-admin/login', [\App\Http\Controllers\PlatformAdmin\PlatformAuthController::class, 'login'])->middleware('throttle:5,1');
+});
+Route::post('/platform-admin/logout', [\App\Http\Controllers\PlatformAdmin\PlatformAuthController::class, 'logout'])->name('platform-admin.logout');
+
+// Protected Platform Super Admin Routes
+Route::middleware(['web', 'super_admin'])->prefix('platform-admin')->name('platform-admin.')->group(function () {
+    // 1. Overview Dashboard
+    Route::get('dashboard', [\App\Http\Controllers\PlatformAdmin\PlatformDashboardController::class, 'index'])->name('dashboard');
+
+    // 2. Organizations
+    Route::get('organizations', [\App\Http\Controllers\PlatformAdmin\PlatformOrganizationController::class, 'index'])->name('organizations.index');
+    Route::get('organizations/{organization}', [\App\Http\Controllers\PlatformAdmin\PlatformOrganizationController::class, 'show'])->name('organizations.show');
+    Route::post('organizations/{organization}/status', [\App\Http\Controllers\PlatformAdmin\PlatformOrganizationController::class, 'updateStatus'])->name('organizations.status');
+    Route::post('organizations/{organization}/change-plan', [\App\Http\Controllers\PlatformAdmin\PlatformOrganizationController::class, 'changePlan'])->name('organizations.change-plan');
+
+    // 3. Users
+    Route::get('users', [\App\Http\Controllers\PlatformAdmin\PlatformUserController::class, 'index'])->name('users.index');
+    Route::get('users/{user}', [\App\Http\Controllers\PlatformAdmin\PlatformUserController::class, 'show'])->name('users.show');
+    Route::post('users/{user}/status', [\App\Http\Controllers\PlatformAdmin\PlatformUserController::class, 'updateStatus'])->name('users.status');
+
+    // 4. Subscriptions
+    Route::get('subscriptions', [\App\Http\Controllers\PlatformAdmin\PlatformSubscriptionController::class, 'index'])->name('subscriptions.index');
+    Route::post('subscriptions/{subscription}/cancel', [\App\Http\Controllers\PlatformAdmin\PlatformSubscriptionController::class, 'cancel'])->name('subscriptions.cancel');
+
+    // 5. Plans & Pricing
+    Route::get('plans', [\App\Http\Controllers\PlatformAdmin\PlatformPlanController::class, 'index'])->name('plans.index');
+    Route::post('plans', [\App\Http\Controllers\PlatformAdmin\PlatformPlanController::class, 'store'])->name('plans.store');
+    Route::put('plans/{plan}', [\App\Http\Controllers\PlatformAdmin\PlatformPlanController::class, 'update'])->name('plans.update');
+    Route::post('plans/{plan}/toggle', [\App\Http\Controllers\PlatformAdmin\PlatformPlanController::class, 'toggle'])->name('plans.toggle');
+
+    // 6. Payments
+    Route::get('payments', [\App\Http\Controllers\PlatformAdmin\PlatformPaymentController::class, 'index'])->name('payments.index');
+    Route::post('payments/{id}/approve', [\App\Http\Controllers\PlatformAdmin\PlatformPaymentController::class, 'approve'])->name('payments.approve');
+    Route::post('payments/{id}/reject', [\App\Http\Controllers\PlatformAdmin\PlatformPaymentController::class, 'reject'])->name('payments.reject');
+    Route::get('payments/{id}/receipt', [\App\Http\Controllers\PlatformAdmin\PlatformPaymentController::class, 'downloadReceipt'])->name('payments.receipt');
+
+    // 7. Invoices
+    Route::get('invoices', [\App\Http\Controllers\PlatformAdmin\PlatformInvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('invoices/{invoice}', [\App\Http\Controllers\PlatformAdmin\PlatformInvoiceController::class, 'show'])->name('invoices.show');
+    Route::post('invoices/{invoice}/verify', [\App\Http\Controllers\PlatformAdmin\PlatformInvoiceController::class, 'verifyPayment'])->name('invoices.verify');
+
+    // 8. Analytics
+    Route::get('analytics', [\App\Http\Controllers\PlatformAdmin\PlatformAnalyticsController::class, 'index'])->name('analytics.index');
+
+    // 9. Support Tickets
+    Route::get('support', [\App\Http\Controllers\PlatformAdmin\PlatformSupportController::class, 'index'])->name('support.index');
+    Route::get('support/{ticket}', [\App\Http\Controllers\PlatformAdmin\PlatformSupportController::class, 'show'])->name('support.show');
+    Route::post('support/{ticket}/reply', [\App\Http\Controllers\PlatformAdmin\PlatformSupportController::class, 'reply'])->name('support.reply');
+    Route::post('support/{ticket}/status', [\App\Http\Controllers\PlatformAdmin\PlatformSupportController::class, 'updateStatus'])->name('support.status');
+
+    // 10. Announcements
+    Route::get('announcements', [\App\Http\Controllers\PlatformAdmin\PlatformAnnouncementController::class, 'index'])->name('announcements.index');
+    Route::post('announcements', [\App\Http\Controllers\PlatformAdmin\PlatformAnnouncementController::class, 'store'])->name('announcements.store');
+    Route::post('announcements/{announcement}/publish', [\App\Http\Controllers\PlatformAdmin\PlatformAnnouncementController::class, 'publish'])->name('announcements.publish');
+    Route::delete('announcements/{announcement}', [\App\Http\Controllers\PlatformAdmin\PlatformAnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+    // 11. Audit Logs
+    Route::get('audit-logs', [\App\Http\Controllers\PlatformAdmin\PlatformAuditLogController::class, 'index'])->name('audit-logs.index');
+
+    // 12. Settings
+    Route::get('settings', [\App\Http\Controllers\PlatformAdmin\PlatformSettingsController::class, 'index'])->name('settings.index');
+    Route::post('settings/password', [\App\Http\Controllers\PlatformAdmin\PlatformSettingsController::class, 'updatePassword'])->name('settings.password');
+});
+
 require __DIR__.'/settings.php';

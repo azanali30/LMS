@@ -1093,6 +1093,13 @@ class SaaSOnboardingController extends Controller
             ];
         });
 
+        // Dispatch official welcome & login credentials email
+        rescue(function () use ($created) {
+            Mail::to($created['user']->email)->send(
+                new \App\Mail\AccountWelcomeLoginMail($created['user'], $created['organization'])
+            );
+        }, report: true);
+
         return Inertia::render('auth/complete-success', [
             'email' => $created['user']->email,
             'organizationName' => $created['organization']->name,

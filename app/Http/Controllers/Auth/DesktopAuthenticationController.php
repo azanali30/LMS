@@ -21,6 +21,11 @@ class DesktopAuthenticationController extends Controller
      */
     public function connect(Request $request): Response|RedirectResponse
     {
+        if (! $request->has(['code_challenge', 'state'])) {
+            return redirect()->route('download')
+                ->with('info', 'Desktop authentication must be initiated from the InstitutoPropio Windows application. Launch the desktop app and click "Sign In via Web Browser".');
+        }
+
         $validated = $request->validate([
             'code_challenge' => ['required', 'string', 'min:43', 'max:128'],
             'state' => ['required', 'string', 'min:8', 'max:128'],

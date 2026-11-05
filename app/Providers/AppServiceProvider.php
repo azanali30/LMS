@@ -28,6 +28,22 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Organization::class, \App\Policies\OrganizationPolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\App\Models\FeeInvoice::class, \App\Policies\FeeInvoicePolicy::class);
 
+        // Branded HTML Password Reset Notification
+        \Illuminate\Auth\Notifications\ResetPassword::toMailUsing(function ($notifiable, string $token) {
+            $resetUrl = url(route('password.reset', [
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ], false));
+
+            return (new \Illuminate\Notifications\Messages\MailMessage)
+                ->subject('Reset Your Password — InstitutoPropio')
+                ->view('emails.password-reset', [
+                    'email' => $notifiable->getEmailForPasswordReset(),
+                    'resetUrl' => $resetUrl,
+                    'count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire', 60),
+                ]);
+        });
+
         $this->ensureProductionSchema();
     }
 

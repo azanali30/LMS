@@ -1,51 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Approved — Complete Your InstitutoPropio Workspace</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #070b14; color: #f1f5f9; margin: 0; padding: 24px; }
-        .card { max-width: 600px; margin: 0 auto; background: #0B1220; border: 1px solid #1e293b; border-radius: 16px; padding: 36px 32px; }
-        .logo { font-size: 20px; font-weight: 800; color: #a855f7; margin-bottom: 24px; letter-spacing: -0.02em; }
-        h1 { font-size: 22px; color: #ffffff; margin: 0 0 12px 0; font-weight: 700; }
-        p { font-size: 14px; line-height: 1.6; color: #94a3b8; margin: 0 0 16px 0; }
-        .highlight { background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px; padding: 16px; margin: 24px 0; }
-        .highlight-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
-        .highlight-item:last-child { margin-bottom: 0; }
-        .label { color: #94a3b8; }
-        .val { color: #f8fafc; font-weight: 600; }
-        .btn { display: inline-block; background: #7c3aed; color: #ffffff !important; font-weight: 600; text-decoration: none; padding: 14px 28px; border-radius: 10px; font-size: 14px; margin: 20px 0; text-align: center; }
-        .footer { font-size: 11px; color: #64748b; margin-top: 32px; border-top: 1px solid #1e293b; padding-top: 16px; text-align: center; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="logo">InstitutoPropio</div>
-        <h1>Your Payment Has Been Verified!</h1>
-        <p>Hello,</p>
-        <p>Great news! Our finance team has successfully reviewed and approved your manual payment verification. Your <strong>30-day free trial</strong> is now ready to activate.</p>
-        
-        <div class="highlight">
-            <div class="highlight-item"><span class="label">Plan:</span> <span class="val">{{ $planName }}</span></div>
-            <div class="highlight-item"><span class="label">Billing Interval:</span> <span class="val">{{ ucfirst($approvalRequest->billing_interval) }}</span></div>
-            <div class="highlight-item"><span class="label">Transaction Reference:</span> <span class="val">{{ $approvalRequest->transaction_reference }}</span></div>
-            <div class="highlight-item"><span class="label">Approved Date:</span> <span class="val">{{ $approvalRequest->approved_at?->format('M d, Y') ?? 'Today' }}</span></div>
-        </div>
+@extends('emails.layout')
 
-        <p>To finalize your setup, please click the secure button below to choose your password and set up your institution details (such as your preferred subdomain and school name):</p>
+@section('title', 'Payment Approved — Complete Your InstitutoPropio Workspace')
 
-        <div style="text-align: center;">
-            <a href="{{ $completionUrl }}" class="btn">Complete Account & Setup Institution &rarr;</a>
-        </div>
-
-        <p style="font-size: 12px; color: #64748b;">
-            This single-use link expires in 7 days. If you did not request this registration, please disregard this email.
+@section('content')
+    <div style="margin-bottom: 24px;">
+        <span style="display: inline-block; background-color: #ECFDF5; border: 1px solid #A7F3D0; color: #047857; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">
+            ✓ Payment Verified & Approved
+        </span>
+        <h1>Congratulations! Your Payment is Verified</h1>
+        <p>
+            Hello, our finance team has reviewed and confirmed your payment verification. Your <strong>30-day free trial</strong> is now ready to activate.
         </p>
+    </div>
 
-        <div class="footer">
-            &copy; {{ date('Y') }} InstitutoPropio SaaS Platform. All rights reserved.
+    <!-- Payment & Plan Summary -->
+    <div class="info-card">
+        <div class="info-row">
+            <span class="info-label">Selected Plan</span>
+            <span class="info-value" style="color: #1769E0;">{{ $planName }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Billing Interval</span>
+            <span class="info-value">{{ ucfirst($approvalRequest->billing_interval) }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Transaction Reference</span>
+            <span class="info-value" style="font-family: monospace;">{{ $approvalRequest->transaction_reference }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Payment Method</span>
+            <span class="info-value">{{ ucfirst(str_replace('_', ' ', $approvalRequest->payment_method)) }}</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Approval Date</span>
+            <span class="info-value">{{ $approvalRequest->approved_at?->format('M d, Y h:i A') ?? now()->format('M d, Y h:i A') }}</span>
         </div>
     </div>
-</body>
-</html>
+
+    <p style="margin-top: 24px;">
+        Click the button below to set your password and complete your institution setup (choose your school name and custom campus subdomain):
+    </p>
+
+    <!-- Call to Action Button -->
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ $completionUrl }}" class="btn-orange" style="font-size: 15px; padding: 14px 32px;">
+            Complete Account & Setup Institution &rarr;
+        </a>
+    </div>
+
+    <!-- Security Information Box -->
+    <div style="background-color: #EFF6FF; border-left: 4px solid #1769E0; padding: 14px 18px; border-radius: 8px; margin-top: 28px;">
+        <p style="margin: 0; font-size: 12px; color: #1E3A8A; line-height: 1.5;">
+            <strong>Security Notice:</strong> This single-use setup link will expire in <strong>7 days</strong>. If you did not request this registration, please contact our security desk immediately at <a href="mailto:support@institutopropio.com" style="color: #1769E0;">support@institutopropio.com</a>.
+        </p>
+    </div>
+@endsection

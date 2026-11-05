@@ -25,10 +25,10 @@ class OrganizationInvitationMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $orgName = $this->invitation->organization->name ?? 'AcademiaLMS';
+        $orgName = $this->invitation->organization->name ?? 'InstitutoPropio';
 
         return new Envelope(
-            subject: "Invitation to join {$orgName} on AcademiaLMS",
+            subject: "Invitation to join {$orgName} on InstitutoPropio",
         );
     }
 

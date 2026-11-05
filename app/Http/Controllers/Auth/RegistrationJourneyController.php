@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AccountWelcomeLoginMail;
 use App\Models\AcademicTerm;
 use App\Models\AcademicYear;
 use App\Models\Organization;
@@ -20,6 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -240,6 +242,12 @@ class RegistrationJourneyController extends Controller
         Auth::login($user);
 
         if ($organization) {
+            rescue(function () use ($user, $organization) {
+                Mail::to($user->email)->send(
+                    new AccountWelcomeLoginMail($user, $organization)
+                );
+            }, report: true);
+
             TenantContext::set($organization);
             $request->session()->put('current_organization_id', $organization->id);
 

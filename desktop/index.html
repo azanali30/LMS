@@ -350,10 +350,7 @@
   <!-- Titlebar -->
   <header class="titlebar">
     <div class="titlebar-brand">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-      </svg>
+      <img src="./logo.png" alt="InstitutoPropio Logo" width="22" height="22" style="border-radius: 4px; object-fit: contain; vertical-align: middle;">
       <span>InstitutoPropio</span>
       <span class="titlebar-badge">Windows Client</span>
     </div>
@@ -372,11 +369,8 @@
   <!-- Main Container -->
   <main class="main-wrapper">
     <div class="card">
-      <div class="logo-container">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-          <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-        </svg>
+      <div class="logo-container" style="background: transparent; box-shadow: none; width: auto; height: auto; margin-bottom: 16px;">
+        <img src="./logo.png" alt="InstitutoPropio Logo" width="76" height="76" style="object-fit: contain; border-radius: 12px; display: inline-block;">
       </div>
 
       <h1>Welcome to InstitutoPropio</h1>
@@ -458,8 +452,9 @@
   </main>
 
   <script>
-    // Centralized Base Web URL (Configurable for Custom Domain)
-    const APP_WEB_URL = "https://institutopropio-production-nkljkm.laravel.cloud";
+    // Centralized Base Web URL (Configurable for Custom Domain or Local Dev)
+    const RAW_WEB_URL = "https://institutopropio-production-nkljkm.laravel.cloud";
+    const APP_WEB_URL = RAW_WEB_URL.replace(/\/+$/, "");
 
     // DOM Elements
     const btnLogin = document.getElementById('btnLogin');

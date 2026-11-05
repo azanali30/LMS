@@ -37,6 +37,7 @@ void createInertiaApp({
             name.startsWith('tenant/') ||
             name.startsWith('school/') ||
             name.startsWith('admin/') ||
+            name.startsWith('platform-admin/') ||
             name.startsWith('learning/') ||
             name.startsWith('organizations/')
         ) {

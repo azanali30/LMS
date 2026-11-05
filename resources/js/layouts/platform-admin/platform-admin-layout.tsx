@@ -32,10 +32,12 @@ export default function PlatformAdminLayout({
     title = 'Platform Control Center',
     children,
 }: PlatformAdminLayoutProps) {
-    const { auth, flash, url } = usePage<any>().props;
+    const page = usePage<any>();
+    const { auth, flash } = page.props || {};
     const [mobileOpen, setMobileOpen] = useState(false);
 
     const user = auth?.user;
+    const currentUrl = page.url || (typeof window !== 'undefined' ? window.location.pathname : '') || '';
 
     const navItems = [
         { label: 'Overview', href: '/platform-admin/dashboard', icon: LayoutDashboard },
@@ -53,10 +55,11 @@ export default function PlatformAdminLayout({
     ];
 
     const isCurrent = (href: string) => {
+        if (!href || typeof currentUrl !== 'string') return false;
         if (href === '/platform-admin/dashboard') {
-            return url === '/platform-admin/dashboard' || url === '/platform-admin';
+            return currentUrl === '/platform-admin/dashboard' || currentUrl === '/platform-admin';
         }
-        return url.startsWith(href);
+        return currentUrl.startsWith(href);
     };
 
     return (

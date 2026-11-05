@@ -40,9 +40,9 @@ class DashboardController extends Controller
             return redirect()->route('invitations.accept', ['token' => $pendingToken]);
         }
 
-        // 1. Super Admin Platform Dashboard
+        // 1. Super Admin Platform Dashboard -> Redirect to dedicated Platform Admin Portal
         if ($user->isSuperAdmin()) {
-            return $this->superAdminDashboard();
+            return redirect()->route('platform-admin.dashboard');
         }
 
         $organization = TenantContext::current();
@@ -99,10 +99,10 @@ class DashboardController extends Controller
     /**
      * Platform-level Super Admin Dashboard.
      */
-    public function superAdminDashboardRoute(Request $request): Response
+    public function superAdminDashboardRoute(Request $request): \Illuminate\Http\RedirectResponse
     {
         abort_unless($request->user()?->isSuperAdmin(), 403, 'Unauthorized. Platform administrator privileges required.');
-        return $this->superAdminDashboard();
+        return redirect()->route('platform-admin.dashboard');
     }
 
     /**

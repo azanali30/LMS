@@ -165,6 +165,14 @@ class PlatformSuperAdminPortalTest extends TestCase
         );
     }
 
+    public function test_super_admin_accessing_general_dashboard_is_redirected_to_platform_admin_dashboard(): void
+    {
+        $admin = $this->createSuperAdmin('super-redirect@institutopropio.com');
+
+        $response = $this->actingAs($admin)->get('/dashboard');
+        $response->assertRedirect(route('platform-admin.dashboard'));
+    }
+
     public function test_super_admin_can_suspend_and_reactivate_organization(): void
     {
         $admin = $this->createSuperAdmin();

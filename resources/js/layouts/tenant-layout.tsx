@@ -535,21 +535,21 @@ export default function TenantLayout({
                         <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-800/80">
                             <div className="flex items-center gap-1.5 px-3 pb-2 text-[10px] font-bold tracking-wider text-rose-600 uppercase dark:text-rose-400">
                                 <ShieldCheck className="size-3" />
-                                Platform Admin
+                                Super Admin Control
                             </div>
                             <Link
-                                href="/admin/dashboard"
+                                href="/platform-admin/dashboard"
                                 onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium text-rose-600 transition hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-500/10"
+                                className="flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 dark:text-rose-300 dark:hover:bg-rose-500/10"
                             >
                                 <ShieldCheck className="size-4" />
-                                <span>Platform Metrics</span>
+                                <span>Super Admin Portal</span>
                             </Link>
                             <Link
-                                href="/admin/payment-approvals"
+                                href="/platform-admin/payments"
                                 onClick={() => setMobileOpen(false)}
                                 className={`flex items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium transition ${
-                                    window.location.pathname.startsWith('/admin/payment-approvals')
+                                    window.location.pathname.startsWith('/platform-admin/payments')
                                         ? 'border border-amber-500/30 bg-amber-500/10 font-semibold text-amber-500 dark:text-amber-300'
                                         : 'text-amber-600 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-500/10'
                                 }`}

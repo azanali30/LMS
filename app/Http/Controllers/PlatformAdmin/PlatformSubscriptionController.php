@@ -29,7 +29,11 @@ class PlatformSubscriptionController extends Controller
                 ->latest();
 
             if ($status) {
-                $query->where('status', $status);
+                if (in_array($status, ['trial', 'trialing'], true)) {
+                    $query->whereIn('status', ['trial', 'trialing']);
+                } else {
+                    $query->where('status', $status);
+                }
             }
 
             if ($planId) {
@@ -80,7 +84,7 @@ class PlatformSubscriptionController extends Controller
             $counts = [
                 'all' => OrganizationSubscription::count(),
                 'active' => OrganizationSubscription::where('status', 'active')->count(),
-                'trialing' => OrganizationSubscription::where('status', 'trialing')->count(),
+                'trialing' => OrganizationSubscription::whereIn('status', ['trial', 'trialing'])->count(),
                 'cancelled' => OrganizationSubscription::where('status', 'cancelled')->count(),
             ];
 
@@ -126,3 +130,4 @@ class PlatformSubscriptionController extends Controller
         });
     }
 }
+

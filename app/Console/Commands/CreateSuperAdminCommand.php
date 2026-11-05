@@ -53,7 +53,7 @@ class CreateSuperAdminCommand extends Command
 
         if ($existingUser) {
             $this->warn("A user account with email [{$email}] already exists.");
-            if (! $this->confirm('Do you want to elevate this user to Platform Super Admin?', true)) {
+            if ($this->input->isInteractive() && ! $this->confirm('Do you want to elevate this user to Platform Super Admin?', true)) {
                 $this->info('Operation cancelled.');
                 return Command::SUCCESS;
             }
@@ -64,7 +64,21 @@ class CreateSuperAdminCommand extends Command
         }
 
         $password = $this->option('password');
-        if (empty($password)) {
+        $shouldUpdatePassword = ! empty($password);
+
+        if ($existingUser && empty($password)) {
+            // Prompt only if interactive and explicitly requested; otherwise preserve existing password
+            if ($this->input->isInteractive() && $this->confirm('Do you want to update the password for this existing user?', false)) {
+                $password = $this->secret('Enter New Super Admin Password:');
+                $passwordConfirm = $this->secret('Confirm Password:');
+
+                if ($password !== $passwordConfirm) {
+                    $this->error('Passwords do not match. Aborting.');
+                    return Command::FAILURE;
+                }
+                $shouldUpdatePassword = true;
+            }
+        } elseif (! $existingUser && empty($password)) {
             $password = $this->secret('Enter New Super Admin Password:');
             $passwordConfirm = $this->secret('Confirm Password:');
 
@@ -72,25 +86,38 @@ class CreateSuperAdminCommand extends Command
                 $this->error('Passwords do not match. Aborting.');
                 return Command::FAILURE;
             }
+            $shouldUpdatePassword = true;
         }
 
-        if (strlen((string) $password) < 8) {
+        if ($shouldUpdatePassword && strlen((string) $password) < 8) {
             $this->error('Password must be at least 8 characters long.');
             return Command::FAILURE;
         }
 
         if ($existingUser) {
-            $existingUser->update([
-                'name' => $name,
+            $updateData = [
                 'role' => 'super_admin',
                 'status' => 'active',
-                'password' => Hash::make($password),
                 'email_verified_at' => $existingUser->email_verified_at ?? now(),
-            ]);
+            ];
+
+            if ($shouldUpdatePassword) {
+                $updateData['password'] = Hash::make($password);
+            }
+
+            $existingUser->update($updateData);
 
             $user = $existingUser;
             $this->info("✓ User [{$email}] has been successfully elevated to Platform Super Admin!");
+            if (! $shouldUpdatePassword) {
+                $this->line("  → Existing account password was preserved unchanged.");
+            }
         } else {
+            if (! $shouldUpdatePassword) {
+                $this->error('Password is required when creating a new user account.');
+                return Command::FAILURE;
+            }
+
             $user = User::create([
                 'name' => $name,
                 'email' => $email,
@@ -118,3 +145,4 @@ class CreateSuperAdminCommand extends Command
         return Command::SUCCESS;
     }
 }
+

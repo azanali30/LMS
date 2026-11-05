@@ -29,8 +29,8 @@ class PlatformOrganizationController extends Controller
             $query = Organization::with(['creator', 'subscription.plan'])
                 ->withCount([
                     'members',
-                    'members as teachers_count' => fn ($q) => $q->where('role', 'teacher'),
-                    'members as students_count' => fn ($q) => $q->where('role', 'student'),
+                    'members as teachers_count' => fn ($q) => $q->where('organization_user.role', 'teacher'),
+                    'members as students_count' => fn ($q) => $q->where('organization_user.role', 'student'),
                     'courses',
                 ])
                 ->latest();
@@ -288,3 +288,4 @@ class PlatformOrganizationController extends Controller
         });
     }
 }
+

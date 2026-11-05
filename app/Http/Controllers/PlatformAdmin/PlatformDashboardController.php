@@ -27,7 +27,7 @@ class PlatformDashboardController extends Controller
             // 1. Organization KPIs
             $totalOrganizations = Organization::count();
             $activeOrganizations = Organization::where('status', 'active')->count();
-            $trialOrganizations = OrganizationSubscription::where('status', 'trialing')->count();
+            $trialOrganizations = OrganizationSubscription::whereIn('status', ['trial', 'trialing'])->count();
             $suspendedOrganizations = Organization::where('status', 'suspended')->count();
 
             // 2. User KPIs
@@ -37,7 +37,7 @@ class PlatformDashboardController extends Controller
             $totalOwners = OrganizationUser::where('role', 'owner')->distinct('user_id')->count('user_id');
 
             // 3. Subscription & Revenue KPIs
-            $activeSubscriptions = OrganizationSubscription::whereIn('status', ['active', 'trialing'])->count();
+            $activeSubscriptions = OrganizationSubscription::whereIn('status', ['active', 'trial', 'trialing'])->count();
             $expiringSubscriptions = OrganizationSubscription::whereNotNull('ends_at')
                 ->where('ends_at', '<=', now()->addDays(7))
                 ->where('ends_at', '>=', now())
@@ -162,3 +162,4 @@ class PlatformDashboardController extends Controller
         });
     }
 }
+

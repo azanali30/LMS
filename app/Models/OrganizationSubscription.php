@@ -75,6 +75,14 @@ class OrganizationSubscription extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    /**
+     * Relationship alias delegating to owner().
+     */
+    public function user(): BelongsTo
+    {
+        return $this->owner();
+    }
+
     public function invoices(): HasMany
     {
         return $this->hasMany(SubscriptionInvoice::class, 'subscription_id');

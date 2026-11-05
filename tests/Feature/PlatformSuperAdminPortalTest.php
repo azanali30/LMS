@@ -388,4 +388,112 @@ class PlatformSuperAdminPortalTest extends TestCase
             'status' => 'active',
         ]);
     }
+
+    public function test_super_admin_can_view_subscriptions_with_user_relationship_alias(): void
+    {
+        $admin = $this->createSuperAdmin('sub-test@institutopropio.com');
+        $plan = SubscriptionPlan::create([
+            'name' => 'Growth Campus',
+            'slug' => 'growth-campus',
+            'price_cents' => 9900,
+            'billing_interval' => 'month',
+        ]);
+
+        $org = Organization::create([
+            'name' => 'Subscription Test Academy',
+            'slug' => 'sub-test-academy',
+            'status' => 'active',
+        ]);
+
+        $sub = OrganizationSubscription::create([
+            'organization_id' => $org->id,
+            'plan_id' => $plan->id,
+            'user_id' => $admin->id,
+            'status' => 'active',
+            'billing_interval' => 'month',
+            'starts_at' => now(),
+        ]);
+
+        // Verify the user() alias works directly on the model
+        $this->assertEquals($admin->id, $sub->user->id);
+
+        $response = $this->actingAs($admin)->get('/platform-admin/subscriptions');
+        $response->assertOk();
+    }
+
+    public function test_super_admin_can_view_organization_with_qualified_member_counts(): void
+    {
+        $admin = $this->createSuperAdmin('org-member-count@institutopropio.com');
+        $org = Organization::create([
+            'name' => 'Metrics Academy',
+            'slug' => 'metrics-academy',
+            'status' => 'active',
+        ]);
+
+        $teacher = $this->createNormalUser('teacher', 'teacher-metrics@example.com');
+        $student = $this->createNormalUser('student', 'student-metrics@example.com');
+
+        $org->members()->attach($teacher->id, ['role' => 'teacher', 'status' => 'active']);
+        $org->members()->attach($student->id, ['role' => 'student', 'status' => 'active']);
+
+        $response = $this->actingAs($admin)->get('/platform-admin/organizations');
+        $response->assertOk();
+    }
+
+    public function test_dashboard_and_subscription_counts_support_both_trial_and_trialing_statuses(): void
+    {
+        $admin = $this->createSuperAdmin('trial-counts@institutopropio.com');
+        $plan = SubscriptionPlan::create([
+            'name' => 'Trial Tier',
+            'slug' => 'trial-tier',
+            'price_cents' => 0,
+            'billing_interval' => 'month',
+        ]);
+
+        $org1 = Organization::create(['name' => 'Legacy Trial School', 'slug' => 'legacy-trial', 'status' => 'active']);
+        $org2 = Organization::create(['name' => 'Modern Trialing School', 'slug' => 'modern-trial', 'status' => 'active']);
+
+        OrganizationSubscription::create([
+            'organization_id' => $org1->id,
+            'plan_id' => $plan->id,
+            'status' => 'trial', // Legacy database default
+        ]);
+
+        OrganizationSubscription::create([
+            'organization_id' => $org2->id,
+            'plan_id' => $plan->id,
+            'status' => 'trialing', // Newer service state
+        ]);
+
+        // Check dashboard endpoint
+        $response = $this->actingAs($admin)->get('/platform-admin/dashboard');
+        $response->assertOk();
+
+        // Check subscriptions endpoint filtered by trial
+        $subResponse = $this->actingAs($admin)->get('/platform-admin/subscriptions?status=trialing');
+        $subResponse->assertOk();
+    }
+
+    public function test_cli_command_preserves_existing_user_password_when_elevating_without_password_option(): void
+    {
+        $existing = User::create([
+            'name' => 'Campus Owner',
+            'email' => 'owner-to-elevate@institutopropio.com',
+            'password' => Hash::make('OriginalUntouchedPassword123!'),
+            'role' => 'student',
+            'status' => 'active',
+        ]);
+
+        $this->artisan('platform:create-super-admin', [
+            '--email' => 'owner-to-elevate@institutopropio.com',
+        ])
+        ->expectsConfirmation('Do you want to elevate this user to Platform Super Admin?', 'yes')
+        ->expectsConfirmation('Do you want to update the password for this existing user?', 'no')
+        ->assertSuccessful();
+
+        $fresh = $existing->fresh();
+        $this->assertEquals('super_admin', $fresh->role);
+        $this->assertTrue(Hash::check('OriginalUntouchedPassword123!', $fresh->password), 'Existing password must be preserved when no password option is provided.');
+    }
 }
+

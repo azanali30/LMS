@@ -43,35 +43,6 @@ class AppServiceProvider extends ServiceProvider
                     'count' => config('auth.passwords.'.config('auth.defaults.passwords').'.expire', 60),
                 ]);
         });
-
-        $this->ensureProductionSchema();
-    }
-
-    /**
-     * Ensure database schema and default records are present in cloud/production environments.
-     */
-    protected function ensureProductionSchema(): void
-    {
-        if (app()->isProduction() && ! app()->runningUnitTests()) {
-            try {
-                if (! \Illuminate\Support\Facades\Schema::hasTable('notifications') ||
-                    ! \Illuminate\Support\Facades\Schema::hasTable('organization_subscriptions') ||
-                    ! \Illuminate\Support\Facades\Schema::hasTable('academic_years') ||
-                    ! \Illuminate\Support\Facades\Schema::hasTable('platform_audit_logs')) {
-                    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-                }
-
-                if (\Illuminate\Support\Facades\Schema::hasTable('subscription_plans') &&
-                    \App\Models\SubscriptionPlan::count() === 0) {
-                    \Illuminate\Support\Facades\Artisan::call('db:seed', [
-                        '--class' => 'SubscriptionPlanSeeder',
-                        '--force' => true,
-                    ]);
-                }
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Production schema verification skipped: ' . $e->getMessage());
-            }
-        }
     }
 
     /**

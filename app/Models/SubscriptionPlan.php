@@ -24,6 +24,8 @@ class SubscriptionPlan extends Model
         'max_teachers',
         'max_courses',
         'is_active',
+        'paddle_price_id_monthly',
+        'paddle_price_id_annual',
     ];
 
     protected function casts(): array

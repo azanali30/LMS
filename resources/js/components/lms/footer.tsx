@@ -14,7 +14,7 @@ export default function Footer() {
             className="border-t border-slate-200 bg-white text-slate-600"
         >
             <div className="mx-auto w-full max-w-[1720px] px-6 py-16 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
+                <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-6">
                     {/* Platform Brand Column */}
                     <div className="space-y-4 lg:col-span-2">
                         <Link
@@ -142,49 +142,90 @@ export default function Footer() {
                         </ul>
                     </div>
 
+                    {/* Legal & Compliance Column */}
+                    <div className="space-y-3">
+                        <h4 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
+                            Legal & Policies
+                        </h4>
+                        <ul className="space-y-2 text-xs text-slate-600">
+                            <li>
+                                <Link
+                                    href="/terms"
+                                    className="transition-colors hover:text-[#078675]"
+                                >
+                                    Terms & Conditions
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/privacy-policy"
+                                    className="transition-colors hover:text-[#078675]"
+                                >
+                                    Privacy Policy
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    href="/refund-policy"
+                                    className="transition-colors hover:text-[#078675]"
+                                >
+                                    Refund Policy
+                                </Link>
+                            </li>
+                            <li className="pt-2 text-[11px] leading-relaxed text-slate-400">
+                                Payments securely processed by <strong>Paddle</strong> as Merchant of Record.
+                            </li>
+                        </ul>
+                    </div>
+
                     {/* Contact & Support */}
                     <div className="space-y-3">
                         <h4 className="text-xs font-bold tracking-wider text-slate-900 uppercase">
-                            Support & Inquiries
+                            Support & Contact
                         </h4>
                         <ul className="space-y-2.5 text-xs text-slate-600">
                             <li className="flex items-start gap-2">
                                 <Mail className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                 <div>
                                     <span className="block font-medium text-slate-800">
-                                        Admissions & Sales
+                                        Online Inquiries
                                     </span>
                                     <Link
                                         href="/contact"
                                         className="text-[11px] text-[#078675] hover:underline"
                                     >
-                                        sales@institutopropio.com
+                                        Submit Support Message
                                     </Link>
-                                </div>
-                            </li>
-                            <li className="flex items-start gap-2">
-                                <PhoneCall className="mt-0.5 size-4 shrink-0 text-[#078675]" />
-                                <div>
-                                    <span className="block font-medium text-slate-800">
-                                        Toll-Free Helpline
-                                    </span>
-                                    <span className="text-[11px] text-slate-500">
-                                        +1 (800) 412-8890
-                                    </span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-2">
                                 <HelpCircle className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                 <div>
                                     <span className="block font-medium text-slate-800">
-                                        Help Center & FAQs
+                                        Help & FAQs
                                     </span>
                                     <Link
                                         href="/contact"
                                         className="text-[11px] text-slate-500 hover:text-slate-900"
                                     >
-                                        View Common Questions
+                                        Frequently Asked Questions
                                     </Link>
+                                </div>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-[#078675]" />
+                                <div>
+                                    <span className="block font-medium text-slate-800">
+                                        Billing Support
+                                    </span>
+                                    <a
+                                        href="https://paddle.net"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[11px] text-slate-500 hover:text-[#078675]"
+                                    >
+                                        Paddle Order Lookup (paddle.net)
+                                    </a>
                                 </div>
                             </li>
                         </ul>
@@ -197,24 +238,12 @@ export default function Footer() {
                         © {currentYear} {platformName}. Enterprise School OS & E-Learning SaaS.
                     </p>
 
-                    <div className="flex flex-wrap items-center gap-6">
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                         <Link
                             href="/pricing"
                             className="font-bold text-[#078675] hover:underline"
                         >
                             Pricing
-                        </Link>
-                        <Link
-                            href="/benefits"
-                            className="transition-colors hover:text-slate-900"
-                        >
-                            Features & Benefits
-                        </Link>
-                        <Link
-                            href="/how-it-works"
-                            className="transition-colors hover:text-slate-900"
-                        >
-                            How It Works
                         </Link>
                         <Link
                             href="/about"
@@ -223,16 +252,28 @@ export default function Footer() {
                             About Us
                         </Link>
                         <Link
-                            href="/download"
-                            className="transition-colors hover:text-slate-900"
-                        >
-                            Desktop App
-                        </Link>
-                        <Link
                             href="/contact"
                             className="transition-colors hover:text-slate-900"
                         >
-                            Contact Sales
+                            Contact
+                        </Link>
+                        <Link
+                            href="/terms"
+                            className="transition-colors hover:text-slate-900"
+                        >
+                            Terms
+                        </Link>
+                        <Link
+                            href="/privacy-policy"
+                            className="transition-colors hover:text-slate-900"
+                        >
+                            Privacy
+                        </Link>
+                        <Link
+                            href="/refund-policy"
+                            className="transition-colors hover:text-slate-900"
+                        >
+                            Refunds
                         </Link>
                     </div>
                 </div>

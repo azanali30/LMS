@@ -32,6 +32,12 @@ Route::get('/about', [PublicController::class, 'about'])->name('about');
 Route::get('/download', [PublicController::class, 'download'])->name('download');
 Route::get('/contact', [PublicController::class, 'contact'])->name('contact');
 Route::post('/contact', [PublicController::class, 'storeContact'])->name('contact.store');
+Route::get('/terms', [PublicController::class, 'terms'])->name('terms');
+Route::get('/privacy-policy', [PublicController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/refund-policy', [PublicController::class, 'refundPolicy'])->name('refund-policy');
+
+// Paddle Billing Webhook (Server-to-Server)
+Route::post('/paddle/webhook', [\App\Http\Controllers\Billing\PaddleWebhookController::class, 'handle'])->name('paddle.webhook');
 
 Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
 Route::get('/courses/{course:slug}', [CourseController::class, 'show'])->name('courses.show');
@@ -121,6 +127,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('change-plan', [SubscriptionBillingController::class, 'changePlan'])->name('change-plan');
         Route::post('cancel', [SubscriptionBillingController::class, 'cancel'])->name('cancel');
         Route::post('dev-trial-activate', [SubscriptionBillingController::class, 'devTrialActivate'])->name('dev-trial-activate');
+        Route::post('paddle/checkout', [\App\Http\Controllers\Billing\PaddleCheckoutController::class, 'initiate'])->name('paddle.checkout');
     });
 
     // Platform Super Admin Routes

@@ -34,6 +34,9 @@
         <link rel="icon" type="image/png" href="/favicon.png">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
+        {{-- Paddle Billing v2 Client Library --}}
+        <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+
         @fonts
 
         @viteReactRefresh

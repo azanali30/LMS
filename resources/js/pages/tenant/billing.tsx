@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/input-error';
+import { openPaddleCheckout } from '@/lib/paddle';
 
 interface Plan {
     id: number;
@@ -180,6 +181,64 @@ export default function SubscriptionBilling({
     const cancelForm = useForm({
         reason: '',
     });
+
+    const [isLaunchingPaddle, setIsLaunchingPaddle] = useState(false);
+
+    const handlePaddleCheckout = async (planId?: number, interval?: string) => {
+        setIsLaunchingPaddle(true);
+        try {
+            const targetPlan = availablePlans.find((p) => p.id === (planId || Number(planForm.data.plan_id)));
+            const targetInterval = interval || planForm.data.billing_interval || 'monthly';
+            if (!targetPlan) {
+                alert('Please select a valid plan.');
+                return;
+            }
+
+            const csrfToken = (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
+            const res = await fetch('/billing/paddle/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    plan_slug: targetPlan.slug,
+                    interval: targetInterval,
+                    organization_id: organization.id,
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.error || 'Failed to initiate Paddle checkout.');
+                return;
+            }
+
+            if (data.is_custom) {
+                window.location.href = data.contact_url || '/contact';
+                return;
+            }
+
+            if (!data.checkout?.price_id) {
+                alert('Paddle Price ID is pending Sandbox configuration in your .env or Paddle Dashboard. Please contact support.');
+                return;
+            }
+
+            openPaddleCheckout({
+                clientToken: data.checkout.client_token,
+                environment: data.checkout.environment,
+                priceId: data.checkout.price_id,
+                customerEmail: data.checkout.customer?.email,
+                customerName: data.checkout.customer?.name,
+                customData: data.checkout.custom_data,
+            });
+        } catch (e: any) {
+            alert(e.message || 'Error communicating with billing server.');
+        } finally {
+            setIsLaunchingPaddle(false);
+        }
+    };
 
     const handleInvoiceRequest = (e: React.FormEvent) => {
         e.preventDefault();
@@ -569,16 +628,27 @@ export default function SubscriptionBilling({
                                         InstitutoPropio supports direct credit card and recurring digital payments via server-side verified webhooks with idempotent transaction replay protection.
                                     </p>
 
-                                    {/* Integration Notice */}
-                                    <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50/60 p-4 text-xs text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-300">
-                                        <div className="flex items-start gap-2.5">
-                                            <Lock className="mt-0.5 size-4 shrink-0 text-blue-600 dark:text-blue-400" />
-                                            <div>
-                                                <strong className="block font-semibold">Payment Gateway Architecture:</strong>
-                                                <span>
-                                                    Live gateway credentials are awaiting final configuration. No fake card credentials are saved or processed. You can request official manual invoices anytime.
-                                                </span>
-                                            </div>
+                                    {/* Paddle Checkout Trigger */}
+                                    <div className="mt-5 space-y-3">
+                                        <Button
+                                            type="button"
+                                            disabled={isLaunchingPaddle}
+                                            onClick={() => handlePaddleCheckout()}
+                                            className="w-full bg-[#E49A2E] text-xs font-bold text-white shadow-md hover:bg-[#d08a24] cursor-pointer"
+                                        >
+                                            <CreditCard className="mr-2 size-4" />
+                                            <span>
+                                                {isLaunchingPaddle
+                                                    ? 'Preparing Secure Checkout...'
+                                                    : 'Subscribe Online via Paddle (Card / PayPal)'}
+                                            </span>
+                                        </Button>
+
+                                        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-center text-[11px] text-slate-500 dark:border-slate-800 dark:bg-slate-800/40 dark:text-slate-400">
+                                            <ShieldCheck className="mr-1 inline-block size-3.5 text-[#078675]" />
+                                            <span>
+                                                Order process & checkout conducted by <strong>Paddle.com</strong>, our Merchant of Record.
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

@@ -36,6 +36,8 @@ class OrganizationSubscription extends Model
         'currency',
         'gateway_customer_id',
         'gateway_subscription_id',
+        'paddle_transaction_id',
+        'paddle_checkout_id',
         'payment_method_status',
         'trial_ends_at',
         'starts_at',

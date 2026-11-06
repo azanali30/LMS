@@ -56,7 +56,7 @@ export default function PricingPage({
     // Fallback official InstitutoPropio plans if not passed via props
     const defaultPlans: PlanProp[] = [
         {
-            name: 'Starter',
+            name: 'Bronze (Starter)',
             slug: 'starter',
             description:
                 'Essential digital campus operating system for a single independent school, academy, or specialized training institute.',
@@ -66,7 +66,7 @@ export default function PricingPage({
             price_annual_formatted: '$190',
             currency: 'USD',
             max_organizations: 1,
-            organization_limit: '1 Institution',
+            organization_limit: '1 Institution (Bronze)',
             features: [
                 '1 Isolated institution workspace',
                 '30-Day free trial included',
@@ -83,7 +83,7 @@ export default function PricingPage({
             is_custom: false,
         },
         {
-            name: 'Growth',
+            name: 'Silver (Growth)',
             slug: 'growth',
             description:
                 'Multi-campus expansion system for educational groups operating up to 5 branch institutions with centralized oversight.',
@@ -93,7 +93,7 @@ export default function PricingPage({
             price_annual_formatted: '$490',
             currency: 'USD',
             max_organizations: 5,
-            organization_limit: 'Up to 5 Institutions',
+            organization_limit: 'Up to 5 Institutions (Silver)',
             features: [
                 'Up to 5 Isolated institution workspaces',
                 '30-Day free trial included',
@@ -110,7 +110,7 @@ export default function PricingPage({
             is_custom: false,
         },
         {
-            name: 'Professional',
+            name: 'Gold (Professional)',
             slug: 'professional',
             description:
                 'Regional campus network architecture managing up to 10 institutions with consolidated portfolio reporting and shared curricula.',
@@ -120,7 +120,7 @@ export default function PricingPage({
             price_annual_formatted: '$990',
             currency: 'USD',
             max_organizations: 10,
-            organization_limit: 'Up to 10 Institutions',
+            organization_limit: 'Up to 10 Institutions (Gold)',
             features: [
                 'Up to 10 Isolated institution workspaces',
                 '30-Day free trial included',
@@ -137,7 +137,7 @@ export default function PricingPage({
             is_custom: false,
         },
         {
-            name: 'Enterprise',
+            name: 'Premium (Enterprise)',
             slug: 'enterprise',
             description:
                 'For national educational trusts, school franchises, and university networks requiring unlimited institutions and bespoke SLAs.',
@@ -147,7 +147,7 @@ export default function PricingPage({
             price_annual_formatted: 'Custom',
             currency: 'USD',
             max_organizations: null,
-            organization_limit: 'Unlimited Institutions',
+            organization_limit: 'Unlimited Institutions (Premium)',
             features: [
                 'Unlimited isolated institution workspaces',
                 'Unlimited students & teacher accounts',
@@ -361,6 +361,10 @@ export default function PricingPage({
             q: 'What happens to our school data if our trial expires?',
             a: 'Your educational data is sacred. When a trial expires, your institution transitions to a safe read-only policy. No students, grades, timetables, or financial records are ever deleted. You can restore administrative write access at any time by renewing your subscription.',
         },
+        {
+            q: 'How are payments and invoices processed?',
+            a: 'All online orders and subscription transactions are processed by Paddle.com Market Ltd, acting as our Merchant of Record. Paddle provides PCI-compliant checkout, automated sales tax and VAT compliance, instant invoice receipts, and secure billing support at paddle.net.',
+        },
     ];
 
     return (
@@ -412,7 +416,7 @@ export default function PricingPage({
                                     className={`cursor-pointer rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
                                         billingInterval === 'monthly'
                                             ? 'bg-[#173A5E] text-white shadow-xs'
-                                            : 'text-slate-600 hover:text-slate-900'
+                                             : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
                                     Monthly Billing
@@ -432,6 +436,14 @@ export default function PricingPage({
                                     </span>
                                 </button>
                             </div>
+                        </div>
+
+                        {/* Paddle Merchant of Record Trust Note */}
+                        <div className="mx-auto mt-6 max-w-xl text-center">
+                            <p className="text-xs text-slate-500">
+                                <ShieldCheck className="mr-1 inline-block size-3.5 text-[#078675]" />
+                                Secure checkout and payment processing handled by <strong className="font-semibold text-slate-700">Paddle.com</strong>, our Merchant of Record.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -467,6 +479,22 @@ export default function PricingPage({
                                 ? 'Contact Sales'
                                 : `Start 30-Day Free Trial`;
 
+                            const tierLabelMap: Record<string, string> = {
+                                starter: 'Bronze',
+                                bronze: 'Bronze',
+                                growth: 'Silver',
+                                silver: 'Silver',
+                                professional: 'Gold',
+                                gold: 'Gold',
+                                enterprise: 'Premium',
+                                premium: 'Premium',
+                            };
+                            const tierName = tierLabelMap[plan.slug.toLowerCase()];
+                            const displayName =
+                                tierName && !plan.name.includes(tierName)
+                                    ? `${plan.name} (${tierName})`
+                                    : plan.name;
+
                             return (
                                 <div
                                     key={plan.slug}
@@ -489,7 +517,7 @@ export default function PricingPage({
                                         {/* Card Header */}
                                         <div className="flex items-center justify-between">
                                             <h3 className="text-2xl font-black text-[#173A5E]">
-                                                {plan.name}
+                                                {displayName}
                                             </h3>
                                             <span className="rounded-full border border-[#078675]/20 bg-[#078675]/10 px-2.5 py-0.5 text-xs font-bold text-[#078675]">
                                                 {plan.organization_limit}

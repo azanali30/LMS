@@ -102,63 +102,58 @@ export default function ContactPage() {
                                                 Electronic Mail
                                             </h3>
                                             <p className="mt-0.5 text-sm font-semibold text-slate-900">
-                                                sales@institutopropio.com
+                                                institutopropio@gmail.com
                                             </p>
                                             <p className="text-xs text-slate-500">
-                                                support@institutopropio.com
+                                                Verified Platform Administration
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-start gap-4">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
-                                            <Phone className="size-5" />
+                                            <ShieldCheck className="size-5" />
                                         </div>
                                         <div>
                                             <h3 className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-                                                Telephone Line
+                                                Billing & Merchant Support
                                             </h3>
                                             <p className="mt-0.5 text-sm font-semibold text-slate-900">
-                                                +1 (800) 412-8890
+                                                Paddle Merchant of Record
                                             </p>
                                             <p className="text-xs text-slate-500">
-                                                Toll-free Institutional Inquiries
+                                                Order lookup & receipts:{' '}
+                                                <a
+                                                    href="https://paddle.net"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-[#078675] hover:underline"
+                                                >
+                                                    paddle.net
+                                                </a>
                                             </p>
                                         </div>
                                     </div>
 
                                     <div className="flex items-start gap-4">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
-                                            <MapPin className="size-5" />
+                                            <MessageSquare className="size-5" />
                                         </div>
                                         <div>
                                             <h3 className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-                                                Campus Technology HQ
+                                                Direct Inquiry Form
                                             </h3>
-                                            <p className="mt-0.5 text-sm font-semibold text-slate-900">
-                                                Technology Innovation Center
-                                            </p>
-                                            <p className="text-xs text-slate-500">
-                                                500 Education Park Way, Suite 800
+                                            <p className="mt-0.5 text-xs text-slate-600 leading-relaxed">
+                                                Messages sent via this secure portal are stored directly in our administration console for verified follow-up.
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-start gap-4">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
-                                            <Clock className="size-5" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xs font-bold tracking-wider text-slate-500 uppercase">
-                                                Operational Hours
-                                            </h3>
-                                            <p className="mt-0.5 text-sm font-semibold text-slate-900">
-                                                Monday – Friday: 08:00 – 18:00 UTC
-                                            </p>
-                                            <p className="text-xs text-slate-500">
-                                                24/7 Platform Incident Monitoring
-                                            </p>
-                                        </div>
+                                    <div className="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-500">
+                                        <p className="font-semibold text-slate-700">Verification Notice:</p>
+                                        <p className="mt-1">
+                                            Dedicated telephone support and physical campus visit appointments require prior arrangement with platform administration.
+                                        </p>
                                     </div>
                                 </div>
                             </div>

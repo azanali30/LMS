@@ -84,6 +84,30 @@ class PublicController extends Controller
     }
 
     /**
+     * Display the Terms and Conditions page.
+     */
+    public function terms(): Response
+    {
+        return Inertia::render('terms');
+    }
+
+    /**
+     * Display the Privacy Policy page.
+     */
+    public function privacyPolicy(): Response
+    {
+        return Inertia::render('privacy-policy');
+    }
+
+    /**
+     * Display the Refund Policy page.
+     */
+    public function refundPolicy(): Response
+    {
+        return Inertia::render('refund-policy');
+    }
+
+    /**
      * Store an incoming contact inquiry.
      */
     public function storeContact(Request $request): RedirectResponse

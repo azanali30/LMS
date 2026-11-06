@@ -1,16 +1,16 @@
 import { usePage } from '@inertiajs/react';
 
-import AppLogoIcon from '@/components/app-logo-icon';
-
 export default function AppLogo() {
     const { name } = usePage().props;
 
     return (
-        <>
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-indigo-700 text-white shadow-sm shadow-violet-500/20">
-                <AppLogoIcon className="size-5 text-white" />
-            </div>
-            <div className="ml-2 grid flex-1 text-left text-sm leading-tight">
+        <div className="flex items-center gap-2.5">
+            <img
+                src="/images/logo-emblem.png"
+                alt="InstitutoPropio"
+                className="size-8 shrink-0 object-contain"
+            />
+            <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-bold tracking-tight text-foreground">
                     {name || 'InstitutoPropio'}
                 </span>
@@ -18,6 +18,6 @@ export default function AppLogo() {
                     Online Learning
                 </span>
             </div>
-        </>
+        </div>
     );
 }

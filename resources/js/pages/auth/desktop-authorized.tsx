@@ -56,7 +56,7 @@ export default function DesktopAuthorized({
                             <CheckCircle2 className="size-8" />
                         </div>
 
-                        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-3xl">
+                        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-[#173A5E] sm:text-3xl">
                             Desktop App Authorized!
                         </h1>
                         <p className="mt-2 text-xs text-slate-600 sm:text-sm leading-relaxed">
@@ -67,7 +67,7 @@ export default function DesktopAuthorized({
                         <div className="mt-6 space-y-3">
                             <a
                                 href={callbackUrl}
-                                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#1769E0] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition hover:bg-[#1256B8]"
+                                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#078675] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-[#078675]/20 transition hover:bg-[#056b5e]"
                             >
                                 <ExternalLink className="size-4" />
                                 <span>Launch InstitutoPropio Desktop</span>

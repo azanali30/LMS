@@ -22,7 +22,7 @@ export default function PublicLayout({ children, title }: PublicLayoutProps) {
     }, []);
 
     return (
-        <div className="flex min-h-screen flex-col bg-white font-sans text-slate-900 selection:bg-[#1769E0] selection:text-white">
+        <div className="flex min-h-screen flex-col bg-white font-sans text-[#172B3D] selection:bg-[#078675] selection:text-white">
             {title && <Head title={title} />}
             <Navbar user={user} />
             <main className="flex-1 bg-white">{children}</main>

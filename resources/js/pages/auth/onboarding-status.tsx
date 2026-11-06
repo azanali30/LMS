@@ -192,11 +192,11 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="mx-auto max-w-2xl text-center">
                         {/* Header Badge */}
-                        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/90 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
-                            <ShieldCheck className="size-3.5 text-[#1769E0]" />
+                        <div className="inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-bold text-[#078675]">
+                            <ShieldCheck className="size-3.5 text-[#078675]" />
                             <span>Secure Application Verification</span>
                         </div>
-                        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-4xl">
+                        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-4xl">
                             Track Payment Application Status
                         </h1>
                         <p className="mt-2.5 text-xs text-slate-600 sm:text-sm leading-relaxed">
@@ -230,10 +230,10 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                         {step === 'email' && (
                             <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 text-left shadow-sm">
                                 <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                    <Lock className="size-3.5 text-[#1769E0]" />
+                                    <Lock className="size-3.5 text-[#078675]" />
                                     <span>Step 1 of 2: Verify Identity</span>
                                 </div>
-                                <h2 className="mt-1.5 text-lg font-bold text-[#0B1528]">
+                                <h2 className="mt-1.5 text-lg font-bold text-[#173A5E]">
                                     Enter Your Work Email
                                 </h2>
                                 <p className="mt-1 text-xs text-slate-500">
@@ -254,7 +254,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 placeholder="director@schoolname.edu"
-                                                className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                                className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                             />
                                         </div>
                                     </div>
@@ -262,7 +262,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     <button
                                         type="submit"
                                         disabled={loading}
-                                        className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#FF7A30] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E] disabled:opacity-50"
+                                        className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#E49A2E] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24] disabled:opacity-50"
                                     >
                                         {loading ? (
                                             <>
@@ -280,7 +280,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
 
                                 <div className="mt-5 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
                                     Already have login credentials?{' '}
-                                    <Link href="/login" className="font-bold text-[#1769E0] hover:underline">
+                                    <Link href="/login" className="font-bold text-[#078675] hover:underline">
                                         Sign in here &rarr;
                                     </Link>
                                 </div>
@@ -292,7 +292,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                             <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 text-left shadow-sm">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                        <KeyRound className="size-3.5 text-[#1769E0]" />
+                                        <KeyRound className="size-3.5 text-[#078675]" />
                                         <span>Step 2 of 2: Confirm Code</span>
                                     </div>
                                     <button
@@ -302,14 +302,14 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                             setError(null);
                                             setNotice(null);
                                         }}
-                                        className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-[#1769E0]"
+                                        className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-[#078675]"
                                     >
                                         <ArrowLeft className="size-3" />
                                         <span>Change Email</span>
                                     </button>
                                 </div>
 
-                                <h2 className="mt-1.5 text-lg font-bold text-[#0B1528]">
+                                <h2 className="mt-1.5 text-lg font-bold text-[#173A5E]">
                                     Enter 6-Digit Code
                                 </h2>
                                 <p className="mt-1 text-xs text-slate-500">
@@ -333,7 +333,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                                 value={otp}
                                                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                                                 placeholder="123456"
-                                                className="h-12 w-full rounded-xl border border-slate-300 bg-white text-center text-xl font-bold tracking-[0.5em] text-[#0B1528] placeholder:text-slate-300 placeholder:tracking-normal transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                                className="h-12 w-full rounded-xl border border-slate-300 bg-white text-center text-xl font-bold tracking-[0.5em] text-[#173A5E] placeholder:text-slate-300 placeholder:tracking-normal transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                             />
                                         </div>
                                     </div>
@@ -341,7 +341,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     <button
                                         type="submit"
                                         disabled={loading || otp.length !== 6}
-                                        className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#FF7A30] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E] disabled:opacity-50"
+                                        className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#E49A2E] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24] disabled:opacity-50"
                                     >
                                         {loading ? (
                                             <>
@@ -363,7 +363,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                         type="button"
                                         disabled={resendCooldown > 0 || loading}
                                         onClick={() => handleRequestOtp()}
-                                        className="font-bold text-[#1769E0] hover:underline disabled:text-slate-400 disabled:no-underline"
+                                        className="font-bold text-[#078675] hover:underline disabled:text-slate-400 disabled:no-underline"
                                     >
                                         {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend Code'}
                                     </button>
@@ -380,7 +380,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                             Application Account
                                         </span>
-                                        <div className="text-sm font-bold text-[#0B1528] mt-0.5">{item.email}</div>
+                                        <div className="text-sm font-bold text-[#173A5E] mt-0.5">{item.email}</div>
                                     </div>
 
                                     {/* Status Badge */}
@@ -447,7 +447,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     {/* 1. Payment Pending Review */}
                                     {(item.status === 'payment_pending_review' || item.status === 'under_review') && (
                                         <div className="rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 text-xs leading-relaxed text-slate-600">
-                                            <p className="font-bold text-[#0B1528] text-sm">Your payment proof is under active verification.</p>
+                                            <p className="font-bold text-[#173A5E] text-sm">Your payment proof is under active verification.</p>
                                             <p className="mt-1 text-slate-500">
                                                 Our finance desk is matching your transaction reference with bank deposit logs. Once verified, you will be able to complete your workspace setup directly from this screen.
                                             </p>
@@ -462,7 +462,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     {item.status === 'approved' && (
                                         <div className="space-y-4">
                                             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 text-xs leading-relaxed text-emerald-900">
-                                                <p className="font-extrabold text-[#0B1528] text-sm">Congratulations! Your payment proof has been approved.</p>
+                                                <p className="font-extrabold text-[#173A5E] text-sm">Congratulations! Your payment proof has been approved.</p>
                                                 <p className="mt-1 text-emerald-800">
                                                     Your 30-day free trial has been unlocked. Click the button below to choose your administrative password, school name, and custom campus subdomain.
                                                 </p>
@@ -476,7 +476,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                             {(item.action_url || item.completion_url) && (
                                                 <a
                                                     href={item.action_url || item.completion_url || '#'}
-                                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF7A30] py-3.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#E49A2E] py-3.5 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                                                 >
                                                     <span>Complete Account & Setup Institution &rarr;</span>
                                                 </a>
@@ -488,7 +488,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     {item.status === 'completed' && (
                                         <div className="space-y-4">
                                             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5 text-xs leading-relaxed text-emerald-900">
-                                                <p className="font-extrabold text-[#0B1528] text-sm">Your institution workspace is fully active.</p>
+                                                <p className="font-extrabold text-[#173A5E] text-sm">Your institution workspace is fully active.</p>
                                                 <p className="mt-1 text-emerald-800">
                                                     Your campus organization has been provisioned and configured. You can sign in using your administrative credentials to manage students, courses, staff, and fees.
                                                 </p>
@@ -496,7 +496,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
 
                                             <Link
                                                 href="/login"
-                                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1769E0] py-3.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition hover:bg-[#1256B8]"
+                                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#173A5E] py-3.5 text-xs font-bold text-white shadow-md shadow-[#078675]/20 transition hover:bg-[#056b5e]"
                                             >
                                                 <span>Sign In to Your Workspace &rarr;</span>
                                             </Link>
@@ -507,7 +507,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     {item.status === 'rejected' && (
                                         <div className="space-y-4">
                                             <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-5 text-xs text-rose-900">
-                                                <p className="font-bold text-[#0B1528] text-sm">Payment Verification Rejected</p>
+                                                <p className="font-bold text-[#173A5E] text-sm">Payment Verification Rejected</p>
                                                 <p className="mt-1 text-xs text-rose-800">
                                                     Our finance desk could not verify your payment proof. Please review the feedback below and submit corrected proof:
                                                 </p>
@@ -518,7 +518,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
 
                                             <a
                                                 href={item.action_url || `/register?email=${encodeURIComponent(item.email)}`}
-                                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#E49A2E] py-3 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                                             >
                                                 <span>Submit Corrected Payment Proof &rarr;</span>
                                             </a>
@@ -543,7 +543,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                             {item.action_url && (
                                                 <a
                                                     href={item.action_url}
-                                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#E49A2E] py-3 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                                                 >
                                                     <span>{item.action_label || 'Provide Requested Information &rarr;'}</span>
                                                 </a>
@@ -557,7 +557,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
                                     <button
                                         type="button"
                                         onClick={handleResetSession}
-                                        className="text-xs font-semibold text-slate-500 hover:text-[#1769E0]"
+                                        className="text-xs font-semibold text-slate-500 hover:text-[#078675]"
                                     >
                                         &larr; Check a different application
                                     </button>
@@ -567,7 +567,7 @@ export default function OnboardingStatus({ approvalRequest, searchEmail = '', ve
 
                         <div className="mt-8 text-center text-xs text-slate-500">
                             Looking to start a new institution?{' '}
-                            <Link href="/register" className="font-bold text-[#1769E0] hover:underline">
+                            <Link href="/register" className="font-bold text-[#078675] hover:underline">
                                 Start new registration &rarr;
                             </Link>
                         </div>

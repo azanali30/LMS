@@ -53,12 +53,12 @@ export default function DesktopConnect({
                 <div className="w-full max-w-lg px-6">
                     <div className="rounded-3xl border border-slate-200 bg-white p-7 sm:p-9 text-left shadow-xl shadow-slate-900/5">
                         {/* Eyebrow badge */}
-                        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/90 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
-                            <Laptop className="size-3.5 text-[#1769E0]" />
+                        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/90 px-3.5 py-1 text-xs font-bold text-[#078675]">
+                            <Laptop className="size-3.5 text-[#078675]" />
                             <span>Windows Desktop Client</span>
                         </div>
 
-                        <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-3xl">
+                        <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-[#173A5E] sm:text-3xl">
                             Authorize Desktop Access
                         </h1>
                         <p className="mt-2 text-xs text-slate-600 sm:text-sm leading-relaxed">
@@ -78,7 +78,7 @@ export default function DesktopConnect({
                             {organization && (
                                 <div className="flex items-center justify-between text-xs border-t border-slate-200/60 pt-2.5">
                                     <span className="font-medium text-slate-500">Campus Workspace</span>
-                                    <div className="flex items-center gap-1.5 font-bold text-[#1769E0]">
+                                    <div className="flex items-center gap-1.5 font-bold text-[#078675]">
                                         <Building2 className="size-3.5" />
                                         <span>{organization.name}</span>
                                     </div>
@@ -95,7 +95,7 @@ export default function DesktopConnect({
 
                         {/* Security Notice */}
                         <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-blue-100 bg-blue-50/60 p-3.5 text-xs text-blue-900 leading-relaxed">
-                            <ShieldCheck className="size-4 shrink-0 text-[#1769E0] mt-0.5" />
+                            <ShieldCheck className="size-4 shrink-0 text-[#078675] mt-0.5" />
                             <p>
                                 A single-use, cryptographically verified session token will be granted to your desktop application. No passwords or credentials are ever stored locally.
                             </p>
@@ -106,7 +106,7 @@ export default function DesktopConnect({
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#FF7A30] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E] disabled:opacity-50"
+                                className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#E49A2E] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24] disabled:opacity-50"
                             >
                                 {processing ? (
                                     <>

@@ -369,14 +369,14 @@ export default function PricingPage({
             <section className="bg-white pt-16 pb-12 sm:pt-24 sm:pb-16 border-b border-slate-100 text-center">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-bold text-[#078675]">
                             <Sparkles className="size-3.5" />
                             <span>Transparent Global SaaS Pricing • USD</span>
                         </div>
 
-                        <h1 className="text-4xl font-extrabold tracking-tight text-[#0B1528] sm:text-6xl lg:text-7xl">
+                        <h1 className="text-4xl font-extrabold tracking-tight text-[#173A5E] sm:text-6xl lg:text-7xl">
                             Empower Every School with{' '}
-                            <span className="text-[#1769E0]">
+                            <span className="text-[#078675]">
                                 InstitutoPropio
                             </span>
                         </h1>
@@ -392,7 +392,7 @@ export default function PricingPage({
                                 Unlimited Students & Teachers
                             </span>
                             <span className="hidden text-slate-300 sm:inline">•</span>
-                            <span className="flex items-center gap-2 text-[#1769E0] font-bold">
+                            <span className="flex items-center gap-2 text-[#078675] font-bold">
                                 <Shield className="size-4" />
                                 30-Day Free Trial
                             </span>
@@ -411,7 +411,7 @@ export default function PricingPage({
                                     onClick={() => setBillingInterval('monthly')}
                                     className={`cursor-pointer rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
                                         billingInterval === 'monthly'
-                                            ? 'bg-[#1769E0] text-white shadow-xs'
+                                            ? 'bg-[#173A5E] text-white shadow-xs'
                                             : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
@@ -422,7 +422,7 @@ export default function PricingPage({
                                     onClick={() => setBillingInterval('annual')}
                                     className={`flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
                                         billingInterval === 'annual'
-                                            ? 'bg-[#1769E0] text-white shadow-xs'
+                                            ? 'bg-[#173A5E] text-white shadow-xs'
                                             : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
@@ -438,7 +438,7 @@ export default function PricingPage({
             </section>
 
             {/* PLAN CARDS GRID */}
-            <section className="bg-[#F7F9FC] py-16 sm:py-24 border-b border-slate-100">
+            <section className="bg-[#F5F8F7] py-16 sm:py-24 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
                         {displayPlans.map((plan) => {
@@ -472,13 +472,13 @@ export default function PricingPage({
                                     key={plan.slug}
                                     className={`group relative flex flex-col justify-between rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                                         plan.is_popular
-                                            ? 'border-[#1769E0] ring-2 ring-[#1769E0]/20 bg-white shadow-xl'
+                                            ? 'border-[#078675] ring-2 ring-[#078675]/20 bg-white shadow-xl'
                                             : 'border-slate-200 bg-white shadow-xs hover:border-slate-300'
                                     }`}
                                 >
                                     {plan.is_popular && (
                                         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FF7A30] px-4 py-1 text-xs font-extrabold text-white shadow-md shadow-orange-500/20">
+                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E49A2E] px-4 py-1 text-xs font-extrabold text-white shadow-md shadow-[#E49A2E]/20">
                                                 <Sparkles className="size-3.5" />
                                                 Most Popular Choice
                                             </span>
@@ -488,10 +488,10 @@ export default function PricingPage({
                                     <div>
                                         {/* Card Header */}
                                         <div className="flex items-center justify-between">
-                                            <h3 className="text-2xl font-black text-[#0B1528]">
+                                            <h3 className="text-2xl font-black text-[#173A5E]">
                                                 {plan.name}
                                             </h3>
-                                            <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-[#1769E0]">
+                                            <span className="rounded-full border border-[#078675]/20 bg-[#078675]/10 px-2.5 py-0.5 text-xs font-bold text-[#078675]">
                                                 {plan.organization_limit}
                                             </span>
                                         </div>
@@ -503,7 +503,7 @@ export default function PricingPage({
                                         {/* Pricing Block */}
                                         <div className="mt-6 border-y border-slate-100 py-5">
                                             <div className="flex items-baseline gap-1.5">
-                                                <span className="text-4xl font-extrabold tracking-tight text-[#0B1528] sm:text-5xl">
+                                                <span className="text-4xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl">
                                                     {displayPrice}
                                                 </span>
                                                 <span className="text-sm font-semibold text-slate-500">
@@ -536,8 +536,8 @@ export default function PricingPage({
                                                 <Users className="size-4 shrink-0 text-emerald-600" />
                                                 <span>Unlimited Students & Teachers</span>
                                             </div>
-                                            <div className="flex items-center gap-2.5 text-xs font-bold text-[#1769E0]">
-                                                <Building2 className="size-4 shrink-0 text-[#1769E0]" />
+                                            <div className="flex items-center gap-2.5 text-xs font-bold text-[#078675]">
+                                                <Building2 className="size-4 shrink-0 text-[#078675]" />
                                                 <span>{plan.organization_limit}</span>
                                             </div>
                                         </div>
@@ -546,7 +546,7 @@ export default function PricingPage({
                                         <ul className="mt-6 space-y-3 text-xs text-slate-600">
                                             {plan.features.map((feature, idx) => (
                                                 <li key={idx} className="flex items-start gap-3">
-                                                    <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[#1769E0]">
+                                                    <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[#078675]">
                                                         <Check className="size-3 stroke-[3]" />
                                                     </div>
                                                     <span className="leading-relaxed">
@@ -563,10 +563,10 @@ export default function PricingPage({
                                             <Button
                                                 className={`w-full py-6 text-xs font-bold shadow-xs transition-all duration-200 cursor-pointer ${
                                                     plan.is_popular
-                                                        ? 'bg-[#FF7A30] text-white hover:bg-[#E5661E] shadow-md shadow-orange-500/20'
+                                                        ? 'bg-[#E49A2E] text-white hover:bg-[#d08a24] shadow-md shadow-[#E49A2E]/20'
                                                         : isEnterprise
-                                                        ? 'bg-[#1769E0] text-white hover:bg-[#1256B8]'
-                                                        : 'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 hover:text-[#1769E0]'
+                                                        ? 'bg-[#173A5E] text-white hover:bg-[#056b5e]'
+                                                        : 'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 hover:text-[#078675]'
                                                 }`}
                                             >
                                                 <span>{ctaLabel}</span>
@@ -588,12 +588,12 @@ export default function PricingPage({
             </section>
 
             {/* 30-DAY TRIAL BANNER */}
-            <section className="bg-blue-50/70 border-b border-blue-100 py-14">
+            <section className="bg-[#078675]/10 border-b border-[#078675]/15 py-14">
                 <div className="mx-auto w-full max-w-5xl px-6 sm:px-8 text-center">
-                    <div className="inline-flex items-center justify-center size-14 rounded-2xl bg-blue-100 text-[#1769E0] mb-4 border border-blue-200 shadow-xs">
+                    <div className="inline-flex items-center justify-center size-14 rounded-2xl bg-blue-100 text-[#078675] mb-4 border border-[#078675]/20 shadow-xs">
                         <ShieldCheck className="size-7" />
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0B1528]">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-[#173A5E]">
                         Experience InstitutoPropio Free for 30 Days
                     </h2>
                     <p className="mx-auto mt-3 max-w-2xl text-xs sm:text-sm leading-relaxed text-slate-600">
@@ -606,10 +606,10 @@ export default function PricingPage({
             <section className="bg-white py-16 sm:py-24 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="text-center mb-14">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#078675]">
                             Feature Breakdown
                         </span>
-                        <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0B1528]">
+                        <h2 className="mt-2 text-3xl sm:text-4xl font-extrabold tracking-tight text-[#173A5E]">
                             Detailed Capability Comparison
                         </h2>
                         <p className="mt-3 text-xs sm:text-sm text-slate-600 max-w-2xl mx-auto">
@@ -627,7 +627,7 @@ export default function PricingPage({
                                     <th className="py-4 px-6 text-xs font-extrabold text-slate-900 uppercase tracking-wider text-center">
                                         Starter
                                     </th>
-                                    <th className="py-4 px-6 text-xs font-extrabold text-[#1769E0] uppercase tracking-wider text-center">
+                                    <th className="py-4 px-6 text-xs font-extrabold text-[#078675] uppercase tracking-wider text-center">
                                         Growth
                                     </th>
                                     <th className="py-4 px-6 text-xs font-extrabold text-slate-900 uppercase tracking-wider text-center">
@@ -644,7 +644,7 @@ export default function PricingPage({
                                         <tr className="bg-slate-50 border-t border-b border-slate-200">
                                             <td
                                                 colSpan={5}
-                                                className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-[#1769E0]"
+                                                className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-[#078675]"
                                             >
                                                 {category.title}
                                             </td>
@@ -666,7 +666,7 @@ export default function PricingPage({
                                                         >
                                                             {typeof val === 'boolean' ? (
                                                                 val ? (
-                                                                    <div className="inline-flex size-6 items-center justify-center rounded-full bg-blue-100 text-[#1769E0]">
+                                                                    <div className="inline-flex size-6 items-center justify-center rounded-full bg-blue-100 text-[#078675]">
                                                                         <Check className="size-4 stroke-[3]" />
                                                                     </div>
                                                                 ) : (
@@ -693,14 +693,14 @@ export default function PricingPage({
             </section>
 
             {/* FREQUENTLY ASKED QUESTIONS */}
-            <section className="bg-[#F7F9FC] py-16 sm:py-24 border-b border-slate-100">
+            <section className="bg-[#F5F8F7] py-16 sm:py-24 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
                     <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-bold text-[#078675]">
                             <HelpCircle className="size-3.5" />
                             <span>Frequently Asked Questions</span>
                         </div>
-                        <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-[#0B1528]">
+                        <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-[#173A5E]">
                             Everything You Need to Know
                         </h2>
                     </div>
@@ -718,12 +718,12 @@ export default function PricingPage({
                                         onClick={() => setActiveFaq(isOpen ? null : idx)}
                                         className="flex w-full cursor-pointer items-center justify-between p-6 text-left transition hover:bg-slate-50"
                                     >
-                                        <span className="text-sm sm:text-base font-bold text-[#0B1528] pr-4">
+                                        <span className="text-sm sm:text-base font-bold text-[#173A5E] pr-4">
                                             {faq.q}
                                         </span>
                                         <ChevronDown
                                             className={`size-5 shrink-0 text-slate-400 transition-transform duration-200 ${
-                                                isOpen ? 'rotate-180 text-[#1769E0]' : ''
+                                                isOpen ? 'rotate-180 text-[#078675]' : ''
                                             }`}
                                         />
                                     </button>
@@ -742,7 +742,7 @@ export default function PricingPage({
             {/* BOTTOM CTA SECTION */}
             <section className="bg-white py-16 sm:py-24 text-center">
                 <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
-                    <h2 className="text-3xl sm:text-5xl font-black text-[#0B1528] tracking-tight">
+                    <h2 className="text-3xl sm:text-5xl font-black text-[#173A5E] tracking-tight">
                         Ready to Transform Your Educational System?
                     </h2>
                     <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-slate-600 leading-relaxed">
@@ -750,14 +750,14 @@ export default function PricingPage({
                     </p>
                     <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                         <Link href="/register?journey=school&plan=growth">
-                            <Button className="h-12 bg-[#FF7A30] px-8 text-sm font-bold text-white hover:bg-[#E5661E] shadow-md shadow-orange-500/20 cursor-pointer">
+                            <Button className="h-12 bg-[#E49A2E] px-8 text-sm font-bold text-white hover:bg-[#d08a24] shadow-md shadow-[#E49A2E]/20 cursor-pointer">
                                 <span>Get Started with 30-Day Free Trial</span>
                                 <ArrowRight className="ml-2 size-4" />
                             </Button>
                         </Link>
                         <Link href="/contact?subject=Sales+Inquiry">
                             <Button variant="outline" className="h-12 border-slate-300 bg-white px-8 text-sm font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">
-                                <PhoneCall className="mr-2 size-4 text-[#1769E0]" />
+                                <PhoneCall className="mr-2 size-4 text-[#078675]" />
                                 <span>Talk to Sales</span>
                             </Button>
                         </Link>

@@ -28,7 +28,7 @@ export default function BenefitsPage() {
             desc: 'Every institution operates within a cryptographically isolated tenant boundary with automatic query-level scoping. Private records never bleed across school domains.',
             icon: ShieldCheck,
             badge: 'Enterprise Security',
-            color: 'text-[#1769E0] bg-blue-50',
+            color: 'text-[#078675] bg-[#078675]/10',
         },
         {
             title: 'End-to-End Academic Operations',
@@ -77,7 +77,7 @@ export default function BenefitsPage() {
             desc: 'Configure grade-level fee structures, batch generate student invoices, record payments, and download printable fee vouchers and receipts.',
             icon: CreditCard,
             badge: 'Financial Control',
-            color: 'text-blue-600 bg-blue-50',
+            color: 'text-[#078675] bg-[#078675]/10',
         },
     ];
 
@@ -87,14 +87,14 @@ export default function BenefitsPage() {
             <section className="bg-white pt-16 pb-12 sm:pt-24 sm:pb-16 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-semibold text-[#1769E0]">
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
                             <Layers className="size-3.5" />
                             <span>Architectural Superiority & Value</span>
                         </div>
 
-                        <h1 className="text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-5xl lg:text-6xl">
+                        <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl lg:text-6xl">
                             Why Educational Institutions Choose Our{' '}
-                            <span className="text-[#1769E0]">Unified SaaS</span>
+                            <span className="text-[#078675]">Unified SaaS</span>
                         </h1>
 
                         <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
@@ -106,13 +106,13 @@ export default function BenefitsPage() {
             </section>
 
             {/* BENEFITS 8-CARD GRID */}
-            <section className="bg-[#F7F9FC] py-16 sm:py-24">
+            <section className="bg-[#F5F8F7] py-16 sm:py-24">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="text-center mb-12">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#078675]">
                             Platform Pillars
                         </span>
-                        <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-3xl">
+                        <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#173A5E] sm:text-3xl">
                             Core Capabilities Engineered for Excellence
                         </h2>
                     </div>
@@ -123,7 +123,7 @@ export default function BenefitsPage() {
                             return (
                                 <div
                                     key={i}
-                                    className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-[#1769E0]/40 hover:shadow-lg"
+                                    className="group flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-[#078675]/40 hover:shadow-lg"
                                 >
                                     <div>
                                         <div className="mb-4 flex items-center justify-between">
@@ -134,7 +134,7 @@ export default function BenefitsPage() {
                                                 {b.badge}
                                             </span>
                                         </div>
-                                        <h3 className="text-base font-bold text-slate-900 group-hover:text-[#1769E0] transition-colors">
+                                        <h3 className="text-base font-bold text-slate-900 group-hover:text-[#078675] transition-colors">
                                             {b.title}
                                         </h3>
                                         <p className="mt-2.5 text-xs leading-relaxed text-slate-600">
@@ -150,10 +150,10 @@ export default function BenefitsPage() {
                     <div className="mt-16 rounded-3xl border border-slate-200 bg-white p-8 sm:p-12 shadow-sm">
                         <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
                             <div className="space-y-4 lg:col-span-6">
-                                <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                                <span className="text-xs font-bold uppercase tracking-wider text-[#078675]">
                                     Unified Architecture
                                 </span>
-                                <h3 className="text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-3xl">
+                                <h3 className="text-2xl font-extrabold tracking-tight text-[#173A5E] sm:text-3xl">
                                     Single Stack Efficiency vs. Fragmented Software
                                 </h3>
                                 <p className="text-xs text-slate-600 leading-relaxed sm:text-sm">
@@ -180,13 +180,13 @@ export default function BenefitsPage() {
                                 </div>
                             </div>
 
-                            <div className="rounded-2xl border border-slate-200 bg-[#F7F9FC] p-6 lg:col-span-6">
+                            <div className="rounded-2xl border border-slate-200 bg-[#F5F8F7] p-6 lg:col-span-6">
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                                         <span className="text-xs font-bold text-slate-900">
                                             Enterprise Software Architecture
                                         </span>
-                                        <span className="text-[11px] font-bold text-[#1769E0]">
+                                        <span className="text-[11px] font-bold text-[#078675]">
                                             100% Native Implementation
                                         </span>
                                     </div>
@@ -231,7 +231,7 @@ export default function BenefitsPage() {
                     </div>
 
                     {/* BOTTOM CTA CARD */}
-                    <div className="mt-16 rounded-3xl bg-[#1769E0] p-8 text-center text-white shadow-xl sm:p-12">
+                    <div className="mt-16 rounded-3xl bg-[#173A5E] p-8 text-center text-white shadow-xl sm:p-12">
                         <div className="mx-auto max-w-2xl">
                             <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
                                 Ready to Upgrade Your Institution?
@@ -243,7 +243,7 @@ export default function BenefitsPage() {
                                 <Button
                                     asChild
                                     size="lg"
-                                    className="bg-[#FF7A30] font-bold text-white shadow-md hover:bg-[#E5661E]"
+                                    className="bg-[#E49A2E] font-bold text-white shadow-md hover:bg-[#d08a24]"
                                 >
                                     <Link href="/register?journey=school">
                                         Create Your School Free

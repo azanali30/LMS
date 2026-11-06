@@ -138,7 +138,7 @@ export default function Register({
                     <div className="mx-auto mb-6 max-w-5xl">
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition-colors hover:text-[#1769E0]"
+                            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 transition-colors hover:text-[#078675]"
                         >
                             <ArrowLeft className="size-3.5" />
                             <span>Back to Homepage</span>
@@ -149,32 +149,32 @@ export default function Register({
                     <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
                         <div className="grid grid-cols-1 lg:grid-cols-12">
                             {/* Left Column: Branding, Context & Platform Value (5 cols) */}
-                            <div className="flex flex-col justify-between border-b border-slate-200 bg-[#F7F9FC] p-6 sm:p-8 lg:col-span-5 lg:border-r lg:border-b-0 lg:p-10">
+                            <div className="flex flex-col justify-between border-b border-slate-200 bg-[#F5F8F7] p-6 sm:p-8 lg:col-span-5 lg:border-r lg:border-b-0 lg:p-10">
                                 <div>
                                     {/* Brand Header */}
                                     <Link
                                         href="/"
                                         className="inline-flex items-center gap-3"
                                     >
-                                        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1769E0] text-white shadow-md shadow-blue-500/20 ring-2 ring-[#1769E0]/20">
+                                        <div className="flex size-10 items-center justify-center rounded-xl bg-[#173A5E] text-white shadow-md shadow-[#078675]/20 ring-2 ring-[#078675]/20">
                                             <AppLogoIcon className="size-5.5 text-white" />
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-lg font-extrabold tracking-tight text-[#0B1528]">
+                                            <span className="text-lg font-extrabold tracking-tight text-[#173A5E]">
                                                 InstitutoPropio
                                             </span>
-                                            <span className="text-[10px] font-bold tracking-wider text-[#1769E0] uppercase">
+                                            <span className="text-[10px] font-bold tracking-wider text-[#078675] uppercase">
                                                 Unified Education SaaS
                                             </span>
                                         </div>
                                     </Link>
 
                                     <div className="mt-8 space-y-3">
-                                        <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50/90 px-3 py-1 text-xs font-bold text-[#1769E0]">
+                                        <div className="inline-flex items-center gap-1.5 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3 py-1 text-xs font-bold text-[#078675]">
                                             <Sparkles className="size-3.5" />
                                             <span>Fast & Secure Onboarding</span>
                                         </div>
-                                        <h1 className="text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-3xl">
+                                        <h1 className="text-2xl font-extrabold tracking-tight text-[#173A5E] sm:text-3xl">
                                             Join the Modern Era of Education
                                         </h1>
                                         <p className="text-xs leading-relaxed text-slate-600 sm:text-sm">
@@ -190,7 +190,7 @@ export default function Register({
                                         {journey === 'school' && (
                                             <>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             Automated Tenant Provisioning:
@@ -199,7 +199,7 @@ export default function Register({
                                                     </span>
                                                 </div>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             Complete Operational Suite:
@@ -208,7 +208,7 @@ export default function Register({
                                                     </span>
                                                 </div>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             30-Day Free Trial:
@@ -222,7 +222,7 @@ export default function Register({
                                         {journey === 'join' && (
                                             <>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             Cryptographic Verification:
@@ -231,7 +231,7 @@ export default function Register({
                                                     </span>
                                                 </div>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             Role-Tailored Portals:
@@ -240,7 +240,7 @@ export default function Register({
                                                     </span>
                                                 </div>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             Existing Account Support:
@@ -254,7 +254,7 @@ export default function Register({
                                         {journey === 'learner' && (
                                             <>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             Independent Learning Hub:
@@ -263,7 +263,7 @@ export default function Register({
                                                     </span>
                                                 </div>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             Multimedia Streaming:
@@ -272,7 +272,7 @@ export default function Register({
                                                     </span>
                                                 </div>
                                                 <div className="flex items-start gap-3 text-xs text-slate-600">
-                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#1769E0]" />
+                                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#078675]" />
                                                     <span>
                                                         <strong className="text-slate-900">
                                                             Verified Digital Certificates:
@@ -310,11 +310,11 @@ export default function Register({
                                             onClick={() => setJourney('school')}
                                             className={`flex flex-col items-start rounded-2xl border p-3.5 text-left transition-all ${
                                                 journey === 'school'
-                                                    ? 'border-[#1769E0] bg-blue-50/70 shadow-xs ring-2 ring-[#1769E0]/20'
-                                                    : 'border-slate-200 bg-[#F7F9FC] hover:border-slate-300 hover:bg-white'
+                                                    ? 'border-[#078675] bg-[#078675]/10 shadow-xs ring-2 ring-[#078675]/20'
+                                                    : 'border-slate-200 bg-[#F5F8F7] hover:border-slate-300 hover:bg-white'
                                             }`}
                                         >
-                                            <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-blue-100 text-[#1769E0]">
+                                            <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-blue-100 text-[#078675]">
                                                 <Building2 className="size-4" />
                                             </div>
                                             <span className="text-xs font-bold text-slate-900">
@@ -331,8 +331,8 @@ export default function Register({
                                             onClick={() => setJourney('join')}
                                             className={`flex flex-col items-start rounded-2xl border p-3.5 text-left transition-all ${
                                                 journey === 'join'
-                                                    ? 'border-[#1769E0] bg-blue-50/70 shadow-xs ring-2 ring-[#1769E0]/20'
-                                                    : 'border-slate-200 bg-[#F7F9FC] hover:border-slate-300 hover:bg-white'
+                                                    ? 'border-[#078675] bg-[#078675]/10 shadow-xs ring-2 ring-[#078675]/20'
+                                                    : 'border-slate-200 bg-[#F5F8F7] hover:border-slate-300 hover:bg-white'
                                             }`}
                                         >
                                             <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
@@ -352,11 +352,11 @@ export default function Register({
                                             onClick={() => setJourney('learner')}
                                             className={`flex flex-col items-start rounded-2xl border p-3.5 text-left transition-all ${
                                                 journey === 'learner'
-                                                    ? 'border-[#1769E0] bg-blue-50/70 shadow-xs ring-2 ring-[#1769E0]/20'
-                                                    : 'border-slate-200 bg-[#F7F9FC] hover:border-slate-300 hover:bg-white'
+                                                    ? 'border-[#078675] bg-[#078675]/10 shadow-xs ring-2 ring-[#078675]/20'
+                                                    : 'border-slate-200 bg-[#F5F8F7] hover:border-slate-300 hover:bg-white'
                                             }`}
                                         >
-                                            <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-orange-100 text-[#FF7A30]">
+                                            <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-orange-100 text-[#E49A2E]">
                                                 <BookOpen className="size-4" />
                                             </div>
                                             <span className="text-xs font-bold text-slate-900">
@@ -375,15 +375,15 @@ export default function Register({
                                         onSubmit={handleSchoolSubmit}
                                         className="space-y-4"
                                     >
-                                        <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-slate-700">
+                                        <div className="rounded-2xl border border-[#078675]/20 bg-[#078675]/10 p-4 text-xs text-slate-700">
                                             <div className="flex flex-wrap items-center justify-between gap-2">
                                                 <div className="flex items-center gap-2">
-                                                    <Sparkles className="size-4 text-[#1769E0]" />
-                                                    <strong className="font-bold text-[#0B1528]">
+                                                    <Sparkles className="size-4 text-[#078675]" />
+                                                    <strong className="font-bold text-[#173A5E]">
                                                         30-Day Free Trial
                                                     </strong>
                                                 </div>
-                                                <span className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase text-[#1769E0] border border-blue-200 shadow-xs">
+                                                <span className="rounded-full bg-white px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase text-[#078675] border border-[#078675]/20 shadow-xs">
                                                     Selected: {schoolForm.data.plan.toUpperCase()} • {schoolForm.data.billing_interval.toUpperCase()}
                                                 </span>
                                             </div>
@@ -392,13 +392,13 @@ export default function Register({
                                             </p>
 
                                             {/* Monthly / Annual Interval Toggle */}
-                                            <div className="mt-3 flex items-center gap-2 border-b border-blue-200 pb-2.5">
+                                            <div className="mt-3 flex items-center gap-2 border-b border-[#078675]/20 pb-2.5">
                                                 <button
                                                     type="button"
                                                     onClick={() => schoolForm.setData('billing_interval', 'monthly')}
                                                     className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
                                                         schoolForm.data.billing_interval === 'monthly'
-                                                            ? 'bg-[#1769E0] text-white shadow-xs'
+                                                            ? 'bg-[#173A5E] text-white shadow-xs'
                                                             : 'bg-white text-slate-600 hover:text-slate-900'
                                                     }`}
                                                 >
@@ -409,7 +409,7 @@ export default function Register({
                                                     onClick={() => schoolForm.setData('billing_interval', 'annual')}
                                                     className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-bold transition ${
                                                         schoolForm.data.billing_interval === 'annual'
-                                                            ? 'bg-[#1769E0] text-white shadow-xs'
+                                                            ? 'bg-[#173A5E] text-white shadow-xs'
                                                             : 'bg-white text-slate-600 hover:text-slate-900'
                                                     }`}
                                                 >
@@ -456,15 +456,15 @@ export default function Register({
                                                             onClick={() => schoolForm.setData('plan', p.slug)}
                                                             className={`flex flex-col items-start rounded-xl border p-2 text-left transition ${
                                                                 isSelected
-                                                                    ? 'border-[#1769E0] bg-white ring-2 ring-[#1769E0]/20 shadow-xs'
+                                                                    ? 'border-[#078675] bg-white ring-2 ring-[#078675]/20 shadow-xs'
                                                                     : 'border-slate-200 bg-white/70 hover:border-slate-300'
                                                             }`}
                                                         >
                                                             <div className="flex w-full items-center justify-between">
                                                                 <span className="text-[11px] font-bold text-slate-900">{p.name}</span>
-                                                                {isSelected && <CheckCircle2 className="size-3 text-[#1769E0]" />}
+                                                                {isSelected && <CheckCircle2 className="size-3 text-[#078675]" />}
                                                             </div>
-                                                            <span className="text-[10px] font-bold text-[#1769E0]">{p.price}</span>
+                                                            <span className="text-[10px] font-bold text-[#078675]">{p.price}</span>
                                                             <span className="text-[9px] text-slate-500">{p.limit}</span>
                                                         </button>
                                                     );
@@ -493,7 +493,7 @@ export default function Register({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={schoolForm.errors.name}
@@ -519,7 +519,7 @@ export default function Register({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={schoolForm.errors.email}
@@ -553,7 +553,7 @@ export default function Register({
                                                             schoolForm.setData('subdomain', autoSlug);
                                                         }
                                                     }}
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={schoolForm.errors.school_name}
@@ -573,7 +573,7 @@ export default function Register({
                                                     onChange={(e) =>
                                                         schoolForm.setData('organization_type', e.target.value)
                                                     }
-                                                    className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:border-[#1769E0] focus:outline-none"
+                                                    className="h-10 rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:border-[#078675] focus:outline-none"
                                                 >
                                                     <option value="school">K-12 School</option>
                                                     <option value="academy">Academy / Training Center</option>
@@ -609,7 +609,7 @@ export default function Register({
                                                             e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''),
                                                         )
                                                     }
-                                                    className="h-10 rounded-xl border-slate-300 bg-white pr-36 text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white pr-36 text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <div className="pointer-events-none absolute right-3 text-xs font-bold text-slate-500">
                                                     .institutopropio.com
@@ -637,7 +637,7 @@ export default function Register({
                                                         )
                                                     }
                                                     placeholder="Minimum 8 characters"
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={schoolForm.errors.password}
@@ -665,7 +665,7 @@ export default function Register({
                                                         )
                                                     }
                                                     placeholder="Re-enter password"
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={
@@ -679,7 +679,7 @@ export default function Register({
                                         <Button
                                             type="submit"
                                             disabled={schoolForm.processing}
-                                            className="h-11 w-full cursor-pointer rounded-xl bg-[#FF7A30] text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                            className="h-11 w-full cursor-pointer rounded-xl bg-[#E49A2E] text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                                         >
                                             {schoolForm.processing ? (
                                                 <span className="flex items-center gap-2">
@@ -714,14 +714,14 @@ export default function Register({
                                                     {invitation.organization_name}
                                                 </strong>{' '}
                                                 as an authorized{' '}
-                                                <strong className="text-[#1769E0] capitalize">
+                                                <strong className="text-[#078675] capitalize">
                                                     {invitation.role}
                                                 </strong>
                                                 .
                                             </div>
                                         ) : (
-                                            <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-slate-700">
-                                                <strong className="block font-bold text-[#0B1528]">
+                                            <div className="rounded-2xl border border-[#078675]/20 bg-[#078675]/10 p-4 text-xs text-slate-700">
+                                                <strong className="block font-bold text-[#173A5E]">
                                                     Invitation Key Required
                                                 </strong>
                                                 Please enter the token provided by your institution administrator to join your school.
@@ -747,7 +747,7 @@ export default function Register({
                                                         e.target.value,
                                                     )
                                                 }
-                                                className="h-10 rounded-xl border-slate-300 bg-white font-mono text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                className="h-10 rounded-xl border-slate-300 bg-white font-mono text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                             />
                                             <InputError
                                                 message={
@@ -776,7 +776,7 @@ export default function Register({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={joinForm.errors.name}
@@ -802,7 +802,7 @@ export default function Register({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={joinForm.errors.email}
@@ -829,7 +829,7 @@ export default function Register({
                                                         )
                                                     }
                                                     placeholder="Choose a password"
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={joinForm.errors.password}
@@ -857,7 +857,7 @@ export default function Register({
                                                         )
                                                     }
                                                     placeholder="Confirm password"
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={
@@ -871,7 +871,7 @@ export default function Register({
                                         <Button
                                             type="submit"
                                             disabled={joinForm.processing}
-                                            className="h-11 w-full cursor-pointer rounded-xl bg-[#1769E0] text-xs font-bold text-white shadow-md shadow-blue-500/20 transition hover:bg-[#1256B8]"
+                                            className="h-11 w-full cursor-pointer rounded-xl bg-[#173A5E] text-xs font-bold text-white shadow-md shadow-[#078675]/20 transition hover:bg-[#056b5e]"
                                         >
                                             {joinForm.processing ? (
                                                 <span className="flex items-center gap-2">
@@ -896,8 +896,8 @@ export default function Register({
                                         onSubmit={handleLearnerSubmit}
                                         className="space-y-4"
                                     >
-                                        <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-slate-700">
-                                            <strong className="block font-bold text-[#0B1528]">
+                                        <div className="rounded-2xl border border-[#078675]/20 bg-[#078675]/10 p-4 text-xs text-slate-700">
+                                            <strong className="block font-bold text-[#173A5E]">
                                                 Independent Student Registration
                                             </strong>
                                             No school affiliation required. Explore courses, stream multimedia lessons, and track personal certificates.
@@ -923,7 +923,7 @@ export default function Register({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={learnerForm.errors.name}
@@ -949,7 +949,7 @@ export default function Register({
                                                             e.target.value,
                                                         )
                                                     }
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={learnerForm.errors.email}
@@ -976,7 +976,7 @@ export default function Register({
                                                         )
                                                     }
                                                     placeholder="Minimum 8 characters"
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={
@@ -1006,7 +1006,7 @@ export default function Register({
                                                         )
                                                     }
                                                     placeholder="Re-enter password"
-                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#1769E0]"
+                                                    className="h-10 rounded-xl border-slate-300 bg-white text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-[#078675]"
                                                 />
                                                 <InputError
                                                     message={
@@ -1020,7 +1020,7 @@ export default function Register({
                                         <Button
                                             type="submit"
                                             disabled={learnerForm.processing}
-                                            className="h-11 w-full cursor-pointer rounded-xl bg-[#FF7A30] text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                            className="h-11 w-full cursor-pointer rounded-xl bg-[#E49A2E] text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                                         >
                                             {learnerForm.processing ? (
                                                 <span className="flex items-center gap-2">
@@ -1044,7 +1044,7 @@ export default function Register({
                                     Already registered on the platform?{' '}
                                     <Link
                                         href={login()}
-                                        className="font-bold text-[#1769E0] underline hover:text-[#1256B8]"
+                                        className="font-bold text-[#078675] underline hover:text-[#056b5e]"
                                     >
                                         Log in to your account &rarr;
                                     </Link>

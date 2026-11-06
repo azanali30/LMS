@@ -10,7 +10,7 @@ interface CourseCardProps {
 
 export default function CourseCard({ course }: CourseCardProps) {
     return (
-        <article className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#1769E0]/40 hover:shadow-xl hover:shadow-[#1769E0]/10">
+        <article className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#078675]/40 hover:shadow-xl hover:shadow-[#078675]/10">
             {/* Top Banner / Graphic representation */}
             <div
                 className={`relative flex h-48 w-full flex-col justify-between overflow-hidden bg-gradient-to-br ${course.gradient} p-5 text-white`}
@@ -29,7 +29,7 @@ export default function CourseCard({ course }: CourseCardProps) {
 
                     <div className="flex items-center gap-1.5">
                         {course.popular && (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-[#FF7A30] px-2.5 py-0.5 text-xs font-bold text-white shadow-xs">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[#E49A2E] px-2.5 py-0.5 text-xs font-bold text-white shadow-xs">
                                 <Sparkles className="size-3" />
                                 Popular
                             </span>
@@ -89,7 +89,7 @@ export default function CourseCard({ course }: CourseCardProps) {
                     </div>
 
                     {/* Course Title */}
-                    <h3 className="line-clamp-2 text-base font-bold text-slate-900 transition-colors group-hover:text-[#1769E0]">
+                    <h3 className="line-clamp-2 text-base font-bold text-slate-900 transition-colors group-hover:text-[#078675]">
                         {course.title}
                     </h3>
 
@@ -123,7 +123,7 @@ export default function CourseCard({ course }: CourseCardProps) {
                             <span className="text-[11px] font-medium text-slate-500">
                                 Access
                             </span>
-                            <span className="text-xs font-bold text-[#1769E0]">
+                            <span className="text-xs font-bold text-[#078675]">
                                 {course.price}
                             </span>
                         </div>
@@ -131,7 +131,7 @@ export default function CourseCard({ course }: CourseCardProps) {
                         <Button
                             asChild
                             size="sm"
-                            className="bg-[#FF7A30] text-xs font-semibold text-white shadow-xs hover:bg-[#E5661E]"
+                            className="bg-[#E49A2E] text-xs font-semibold text-white shadow-xs hover:bg-[#d08a24]"
                         >
                             <Link href={register()}>
                                 Enroll Now

@@ -32,25 +32,25 @@ export default function AuthSimpleLayout({
     const platformName = (name as string) || 'InstitutoPropio';
     const isTenant = Boolean(tenant && tenant.name);
     const displayName = isTenant ? tenant!.name : platformName;
-    const brandColor = tenant?.primary_color || '#1769E0';
+    const brandColor = tenant?.primary_color || '#078675';
 
     return (
         <div className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-slate-50/70 p-4 sm:p-6 md:p-10 dark:bg-[#070D18]">
             {/* Ambient background glows */}
             <div
                 aria-hidden="true"
-                className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-600/15"
+                className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 rounded-full bg-[#078675]/100/10 blur-3xl dark:bg-[#078675]/15"
             />
             <div
                 aria-hidden="true"
-                className="pointer-events-none absolute right-1/4 -bottom-32 -z-10 h-80 w-80 rounded-full bg-blue-500/8 blur-3xl dark:bg-blue-600/10"
+                className="pointer-events-none absolute right-1/4 -bottom-32 -z-10 h-80 w-80 rounded-full bg-[#078675]/100/8 blur-3xl dark:bg-[#078675]/10"
             />
 
             {/* Back to Home link */}
             <div className="mb-6 w-full max-w-md">
                 <Link
                     href={home()}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 transition-colors hover:text-[#1769E0] dark:text-slate-400 dark:hover:text-white"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 transition-colors hover:text-[#078675] dark:text-slate-400 dark:hover:text-white"
                 >
                     <ArrowLeft className="size-3.5" />
                     {isTenant ? 'Back to main website' : 'Back to public website'}
@@ -72,7 +72,7 @@ export default function AuthSimpleLayout({
                                 />
                             ) : (
                                 <div
-                                    className="flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-md shadow-blue-600/20 ring-2 ring-blue-500/20 font-bold text-lg"
+                                    className="flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-md shadow-[#078675]/20 ring-2 ring-blue-500/20 font-bold text-lg"
                                     style={{ backgroundColor: brandColor }}
                                 >
                                     {isTenant ? displayName!.charAt(0).toUpperCase() : <AppLogoIcon className="size-6 text-white" />}

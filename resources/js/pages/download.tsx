@@ -30,14 +30,14 @@ export default function DownloadPage() {
                 <section className="relative mx-auto w-full max-w-[1720px] px-6 pt-16 pb-12 text-center sm:px-8 md:px-12 lg:px-16 xl:px-20 border-b border-slate-100">
                     <div className="mx-auto max-w-4xl">
                     {/* Eyebrow badge */}
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-semibold text-[#1769E0]">
-                        <Laptop className="size-3.5 text-[#1769E0]" />
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
+                        <Laptop className="size-3.5 text-[#078675]" />
                         <span>Windows Tauri Desktop Client</span>
                     </div>
 
-                    <h1 className="text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-5xl lg:text-6xl">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl lg:text-6xl">
                         Dedicated Desktop Power for Your{' '}
-                        <span className="text-[#1769E0]">Campus Workspace</span>
+                        <span className="text-[#078675]">Campus Workspace</span>
                     </h1>
 
                     <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
@@ -69,7 +69,7 @@ export default function DownloadPage() {
                                     <Button
                                         asChild
                                         size="sm"
-                                        className="bg-[#1769E0] text-xs font-bold text-white hover:bg-[#1256B8]"
+                                        className="bg-[#173A5E] text-xs font-bold text-white hover:bg-[#056b5e]"
                                     >
                                         <Link href="/register">
                                             Access Web Platform Now
@@ -95,9 +95,9 @@ export default function DownloadPage() {
 
                 {/* Important Connectivity Requirement Notice */}
                 <section className="mx-auto w-full max-w-[1720px] px-6 py-8 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                    <div className="rounded-2xl border border-blue-200 bg-blue-50/50 p-5 shadow-xs">
+                    <div className="rounded-2xl border border-[#078675]/20 bg-[#078675]/10 p-5 shadow-xs">
                         <div className="flex items-start gap-3">
-                            <Server className="mt-0.5 size-5 shrink-0 text-[#1769E0]" />
+                            <Server className="mt-0.5 size-5 shrink-0 text-[#078675]" />
                             <div>
                                 <h4 className="text-sm font-bold text-slate-900">
                                     Server Connection & Connectivity Requirement
@@ -113,13 +113,13 @@ export default function DownloadPage() {
                 </section>
 
                 {/* Key Benefits of the Desktop App */}
-                <section className="border-t border-slate-200 bg-[#F7F9FC] py-16 sm:py-20">
+                <section className="border-t border-slate-200 bg-[#F5F8F7] py-16 sm:py-20">
                     <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                         <div className="text-center">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                            <span className="text-xs font-bold uppercase tracking-wider text-[#078675]">
                                 Native Capabilities
                             </span>
-                            <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-3xl">
+                            <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#173A5E] sm:text-3xl">
                                 Why Deploy the Windows Desktop Client?
                             </h2>
                             <p className="mx-auto mt-3 max-w-2xl text-xs text-slate-600 sm:text-sm">
@@ -170,9 +170,9 @@ export default function DownloadPage() {
                                 return (
                                     <div
                                         key={item.title}
-                                        className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all hover:border-[#1769E0]/40 hover:shadow-md"
+                                        className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-xs transition-all hover:border-[#078675]/40 hover:shadow-md"
                                     >
-                                        <div className="flex size-11 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0] transition-colors group-hover:bg-[#1769E0] group-hover:text-white">
+                                        <div className="flex size-11 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675] transition-colors group-hover:bg-[#173A5E] group-hover:text-white">
                                             <Icon className="size-5" />
                                         </div>
                                         <h3 className="mt-4 text-base font-bold text-slate-900">
@@ -192,10 +192,10 @@ export default function DownloadPage() {
                 <section className="py-16 sm:py-20 bg-white border-t border-slate-200">
                     <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                         <div className="text-center">
-                            <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                            <span className="text-xs font-bold uppercase tracking-wider text-[#078675]">
                                 Specifications
                             </span>
-                            <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0B1528] sm:text-3xl">
+                            <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#173A5E] sm:text-3xl">
                                 Verified System Requirements
                             </h2>
                             <p className="mx-auto mt-2 max-w-xl text-xs text-slate-600 sm:text-sm">
@@ -203,7 +203,7 @@ export default function DownloadPage() {
                             </p>
                         </div>
 
-                        <div className="mt-10 overflow-hidden rounded-2xl border border-slate-200 bg-[#F7F9FC] shadow-xs">
+                        <div className="mt-10 overflow-hidden rounded-2xl border border-slate-200 bg-[#F5F8F7] shadow-xs">
                             <table className="w-full text-left text-xs">
                                 <thead className="border-b border-slate-200 bg-slate-100 text-slate-700">
                                     <tr>
@@ -215,7 +215,7 @@ export default function DownloadPage() {
                                 <tbody className="divide-y divide-slate-200/80 bg-white">
                                     <tr>
                                         <td className="px-6 py-3.5 font-semibold text-slate-900 flex items-center gap-2">
-                                            <Monitor className="size-4 text-[#1769E0]" />
+                                            <Monitor className="size-4 text-[#078675]" />
                                             Operating System
                                         </td>
                                         <td className="px-6 py-3.5 text-slate-600">
@@ -227,7 +227,7 @@ export default function DownloadPage() {
                                     </tr>
                                     <tr>
                                         <td className="px-6 py-3.5 font-semibold text-slate-900 flex items-center gap-2">
-                                            <Cpu className="size-4 text-[#1769E0]" />
+                                            <Cpu className="size-4 text-[#078675]" />
                                             Processor & Architecture
                                         </td>
                                         <td className="px-6 py-3.5 text-slate-600">
@@ -239,7 +239,7 @@ export default function DownloadPage() {
                                     </tr>
                                     <tr>
                                         <td className="px-6 py-3.5 font-semibold text-slate-900 flex items-center gap-2">
-                                            <HardDrive className="size-4 text-[#1769E0]" />
+                                            <HardDrive className="size-4 text-[#078675]" />
                                             Memory (RAM)
                                         </td>
                                         <td className="px-6 py-3.5 text-slate-600">
@@ -251,7 +251,7 @@ export default function DownloadPage() {
                                     </tr>
                                     <tr>
                                         <td className="px-6 py-3.5 font-semibold text-slate-900 flex items-center gap-2">
-                                            <Layers className="size-4 text-[#1769E0]" />
+                                            <Layers className="size-4 text-[#078675]" />
                                             Disk Space
                                         </td>
                                         <td className="px-6 py-3.5 text-slate-600">
@@ -263,7 +263,7 @@ export default function DownloadPage() {
                                     </tr>
                                     <tr>
                                         <td className="px-6 py-3.5 font-semibold text-slate-900 flex items-center gap-2">
-                                            <Sparkles className="size-4 text-[#1769E0]" />
+                                            <Sparkles className="size-4 text-[#078675]" />
                                             Runtime Engine
                                         </td>
                                         <td className="px-6 py-3.5 text-slate-600">
@@ -280,16 +280,16 @@ export default function DownloadPage() {
                 </section>
 
                 {/* Installation & Troubleshooting Guidance */}
-                <section className="border-t border-slate-200 bg-[#F7F9FC] py-16 sm:py-20">
+                <section className="border-t border-slate-200 bg-[#F5F8F7] py-16 sm:py-20">
                     <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
                             {/* Step-by-Step Installation */}
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-[#078675]">
                                         Setup Workflow
                                     </span>
-                                    <h3 className="text-xl font-bold tracking-tight text-[#0B1528]">
+                                    <h3 className="text-xl font-bold tracking-tight text-[#173A5E]">
                                         Installation Steps (When Released)
                                     </h3>
                                     <p className="text-xs text-slate-600">
@@ -324,7 +324,7 @@ export default function DownloadPage() {
                                             key={s.step}
                                             className="flex items-start gap-3.5 rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs"
                                         >
-                                            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-[#1769E0]">
+                                            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#078675]/10 text-xs font-bold text-[#078675]">
                                                 {s.step}
                                             </span>
                                             <div>
@@ -343,10 +343,10 @@ export default function DownloadPage() {
                             {/* Troubleshooting Guidance */}
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-[#078675]">
                                         Help & Diagnostics
                                     </span>
-                                    <h3 className="text-xl font-bold tracking-tight text-[#0B1528]">
+                                    <h3 className="text-xl font-bold tracking-tight text-[#173A5E]">
                                         Troubleshooting Guidance
                                     </h3>
                                     <p className="text-xs text-slate-600">
@@ -357,7 +357,7 @@ export default function DownloadPage() {
                                 <div className="space-y-4">
                                     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
                                         <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
-                                            <Wifi className="size-4 text-[#1769E0]" />
+                                            <Wifi className="size-4 text-[#078675]" />
                                             <span>"Cannot connect to LMS Server"</span>
                                         </div>
                                         <p className="mt-1 text-[11px] text-slate-600 leading-relaxed">
@@ -377,12 +377,12 @@ export default function DownloadPage() {
 
                                     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs">
                                         <div className="flex items-center gap-2 text-xs font-bold text-slate-900">
-                                            <HelpCircle className="size-4 text-[#1769E0]" />
+                                            <HelpCircle className="size-4 text-[#078675]" />
                                             <span>Support Inquiries</span>
                                         </div>
                                         <p className="mt-1 text-[11px] text-slate-600 leading-relaxed">
                                             For technical assistance or institutional provisioning requests, submit a direct inquiry through our{' '}
-                                            <Link href="/contact" className="font-semibold text-[#1769E0] hover:underline">
+                                            <Link href="/contact" className="font-semibold text-[#078675] hover:underline">
                                                 Contact Support
                                             </Link>{' '}
                                             form.

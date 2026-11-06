@@ -68,18 +68,32 @@
     --color-lms-slate-light: #f8fafc;
     --color-lms-slate-card: #1e293b;
 
-    /* RingCentral-inspired B2B SaaS Palette */
-    --color-brand-blue: #1769e0;
-    --color-brand-blue-hover: #1256b8;
-    --color-brand-blue-light: #eff6ff;
-    --color-brand-blue-subtle: #f0f7ff;
-    --color-brand-orange: #ff7a30;
-    --color-brand-orange-hover: #e5661e;
-    --color-brand-orange-light: #fff7ed;
-    --color-brand-navy: #0b1528;
-    --color-brand-navy-card: #0f1c34;
-    --color-brand-slate: #334155;
+    /* Official InstitutoPropio Brand Palette */
+    --color-brand-navy: #173a5e;
+    --color-brand-navy-hover: #122e4b;
+    --color-brand-navy-subtle: #f5f8f7;
+    --color-brand-teal: #078675;
+    --color-brand-teal-hover: #056b5e;
+    --color-brand-teal-light: #e6f6f4;
+    --color-brand-teal-subtle: #f0faf9;
+    --color-brand-green: #26965b;
+    --color-brand-green-hover: #1f7c4b;
+    --color-brand-green-light: #eaf7f0;
+    --color-brand-orange: #e49a2e;
+    --color-brand-orange-hover: #d08a24;
+    --color-brand-orange-light: #fef7ec;
+    --color-brand-bg: #f5f8f7;
+    --color-brand-text: #172b3d;
+    --color-brand-muted: #64748b;
     --color-brand-border: #e2e8f0;
+
+    /* Legacy aliases mapped safely to InstitutoPropio Brand */
+    --color-brand-blue: #078675;
+    --color-brand-blue-hover: #056b5e;
+    --color-brand-blue-light: #e6f6f4;
+    --color-brand-blue-subtle: #f0faf9;
+    --color-brand-navy-card: #173a5e;
+    --color-brand-slate: #172b3d;
 }
 
 :root {

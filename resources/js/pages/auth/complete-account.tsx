@@ -79,7 +79,7 @@ export default function CompleteAccount({
                             <CheckCircle2 className="size-3.5 text-emerald-600" />
                             <span>Payment Approved — Final Step</span>
                         </div>
-                        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-4xl">
+                        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-4xl">
                             Complete Account & Institution Details
                         </h1>
                         <p className="mt-2 text-xs text-slate-600 sm:text-sm leading-relaxed">
@@ -88,19 +88,19 @@ export default function CompleteAccount({
                     </div>
 
                     {/* Approved Plan Summary Bar */}
-                    <div className="mx-auto max-w-2xl mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-blue-200 bg-blue-50/80 p-5 shadow-xs">
+                    <div className="mx-auto max-w-2xl mb-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#078675]/20 bg-[#078675]/10 p-5 shadow-xs">
                         <div>
-                            <span className="text-[10px] font-bold tracking-wider text-[#1769E0] uppercase">
+                            <span className="text-[10px] font-bold tracking-wider text-[#078675] uppercase">
                                 Approved Subscription Tier
                             </span>
-                            <div className="text-base font-bold text-[#0B1528]">{plan_name}</div>
+                            <div className="text-base font-bold text-[#173A5E]">{plan_name}</div>
                             <span className="text-xs text-slate-600">
                                 30-Day Free Trial starts immediately upon account activation.
                             </span>
                         </div>
                         <div className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-right shadow-xs">
                             <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Registered Work Email</div>
-                            <div className="font-mono text-xs font-bold text-[#1769E0]">{email}</div>
+                            <div className="font-mono text-xs font-bold text-[#078675]">{email}</div>
                         </div>
                     </div>
 
@@ -121,7 +121,7 @@ export default function CompleteAccount({
                                         value={form.data.name}
                                         onChange={(e) => form.setData('name', e.target.value)}
                                         placeholder="e.g. Dr. Sarah Jenkins"
-                                        className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                        className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                     />
                                 </div>
                                 {form.errors.name && (
@@ -141,7 +141,7 @@ export default function CompleteAccount({
                                         value={form.data.school_name}
                                         onChange={handleSchoolNameChange}
                                         placeholder="e.g. Oakridge Academy of Science"
-                                        className="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                        className="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                     />
                                     {form.errors.school_name && (
                                         <p className="mt-1 text-xs text-rose-600">{form.errors.school_name}</p>
@@ -155,7 +155,7 @@ export default function CompleteAccount({
                                     <select
                                         value={form.data.organization_type}
                                         onChange={(e) => form.setData('organization_type', e.target.value)}
-                                        className="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                        className="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                     >
                                         {organizationTypes.map((t) => (
                                             <option key={t.value} value={t.value}>
@@ -193,7 +193,7 @@ export default function CompleteAccount({
                                             form.setData('subdomain', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
                                         }}
                                         placeholder="oakridge-academy"
-                                        className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-18 pr-44 text-sm font-mono text-[#1769E0] placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                        className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-18 pr-44 text-sm font-mono text-[#078675] placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                     />
                                     <span className="absolute right-3.5 text-xs text-slate-500 font-semibold">
                                         .institutopropio.com
@@ -218,7 +218,7 @@ export default function CompleteAccount({
                                             value={form.data.password}
                                             onChange={(e) => form.setData('password', e.target.value)}
                                             placeholder="Min. 8 characters"
-                                            className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                            className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                         />
                                     </div>
                                     {form.errors.password && (
@@ -238,7 +238,7 @@ export default function CompleteAccount({
                                             value={form.data.password_confirmation}
                                             onChange={(e) => form.setData('password_confirmation', e.target.value)}
                                             placeholder="Repeat password"
-                                            className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                            className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                         />
                                     </div>
                                 </div>
@@ -248,7 +248,7 @@ export default function CompleteAccount({
                             <button
                                 type="submit"
                                 disabled={form.processing}
-                                className="mt-4 flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E] disabled:opacity-50"
+                                className="mt-4 flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#E49A2E] py-3 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24] disabled:opacity-50"
                             >
                                 {form.processing ? (
                                     <>

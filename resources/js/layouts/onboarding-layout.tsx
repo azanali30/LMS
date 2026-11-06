@@ -25,7 +25,7 @@ export default function OnboardingLayout({
     }, []);
 
     return (
-        <div className="flex min-h-screen flex-col bg-[#F8FAFC] font-sans text-slate-900 antialiased selection:bg-[#1769E0] selection:text-white">
+        <div className="flex min-h-screen flex-col bg-[#F8FAFC] font-sans text-slate-900 antialiased selection:bg-[#173A5E] selection:text-white">
             {title && <Head title={title} />}
 
             {/* FOCUSED ONBOARDING TOP BAR (No public marketing mega-menus) */}
@@ -37,14 +37,14 @@ export default function OnboardingLayout({
                         className="group flex items-center gap-3 transition-transform hover:scale-[1.01]"
                         aria-label={`${platformName} Home`}
                     >
-                        <div className="flex size-10 items-center justify-center rounded-xl bg-[#1769E0] text-white shadow-md shadow-blue-600/20 ring-2 ring-[#1769E0]/20 transition-all group-hover:bg-[#1256B8]">
+                        <div className="flex size-10 items-center justify-center rounded-xl bg-[#173A5E] text-white shadow-md shadow-[#078675]/20 ring-2 ring-[#078675]/20 transition-all group-hover:bg-[#056b5e]">
                             <AppLogoIcon className="size-5.5 text-white" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-base font-extrabold tracking-tight text-[#0B1528] sm:text-lg">
+                            <span className="text-base font-extrabold tracking-tight text-[#173A5E] sm:text-lg">
                                 {platformName}
                             </span>
-                            <span className="text-[10px] font-bold tracking-wider text-[#1769E0] uppercase">
+                            <span className="text-[10px] font-bold tracking-wider text-[#078675] uppercase">
                                 Unified Education SaaS
                             </span>
                         </div>
@@ -61,7 +61,7 @@ export default function OnboardingLayout({
                             <span className="hidden sm:inline text-slate-500">Already have an institution?</span>
                             <Link
                                 href="/login"
-                                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 font-semibold text-slate-700 shadow-xs transition hover:border-[#1769E0] hover:text-[#1769E0]"
+                                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-1.5 font-semibold text-slate-700 shadow-xs transition hover:border-[#078675] hover:text-[#078675]"
                             >
                                 <span>Sign In</span>
                                 <ArrowRight className="size-3.5" />
@@ -90,11 +90,11 @@ export default function OnboardingLayout({
                             ISO 27001 & SOC-2 Certified
                         </span>
                         <span className="text-slate-300">•</span>
-                        <Link href="/onboarding/status" className="font-medium text-slate-600 hover:text-[#1769E0] transition">
+                        <Link href="/onboarding/status" className="font-medium text-slate-600 hover:text-[#078675] transition">
                             Track Existing Application
                         </Link>
                         <span className="text-slate-300">•</span>
-                        <Link href="/contact" className="font-medium text-slate-600 hover:text-[#1769E0] transition">
+                        <Link href="/contact" className="font-medium text-slate-600 hover:text-[#078675] transition">
                             Finance & Support Desk
                         </Link>
                     </div>

@@ -155,7 +155,7 @@ export default function CourseShowPage({
                 <div className="mb-6">
                     <Link
                         href={isInsideLms ? '/learning/courses' : '/courses'}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 transition hover:text-[#1769E0]"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 transition hover:text-[#078675]"
                     >
                         <ArrowLeft className="size-3.5" />
                         <span>{isInsideLms ? 'Back to Courses' : 'Back to Course Catalog'}</span>
@@ -163,10 +163,10 @@ export default function CourseShowPage({
                 </div>
 
                 {/* Course Header Hero */}
-                <div className="relative mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-[#F7F9FC] p-6 shadow-sm sm:p-10">
+                <div className="relative mb-8 overflow-hidden rounded-3xl border border-slate-200 bg-[#F5F8F7] p-6 shadow-sm sm:p-10">
                     <div className="relative max-w-3xl">
                         <div className="mb-4 flex flex-wrap items-center gap-2">
-                            <span className="text-xs font-bold tracking-wider text-[#1769E0] uppercase">
+                            <span className="text-xs font-bold tracking-wider text-[#078675] uppercase">
                                 {course.category?.name || 'Curriculum Track'}
                             </span>
                             <span className="text-slate-400">&bull;</span>
@@ -177,14 +177,14 @@ export default function CourseShowPage({
                                 <>
                                     <span className="text-slate-400">&bull;</span>
                                     <span className="flex items-center gap-1 text-xs text-slate-500 font-medium">
-                                        <Clock className="size-3 text-[#1769E0]" />
+                                        <Clock className="size-3 text-[#078675]" />
                                         <span>{course.duration}</span>
                                     </span>
                                 </>
                             )}
                         </div>
 
-                        <h1 className="text-2xl font-black tracking-tight text-[#0B1528] sm:text-4xl">
+                        <h1 className="text-2xl font-black tracking-tight text-[#173A5E] sm:text-4xl">
                             {course.title}
                         </h1>
 
@@ -214,7 +214,7 @@ export default function CourseShowPage({
                                     {firstLesson && (
                                         <Link
                                             href={`/learning/courses/${course.slug}/lessons/${firstLesson.slug}`}
-                                            className="flex items-center gap-2 rounded-xl bg-[#1769E0] px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-[#1256B8]"
+                                            className="flex items-center gap-2 rounded-xl bg-[#173A5E] px-6 py-3 text-xs font-bold text-white shadow-md hover:bg-[#056b5e]"
                                         >
                                             <PlayCircle className="size-4" />
                                             <span>Continue Learning</span>
@@ -222,7 +222,7 @@ export default function CourseShowPage({
                                     )}
                                     <div className="text-xs text-slate-600">
                                         Enrolled &bull;{' '}
-                                        <strong className="text-[#1769E0]">
+                                        <strong className="text-[#078675]">
                                             {enrollment?.progress_percent || 0}% Complete
                                         </strong>
                                     </div>
@@ -231,7 +231,7 @@ export default function CourseShowPage({
                                 <Button
                                     onClick={handleEnroll}
                                     size="lg"
-                                    className="bg-[#FF7A30] font-bold text-white shadow-md hover:bg-[#E5661E]"
+                                    className="bg-[#E49A2E] font-bold text-white shadow-md hover:bg-[#d08a24]"
                                 >
                                     <Sparkles className="size-4 mr-2" />
                                     <span>Enroll in Course</span>
@@ -245,8 +245,8 @@ export default function CourseShowPage({
                 <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                     <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
-                            <Layers className="size-5 text-[#1769E0]" />
-                            <h2 className="text-lg font-bold tracking-tight text-[#0B1528]">
+                            <Layers className="size-5 text-[#078675]" />
+                            <h2 className="text-lg font-bold tracking-tight text-[#173A5E]">
                                 Course Curriculum & Syllabus
                             </h2>
                         </div>
@@ -255,7 +255,7 @@ export default function CourseShowPage({
                             <button
                                 type="button"
                                 onClick={() => setShowAddModule((prev) => !prev)}
-                                className="flex items-center gap-1.5 rounded-xl bg-[#1769E0] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#1256B8]"
+                                className="flex items-center gap-1.5 rounded-xl bg-[#173A5E] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#056b5e]"
                             >
                                 <Plus className="size-3.5" />
                                 <span>{showAddModule ? 'Cancel' : 'Add Module'}</span>
@@ -267,7 +267,7 @@ export default function CourseShowPage({
                     {canManage && showAddModule && (
                         <form
                             onSubmit={handleCreateModule}
-                            className="mb-6 rounded-2xl border border-blue-200 bg-blue-50/50 p-4"
+                            className="mb-6 rounded-2xl border border-[#078675]/20 bg-[#078675]/10 p-4"
                         >
                             <h4 className="mb-3 text-xs font-bold text-slate-900">
                                 Add New Syllabus Module
@@ -279,14 +279,14 @@ export default function CourseShowPage({
                                     placeholder="Module title (e.g. Module 1: Foundations of System Architecture)"
                                     value={newModuleTitle}
                                     onChange={(e) => setNewModuleTitle(e.target.value)}
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-[#1769E0]"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-[#078675]"
                                 />
                                 <textarea
                                     rows={2}
                                     placeholder="Module overview / objectives (optional)..."
                                     value={newModuleDesc}
                                     onChange={(e) => setNewModuleDesc(e.target.value)}
-                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-[#1769E0]"
+                                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs text-slate-900 outline-none focus:border-[#078675]"
                                 />
                                 <div className="flex justify-end gap-2">
                                     <button
@@ -298,7 +298,7 @@ export default function CourseShowPage({
                                     </button>
                                     <button
                                         type="submit"
-                                        className="rounded-xl bg-[#1769E0] px-4 py-1.5 text-xs font-bold text-white hover:bg-[#1256B8]"
+                                        className="rounded-xl bg-[#173A5E] px-4 py-1.5 text-xs font-bold text-white hover:bg-[#056b5e]"
                                     >
                                         Save Module
                                     </button>
@@ -317,7 +317,7 @@ export default function CourseShowPage({
                                     <button
                                         type="button"
                                         onClick={() => setShowAddModule(true)}
-                                        className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[#1769E0] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#1256B8]"
+                                        className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-[#173A5E] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#056b5e]"
                                     >
                                         <Plus className="size-3.5" />
                                         <span>Create First Module</span>
@@ -330,7 +330,7 @@ export default function CourseShowPage({
                                 return (
                                     <div
                                         key={mod.id}
-                                        className="overflow-hidden rounded-2xl border border-slate-200 bg-[#F7F9FC]"
+                                        className="overflow-hidden rounded-2xl border border-slate-200 bg-[#F5F8F7]"
                                     >
                                         <div className="flex items-center justify-between px-5 py-4 transition hover:bg-slate-100/70">
                                             <button
@@ -338,11 +338,11 @@ export default function CourseShowPage({
                                                 onClick={() => toggleModule(mod.id)}
                                                 className="flex flex-1 items-center gap-3 text-left"
                                             >
-                                                <span className="flex size-7 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-[#1769E0]">
+                                                <span className="flex size-7 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-[#078675]">
                                                     {modIdx + 1}
                                                 </span>
                                                 <div>
-                                                    <h3 className="text-sm font-bold text-[#0B1528]">
+                                                    <h3 className="text-sm font-bold text-[#173A5E]">
                                                         {mod.title}
                                                     </h3>
                                                     {mod.description && (
@@ -361,7 +361,7 @@ export default function CourseShowPage({
                                                     <button
                                                         type="button"
                                                         onClick={() => setAddingLessonModuleId(addingLessonModuleId === mod.id ? null : mod.id)}
-                                                        className="flex items-center gap-1 rounded-lg border border-blue-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1769E0] hover:bg-blue-50"
+                                                        className="flex items-center gap-1 rounded-lg border border-[#078675]/20 bg-white px-2.5 py-1 text-[11px] font-semibold text-[#078675] hover:bg-[#078675]/10"
                                                     >
                                                         <Plus className="size-3" />
                                                         <span>Add Lesson</span>
@@ -383,7 +383,7 @@ export default function CourseShowPage({
                                                     className="p-1 text-slate-400 hover:text-slate-600"
                                                 >
                                                     <ChevronDown
-                                                        className={`size-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-[#1769E0]' : ''}`}
+                                                        className={`size-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-[#078675]' : ''}`}
                                                     />
                                                 </button>
                                             </div>
@@ -406,7 +406,7 @@ export default function CourseShowPage({
                                                             placeholder="Lesson title e.g. Scope, Hoisting & Closures"
                                                             value={newLessonTitle}
                                                             onChange={(e) => setNewLessonTitle(e.target.value)}
-                                                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[#1769E0]"
+                                                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[#078675]"
                                                         />
                                                     </div>
                                                     <div>
@@ -416,7 +416,7 @@ export default function CourseShowPage({
                                                             placeholder="Minutes"
                                                             value={newLessonDuration}
                                                             onChange={(e) => setNewLessonDuration(parseInt(e.target.value) || 15)}
-                                                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[#1769E0]"
+                                                            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-900 outline-none focus:border-[#078675]"
                                                         />
                                                     </div>
                                                 </div>
@@ -426,7 +426,7 @@ export default function CourseShowPage({
                                                             type="checkbox"
                                                             checked={newLessonPreview}
                                                             onChange={(e) => setNewLessonPreview(e.target.checked)}
-                                                            className="rounded text-[#1769E0]"
+                                                            className="rounded text-[#078675]"
                                                         />
                                                         <span>Allow Free Preview</span>
                                                     </label>
@@ -440,7 +440,7 @@ export default function CourseShowPage({
                                                         </button>
                                                         <button
                                                             type="submit"
-                                                            className="rounded-xl bg-[#1769E0] px-3 py-1 text-xs font-bold text-white hover:bg-[#1256B8]"
+                                                            className="rounded-xl bg-[#173A5E] px-3 py-1 text-xs font-bold text-white hover:bg-[#056b5e]"
                                                         >
                                                             Save Lesson
                                                         </button>
@@ -462,7 +462,7 @@ export default function CourseShowPage({
                                                             className="flex items-center justify-between px-6 py-3.5 transition hover:bg-slate-50"
                                                         >
                                                             <div className="flex min-w-0 items-center gap-3">
-                                                                <PlayCircle className="size-4 shrink-0 text-[#1769E0]" />
+                                                                <PlayCircle className="size-4 shrink-0 text-[#078675]" />
                                                                 <div className="min-w-0">
                                                                     <div className="truncate text-xs font-bold text-slate-900">
                                                                         {les.title}
@@ -477,7 +477,7 @@ export default function CourseShowPage({
                                                                 {isEnrolled || les.is_free_preview ? (
                                                                     <Link
                                                                         href={`/learning/courses/${course.slug}/lessons/${les.slug}`}
-                                                                        className="flex items-center gap-1 text-xs font-bold text-[#1769E0] hover:underline"
+                                                                        className="flex items-center gap-1 text-xs font-bold text-[#078675] hover:underline"
                                                                     >
                                                                         <span>
                                                                             {les.is_free_preview && !isEnrolled

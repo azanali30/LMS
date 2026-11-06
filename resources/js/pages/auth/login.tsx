@@ -53,7 +53,7 @@ export default function Login({ status, canResetPassword }: Props) {
             <Head title={tenant?.name ? `${tenant.name} - Log in` : 'Log in'} />
 
             {tenant?.name && (
-                <div className="mb-4 flex items-center justify-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50/80 px-3 py-1.5 text-xs font-semibold text-[#1769E0] dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300">
+                <div className="mb-4 flex items-center justify-center gap-1.5 rounded-lg border border-[#078675]/20 bg-[#078675]/10 px-3 py-1.5 text-xs font-semibold text-[#078675] dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300">
                     <span>School Portal: <strong>{tenant.name}</strong></span>
                 </div>
             )}
@@ -84,7 +84,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="you@example.com"
-                                    className="h-10 focus-visible:ring-[#1769E0] focus-visible:border-[#1769E0]"
+                                    className="h-10 focus-visible:ring-[#078675] focus-visible:border-[#078675]"
                                 />
                                 <InputError message={errors.email} />
                             </div>
@@ -100,7 +100,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="text-xs font-semibold text-[#1769E0] hover:text-[#1256B8] dark:text-blue-400"
+                                            className="text-xs font-semibold text-[#078675] hover:text-[#056b5e] dark:text-blue-400"
                                             tabIndex={5}
                                         >
                                             Forgot password?
@@ -114,7 +114,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Enter your password"
-                                    className="h-10 focus-visible:ring-[#1769E0] focus-visible:border-[#1769E0]"
+                                    className="h-10 focus-visible:ring-[#078675] focus-visible:border-[#078675]"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -124,7 +124,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
-                                    className="data-[state=checked]:border-[#1769E0] data-[state=checked]:bg-[#1769E0]"
+                                    className="data-[state=checked]:border-[#078675] data-[state=checked]:bg-[#173A5E]"
                                 />
                                 <Label
                                     htmlFor="remember"
@@ -136,7 +136,7 @@ export default function Login({ status, canResetPassword }: Props) {
 
                             <Button
                                 type="submit"
-                                className="mt-2 h-10 w-full cursor-pointer bg-[#1769E0] font-semibold text-white shadow-md shadow-blue-500/20 transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60"
+                                className="mt-2 h-10 w-full cursor-pointer bg-[#173A5E] font-semibold text-white shadow-md shadow-[#078675]/20 transition-all hover:opacity-90 active:scale-[0.99] disabled:opacity-60"
                                 style={tenant?.primary_color ? { backgroundColor: tenant.primary_color } : undefined}
                                 tabIndex={4}
                                 disabled={processing}
@@ -154,7 +154,7 @@ export default function Login({ status, canResetPassword }: Props) {
                             <TextLink
                                 href={register()}
                                 tabIndex={5}
-                                className="font-bold text-[#FF7A30] hover:text-[#E5661E]"
+                                className="font-bold text-[#E49A2E] hover:text-[#d08a24]"
                             >
                                 Get Started Free
                             </TextLink>
@@ -166,7 +166,7 @@ export default function Login({ status, canResetPassword }: Props) {
             {!tenant && (
                 <div className="mt-6 rounded-2xl border border-slate-200/90 bg-slate-50/70 p-4 text-xs dark:border-slate-800 dark:bg-slate-900/60">
                     <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200 mb-1">
-                        <Building2 className="size-3.5 text-[#1769E0]" />
+                        <Building2 className="size-3.5 text-[#078675]" />
                         <span>Accessing Your School or Academy?</span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5">
@@ -181,11 +181,11 @@ export default function Login({ status, canResetPassword }: Props) {
                                 setSubdomainError('');
                             }}
                             placeholder="e.g. greenvalley"
-                            className="h-8.5 flex-1 rounded-lg border border-slate-300 bg-white px-2.5 text-xs text-slate-800 placeholder:text-slate-400 focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                            className="h-8.5 flex-1 rounded-lg border border-slate-300 bg-white px-2.5 text-xs text-slate-800 placeholder:text-slate-400 focus:border-[#078675] focus:ring-1 focus:ring-[#078675] focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                         />
                         <button
                             type="submit"
-                            className="h-8.5 rounded-lg bg-[#1769E0] px-3 text-xs font-semibold text-white hover:bg-[#1256B8] transition-colors"
+                            className="h-8.5 rounded-lg bg-[#173A5E] px-3 text-xs font-semibold text-white hover:bg-[#056b5e] transition-colors"
                         >
                             Go &rarr;
                         </button>

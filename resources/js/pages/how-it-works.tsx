@@ -117,11 +117,11 @@ export default function HowItWorksPage() {
                 {/* Hero Header */}
                 <section className="relative mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-semibold text-[#1769E0]">
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
                             <Sparkles className="size-3.5" />
                             <span>Platform Architecture & Workflows</span>
                         </div>
-                        <h1 className="text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-5xl">
+                        <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl">
                             How Our Platform Works for Every Role
                         </h1>
                         <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg leading-relaxed">
@@ -144,7 +144,7 @@ export default function HowItWorksPage() {
                                         onClick={() => setActiveTab(t.id as any)}
                                         className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition sm:px-6 sm:text-sm cursor-pointer ${
                                             isSelected
-                                                ? 'bg-[#1769E0] text-white shadow-sm shadow-blue-500/25'
+                                                ? 'bg-[#173A5E] text-white shadow-sm shadow-[#078675]/25'
                                                 : 'text-slate-600 hover:text-slate-900'
                                         }`}
                                     >
@@ -159,16 +159,16 @@ export default function HowItWorksPage() {
 
                 {/* Active Journey Presentation */}
                 <section className="mx-auto mt-12 w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                    <div className="rounded-3xl border border-slate-200 bg-[#F7F9FC] p-6 shadow-sm sm:p-12">
+                    <div className="rounded-3xl border border-slate-200 bg-[#F5F8F7] p-6 shadow-sm sm:p-12">
                         <div className="mb-4 flex items-center gap-3.5">
-                            <div className="flex size-11 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                            <div className="flex size-11 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
                                 <JourneyIcon className="size-5.5" />
                             </div>
                             <div>
-                                <span className="block text-[11px] font-bold tracking-wider text-[#1769E0] uppercase">
+                                <span className="block text-[11px] font-bold tracking-wider text-[#078675] uppercase">
                                     {currentJourney.badge}
                                 </span>
-                                <h2 className="text-xl font-extrabold tracking-tight text-[#0B1528] sm:text-2xl">
+                                <h2 className="text-xl font-extrabold tracking-tight text-[#173A5E] sm:text-2xl">
                                     {currentJourney.title}
                                 </h2>
                             </div>
@@ -183,10 +183,10 @@ export default function HowItWorksPage() {
                             {currentJourney.steps.map((st, i) => (
                                 <div
                                     key={i}
-                                    className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:border-[#1769E0]/40 hover:shadow-xs"
+                                    className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:border-[#078675]/40 hover:shadow-xs"
                                 >
                                     <div>
-                                        <span className="mb-2 block font-mono text-2xl font-black text-[#1769E0]">
+                                        <span className="mb-2 block font-mono text-2xl font-black text-[#078675]">
                                             {st.num}
                                         </span>
                                         <h3 className="mb-2 text-base font-bold text-slate-900">
@@ -207,7 +207,7 @@ export default function HowItWorksPage() {
                             </span>
                             <Button
                                 asChild
-                                className="bg-[#FF7A30] font-bold text-white shadow-md hover:bg-[#E5661E]"
+                                className="bg-[#E49A2E] font-bold text-white shadow-md hover:bg-[#d08a24]"
                             >
                                 <Link href={currentJourney.ctaLink}>
                                     <span>{currentJourney.ctaText}</span>

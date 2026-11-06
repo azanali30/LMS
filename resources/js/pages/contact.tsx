@@ -70,11 +70,11 @@ export default function ContactPage() {
                 {/* Hero Header */}
                 <section className="relative mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-semibold text-[#1769E0]">
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
                             <MessageSquare className="size-3.5" />
                             <span>Direct Institutional Communication</span>
                         </div>
-                        <h1 className="text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-5xl">
+                        <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl">
                             We're Here to Support Your Campus
                         </h1>
                         <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg leading-relaxed">
@@ -88,13 +88,13 @@ export default function ContactPage() {
                     <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                         {/* Contact Information & Channels */}
                         <div className="space-y-6 lg:col-span-5">
-                            <div className="rounded-3xl border border-slate-200 bg-[#F7F9FC] p-6 sm:p-8 shadow-xs">
-                                <h2 className="mb-6 text-lg font-extrabold text-[#0B1528]">
+                            <div className="rounded-3xl border border-slate-200 bg-[#F5F8F7] p-6 sm:p-8 shadow-xs">
+                                <h2 className="mb-6 text-lg font-extrabold text-[#173A5E]">
                                     Direct Channels
                                 </h2>
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-4">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
                                             <Mail className="size-5" />
                                         </div>
                                         <div>
@@ -111,7 +111,7 @@ export default function ContactPage() {
                                     </div>
 
                                     <div className="flex items-start gap-4">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
                                             <Phone className="size-5" />
                                         </div>
                                         <div>
@@ -128,7 +128,7 @@ export default function ContactPage() {
                                     </div>
 
                                     <div className="flex items-start gap-4">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
                                             <MapPin className="size-5" />
                                         </div>
                                         <div>
@@ -145,7 +145,7 @@ export default function ContactPage() {
                                     </div>
 
                                     <div className="flex items-start gap-4">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
                                             <Clock className="size-5" />
                                         </div>
                                         <div>
@@ -167,7 +167,7 @@ export default function ContactPage() {
                         {/* Interactive Contact Form */}
                         <div className="lg:col-span-7">
                             <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xs">
-                                <h2 className="mb-2 text-xl font-bold tracking-tight text-[#0B1528]">
+                                <h2 className="mb-2 text-xl font-bold tracking-tight text-[#173A5E]">
                                     Send Us an Inquiry
                                 </h2>
                                 <p className="mb-6 text-xs text-slate-500">
@@ -193,7 +193,7 @@ export default function ContactPage() {
                                                 placeholder="Dr. Sarah Jenkins"
                                                 value={data.name}
                                                 onChange={(e) => setData('name', e.target.value)}
-                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition outline-none focus:border-[#1769E0] focus:bg-white focus:ring-2 focus:ring-[#1769E0]/20"
+                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition outline-none focus:border-[#078675] focus:bg-white focus:ring-2 focus:ring-[#078675]/20"
                                             />
                                             {errors.name && (
                                                 <p className="mt-1 text-xs text-rose-500 font-medium">
@@ -212,7 +212,7 @@ export default function ContactPage() {
                                                 placeholder="s.jenkins@academy.edu"
                                                 value={data.email}
                                                 onChange={(e) => setData('email', e.target.value)}
-                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition outline-none focus:border-[#1769E0] focus:bg-white focus:ring-2 focus:ring-[#1769E0]/20"
+                                                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition outline-none focus:border-[#078675] focus:bg-white focus:ring-2 focus:ring-[#078675]/20"
                                             />
                                             {errors.email && (
                                                 <p className="mt-1 text-xs text-rose-500 font-medium">
@@ -232,7 +232,7 @@ export default function ContactPage() {
                                             placeholder="e.g. School Enterprise Deployment & Onboarding Assistance"
                                             value={data.subject}
                                             onChange={(e) => setData('subject', e.target.value)}
-                                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition outline-none focus:border-[#1769E0] focus:bg-white focus:ring-2 focus:ring-[#1769E0]/20"
+                                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition outline-none focus:border-[#078675] focus:bg-white focus:ring-2 focus:ring-[#078675]/20"
                                         />
                                         {errors.subject && (
                                             <p className="mt-1 text-xs text-rose-500 font-medium">
@@ -251,7 +251,7 @@ export default function ContactPage() {
                                             placeholder="Provide context regarding your institution, student body size, or technical questions..."
                                             value={data.message}
                                             onChange={(e) => setData('message', e.target.value)}
-                                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition outline-none focus:border-[#1769E0] focus:bg-white focus:ring-2 focus:ring-[#1769E0]/20"
+                                            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-slate-900 placeholder-slate-400 transition outline-none focus:border-[#078675] focus:bg-white focus:ring-2 focus:ring-[#078675]/20"
                                         />
                                         {errors.message && (
                                             <p className="mt-1 text-xs text-rose-500 font-medium">
@@ -263,7 +263,7 @@ export default function ContactPage() {
                                     <Button
                                         type="submit"
                                         disabled={processing}
-                                        className="w-full h-11 bg-[#FF7A30] font-bold text-white shadow-md hover:bg-[#E5661E] disabled:opacity-60 cursor-pointer"
+                                        className="w-full h-11 bg-[#E49A2E] font-bold text-white shadow-md hover:bg-[#d08a24] disabled:opacity-60 cursor-pointer"
                                     >
                                         {processing ? (
                                             <>
@@ -286,11 +286,11 @@ export default function ContactPage() {
                 {/* FAQ Section */}
                 <section className="mx-auto mt-20 max-w-4xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-8 text-center">
-                        <div className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#1769E0] uppercase">
+                        <div className="mb-1 inline-flex items-center gap-1.5 text-xs font-bold tracking-wider text-[#078675] uppercase">
                             <HelpCircle className="size-3.5" />
                             <span>Quick Answers</span>
                         </div>
-                        <h2 className="text-2xl font-extrabold tracking-tight text-[#0B1528]">
+                        <h2 className="text-2xl font-extrabold tracking-tight text-[#173A5E]">
                             Frequently Asked Questions
                         </h2>
                     </div>
@@ -310,7 +310,7 @@ export default function ContactPage() {
                                     >
                                         <span>{faq.q}</span>
                                         <ChevronDown
-                                            className={`size-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-[#1769E0]' : ''}`}
+                                            className={`size-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-[#078675]' : ''}`}
                                         />
                                     </button>
                                     {isOpen && (

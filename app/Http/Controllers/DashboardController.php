@@ -40,8 +40,8 @@ class DashboardController extends Controller
             return redirect()->route('invitations.accept', ['token' => $pendingToken]);
         }
 
-        // 1. Super Admin Platform Dashboard -> Redirect to dedicated Platform Admin Portal
-        if ($user->isSuperAdmin()) {
+        // 1. Super Admin Platform Dashboard -> Redirect to dedicated Platform Admin Portal when not in a tenant context
+        if ($user->isSuperAdmin() && !TenantContext::check()) {
             return redirect()->route('platform-admin.dashboard');
         }
 

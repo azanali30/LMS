@@ -28,7 +28,7 @@ export default function CompleteSuccess({
                             <span>30-Day Free Trial Active</span>
                         </div>
 
-                        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-[#0B1528]">
+                        <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-[#173A5E]">
                             Workspace Ready!
                         </h1>
 
@@ -43,7 +43,7 @@ export default function CompleteSuccess({
                             </div>
                             <div className="flex justify-between border-b border-slate-200/80 pb-2">
                                 <span className="text-slate-500">Portal Subdomain:</span>
-                                <span className="font-mono font-bold text-[#1769E0]">{subdomain}.institutopropio.com</span>
+                                <span className="font-mono font-bold text-[#078675]">{subdomain}.institutopropio.com</span>
                             </div>
                             <div className="flex justify-between pt-1">
                                 <span className="text-slate-500">Role:</span>
@@ -54,7 +54,7 @@ export default function CompleteSuccess({
                         <div className="space-y-3">
                             <Link
                                 href="/login"
-                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#E49A2E] py-3 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                             >
                                 <LogIn className="size-4" />
                                 <span>Log In to Your Account</span>

@@ -107,7 +107,7 @@ export default function CoursesCatalogPage({
         if (normalized.includes('adv')) {
             return {
                 label: 'Advanced',
-                className: 'bg-blue-50 text-[#1769E0] border-blue-200',
+                className: 'bg-[#078675]/10 text-[#078675] border-[#078675]/20',
             };
         }
         return {
@@ -123,12 +123,12 @@ export default function CoursesCatalogPage({
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
                         <div className="max-w-4xl">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3.5 py-1 text-xs font-semibold text-[#1769E0]">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
                                 <Sparkles className="size-3.5" />
                                 <span>Curated Specializations & Cohort Tracks</span>
                             </div>
 
-                            <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-5xl lg:text-6xl">
+                            <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl lg:text-6xl">
                                 Explore Courses & Learning Tracks
                             </h1>
 
@@ -139,12 +139,12 @@ export default function CoursesCatalogPage({
 
                         {/* Quick Trust Badges on the right */}
                         <div className="flex flex-wrap items-center gap-3 self-start lg:self-end">
-                            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-[#F7F9FC] px-4 py-2.5 text-xs font-medium text-slate-700 shadow-xs">
-                                <Award className="size-4 text-[#1769E0]" />
+                            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-[#F5F8F7] px-4 py-2.5 text-xs font-medium text-slate-700 shadow-xs">
+                                <Award className="size-4 text-[#078675]" />
                                 <span>Verifiable Digital Certificates</span>
                             </div>
-                            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-[#F7F9FC] px-4 py-2.5 text-xs font-medium text-slate-700 shadow-xs">
-                                <GraduationCap className="size-4 text-[#1769E0]" />
+                            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-[#F5F8F7] px-4 py-2.5 text-xs font-medium text-slate-700 shadow-xs">
+                                <GraduationCap className="size-4 text-[#078675]" />
                                 <span>Multi-Tenant School Access</span>
                             </div>
                         </div>
@@ -153,7 +153,7 @@ export default function CoursesCatalogPage({
             </section>
 
             {/* FULL-WIDTH CATALOG BODY & FILTER SYSTEM */}
-            <section className="w-full bg-[#F7F9FC] py-10 sm:py-14 min-h-[700px]">
+            <section className="w-full bg-[#F5F8F7] py-10 sm:py-14 min-h-[700px]">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     
                     {/* FULL-WIDTH SEARCH & CATEGORY BAR */}
@@ -169,7 +169,7 @@ export default function CoursesCatalogPage({
                                     setSearch(e.target.value);
                                     handleFilter(selectedCategory, e.target.value);
                                 }}
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3.5 pl-11 pr-10 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#1769E0] focus:bg-white focus:ring-2 focus:ring-[#1769E0]/20"
+                                className="w-full rounded-xl border border-slate-200 bg-slate-50/70 py-3.5 pl-11 pr-10 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#078675] focus:bg-white focus:ring-2 focus:ring-[#078675]/20"
                             />
                             {search && (
                                 <button
@@ -200,7 +200,7 @@ export default function CoursesCatalogPage({
                                 }}
                                 className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
                                     selectedCategory === ''
-                                        ? 'bg-[#1769E0] text-white shadow-xs'
+                                        ? 'bg-[#173A5E] text-white shadow-xs'
                                         : 'border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                                 }`}
                             >
@@ -220,7 +220,7 @@ export default function CoursesCatalogPage({
                                         }}
                                         className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
                                             isActive
-                                                ? 'bg-[#1769E0] text-white shadow-xs'
+                                                ? 'bg-[#173A5E] text-white shadow-xs'
                                                 : 'border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                                         }`}
                                     >
@@ -262,7 +262,7 @@ export default function CoursesCatalogPage({
                                     setSelectedCategory('');
                                     handleFilter('', '');
                                 }}
-                                className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#1769E0]"
+                                className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-[#078675]"
                             >
                                 Clear All Filters
                             </button>
@@ -276,7 +276,7 @@ export default function CoursesCatalogPage({
                                 return (
                                     <div
                                         key={course.id}
-                                        className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-[#1769E0]/40 hover:shadow-xl"
+                                        className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-[#078675]/40 hover:shadow-xl"
                                     >
                                         {/* VISUAL IMAGE BANNER */}
                                         <div className="relative h-48 w-full overflow-hidden bg-slate-100">
@@ -291,7 +291,7 @@ export default function CoursesCatalogPage({
 
                                             {/* Category Badge on top-left */}
                                             <div className="absolute left-3 top-3">
-                                                <span className="inline-flex items-center rounded-full border border-white/60 bg-white/95 px-3 py-1 text-[11px] font-bold text-[#1769E0] shadow-xs backdrop-blur-xs">
+                                                <span className="inline-flex items-center rounded-full border border-white/60 bg-white/95 px-3 py-1 text-[11px] font-bold text-[#078675] shadow-xs backdrop-blur-xs">
                                                     {course.category?.name || 'Academic Track'}
                                                 </span>
                                             </div>
@@ -329,7 +329,7 @@ export default function CoursesCatalogPage({
                                                 )}
 
                                                 {/* Title */}
-                                                <h3 className="line-clamp-2 text-base font-bold text-slate-900 transition-colors group-hover:text-[#1769E0]">
+                                                <h3 className="line-clamp-2 text-base font-bold text-slate-900 transition-colors group-hover:text-[#078675]">
                                                     {course.title}
                                                 </h3>
 
@@ -353,7 +353,7 @@ export default function CoursesCatalogPage({
 
                                                 <Link
                                                     href={`/courses/${course.slug}`}
-                                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1769E0] px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#1256B8]"
+                                                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#173A5E] px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#056b5e]"
                                                 >
                                                     <PlayCircle className="size-4" />
                                                     <span>View Syllabus & Enroll</span>
@@ -377,7 +377,7 @@ export default function CoursesCatalogPage({
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                     className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition ${
                                         link.active
-                                            ? 'bg-[#1769E0] text-white shadow-xs'
+                                            ? 'bg-[#173A5E] text-white shadow-xs'
                                             : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 disabled:opacity-30'
                                     }`}
                                 />

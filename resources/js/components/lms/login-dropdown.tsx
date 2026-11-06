@@ -63,7 +63,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
         return (
             <div className="space-y-2">
                 <div className="flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-wider text-slate-400">
-                    <LogIn className="size-3.5 text-[#1769E0]" />
+                    <LogIn className="size-3.5 text-[#078675]" />
                     <span>Account Access</span>
                 </div>
                 <div className="divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
@@ -74,11 +74,11 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                         className="group flex items-center justify-between p-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0] transition-colors group-hover:bg-[#1769E0] group-hover:text-white dark:bg-blue-950/50 dark:text-blue-400">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675] transition-colors group-hover:bg-[#173A5E] group-hover:text-white dark:bg-blue-950/50 dark:text-blue-400">
                                 <LogIn className="size-4" />
                             </div>
                             <div>
-                                <span className="text-sm font-bold text-slate-900 group-hover:text-[#1769E0] dark:text-white">
+                                <span className="text-sm font-bold text-slate-900 group-hover:text-[#078675] dark:text-white">
                                     Login
                                 </span>
                                 <p className="text-xs text-slate-500 line-clamp-1 dark:text-slate-400">
@@ -86,7 +86,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                                 </p>
                             </div>
                         </div>
-                        <ArrowRight className="size-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#1769E0]" />
+                        <ArrowRight className="size-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#078675]" />
                     </Link>
 
                     {/* Item 2: Track Payment Application */}
@@ -96,11 +96,11 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                         className="group flex items-center justify-between p-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0] transition-colors group-hover:bg-[#1769E0] group-hover:text-white dark:bg-blue-950/50 dark:text-blue-400">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675] transition-colors group-hover:bg-[#173A5E] group-hover:text-white dark:bg-blue-950/50 dark:text-blue-400">
                                 <ClipboardCheck className="size-4" />
                             </div>
                             <div>
-                                <span className="text-sm font-bold text-slate-900 group-hover:text-[#1769E0] dark:text-white">
+                                <span className="text-sm font-bold text-slate-900 group-hover:text-[#078675] dark:text-white">
                                     Track Payment Application
                                 </span>
                                 <p className="text-xs text-slate-500 line-clamp-1 dark:text-slate-400">
@@ -108,7 +108,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                                 </p>
                             </div>
                         </div>
-                        <ArrowRight className="size-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#1769E0]" />
+                        <ArrowRight className="size-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#078675]" />
                     </Link>
 
                     {/* Item 3: Download Desktop App */}
@@ -118,12 +118,12 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                         className="group flex items-center justify-between p-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60"
                     >
                         <div className="flex items-center gap-3">
-                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors group-hover:bg-blue-50 group-hover:text-[#1769E0] dark:bg-slate-800 dark:text-slate-300">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors group-hover:bg-[#078675]/10 group-hover:text-[#078675] dark:bg-slate-800 dark:text-slate-300">
                                 <Laptop className="size-4" />
                             </div>
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm font-bold text-slate-900 group-hover:text-[#1769E0] dark:text-white">
+                                    <span className="text-sm font-bold text-slate-900 group-hover:text-[#078675] dark:text-white">
                                         Download Desktop App
                                     </span>
                                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-950/50 dark:text-amber-300">
@@ -135,7 +135,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                                 </p>
                             </div>
                         </div>
-                        <ArrowRight className="size-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#1769E0]" />
+                        <ArrowRight className="size-4 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#078675]" />
                     </Link>
 
                     {/* Footer: Register Your School */}
@@ -143,7 +143,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                         <Link
                             href="/register?journey=school"
                             onClick={handleSelect}
-                            className="group flex items-center justify-between text-xs font-semibold text-[#1769E0] hover:text-[#1256B8] dark:text-blue-400"
+                            className="group flex items-center justify-between text-xs font-semibold text-[#078675] hover:text-[#056b5e] dark:text-blue-400"
                         >
                             <span className="flex items-center gap-1.5">
                                 <Sparkles className="size-3.5" />
@@ -165,17 +165,17 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 aria-label="Toggle Login Menu"
-                className={`group inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1769E0] ${
+                className={`group inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#078675] ${
                     isOpen
-                        ? 'bg-blue-50 text-[#1769E0]'
-                        : 'text-slate-600 hover:text-[#1769E0]'
+                        ? 'bg-[#078675]/10 text-[#078675]'
+                        : 'text-slate-600 hover:text-[#078675]'
                 }`}
             >
-                <LogIn className="size-3.5 text-slate-400 transition-colors group-hover:text-[#1769E0]" />
+                <LogIn className="size-3.5 text-slate-400 transition-colors group-hover:text-[#078675]" />
                 <span>Login</span>
                 <ChevronDown
-                    className={`size-3 text-slate-400 transition-transform duration-200 group-hover:text-[#1769E0] ${
-                        isOpen ? 'rotate-180 text-[#1769E0]' : ''
+                    className={`size-3 text-slate-400 transition-transform duration-200 group-hover:text-[#078675] ${
+                        isOpen ? 'rotate-180 text-[#078675]' : ''
                     }`}
                 />
             </button>
@@ -196,12 +196,12 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                             className="group flex items-center justify-between rounded-xl p-2.5 transition-all duration-150 hover:bg-slate-50 focus-visible:bg-slate-50 focus-visible:outline-none dark:hover:bg-slate-800/60"
                         >
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0] shadow-2xs ring-1 ring-blue-100 transition-all group-hover:bg-[#1769E0] group-hover:text-white dark:bg-blue-950/60 dark:text-blue-400 dark:ring-blue-900/60">
+                                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675] shadow-2xs ring-1 ring-[#078675]/20 transition-all group-hover:bg-[#173A5E] group-hover:text-white dark:bg-blue-950/60 dark:text-blue-400 dark:ring-blue-900/60">
                                     <LogIn className="size-4.5" />
                                 </div>
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="text-xs font-bold text-slate-900 group-hover:text-[#1769E0] dark:text-white dark:group-hover:text-blue-400">
+                                        <span className="text-xs font-bold text-slate-900 group-hover:text-[#078675] dark:text-white dark:group-hover:text-blue-400">
                                             Login
                                         </span>
                                     </div>
@@ -210,7 +210,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                                     </p>
                                 </div>
                             </div>
-                            <ArrowRight className="size-3.5 shrink-0 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-[#1769E0] group-hover:opacity-100" />
+                            <ArrowRight className="size-3.5 shrink-0 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-[#078675] group-hover:opacity-100" />
                         </Link>
 
                         {/* 2. Track Payment Application Item */}
@@ -221,12 +221,12 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                             className="group flex items-center justify-between rounded-xl p-2.5 transition-all duration-150 hover:bg-slate-50 focus-visible:bg-slate-50 focus-visible:outline-none dark:hover:bg-slate-800/60"
                         >
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0] shadow-2xs ring-1 ring-blue-100 transition-all group-hover:bg-[#1769E0] group-hover:text-white dark:bg-blue-950/60 dark:text-blue-400 dark:ring-blue-900/60">
+                                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675] shadow-2xs ring-1 ring-[#078675]/20 transition-all group-hover:bg-[#173A5E] group-hover:text-white dark:bg-blue-950/60 dark:text-blue-400 dark:ring-blue-900/60">
                                     <ClipboardCheck className="size-4.5" />
                                 </div>
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="text-xs font-bold text-slate-900 group-hover:text-[#1769E0] dark:text-white dark:group-hover:text-blue-400">
+                                        <span className="text-xs font-bold text-slate-900 group-hover:text-[#078675] dark:text-white dark:group-hover:text-blue-400">
                                             Track Payment Application
                                         </span>
                                     </div>
@@ -235,7 +235,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                                     </p>
                                 </div>
                             </div>
-                            <ArrowRight className="size-3.5 shrink-0 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-[#1769E0] group-hover:opacity-100" />
+                            <ArrowRight className="size-3.5 shrink-0 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-[#078675] group-hover:opacity-100" />
                         </Link>
 
                         {/* 3. Download Desktop App Item */}
@@ -246,12 +246,12 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                             className="group flex items-center justify-between rounded-xl p-2.5 transition-all duration-150 hover:bg-slate-50 focus-visible:bg-slate-50 focus-visible:outline-none dark:hover:bg-slate-800/60"
                         >
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 shadow-2xs ring-1 ring-slate-200/80 transition-all group-hover:bg-blue-50 group-hover:text-[#1769E0] group-hover:ring-blue-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
+                                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700 shadow-2xs ring-1 ring-slate-200/80 transition-all group-hover:bg-[#078675]/10 group-hover:text-[#078675] group-hover:ring-blue-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
                                     <Laptop className="size-4.5" />
                                 </div>
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs font-bold text-slate-900 group-hover:text-[#1769E0] dark:text-white dark:group-hover:text-blue-400">
+                                        <span className="text-xs font-bold text-slate-900 group-hover:text-[#078675] dark:text-white dark:group-hover:text-blue-400">
                                             Download Desktop App
                                         </span>
                                         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
@@ -263,7 +263,7 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                                     </p>
                                 </div>
                             </div>
-                            <ArrowRight className="size-3.5 shrink-0 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-[#1769E0] group-hover:opacity-100" />
+                            <ArrowRight className="size-3.5 shrink-0 text-slate-300 opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-[#078675] group-hover:opacity-100" />
                         </Link>
                     </div>
 
@@ -273,10 +273,10 @@ export default function LoginDropdown({ variant = 'utility', onCloseMenu }: Logi
                             href="/register?journey=school"
                             role="menuitem"
                             onClick={handleSelect}
-                            className="group flex items-center justify-between text-xs font-semibold text-[#1769E0] hover:text-[#1256B8] transition-colors dark:text-blue-400 dark:hover:text-blue-300"
+                            className="group flex items-center justify-between text-xs font-semibold text-[#078675] hover:text-[#056b5e] transition-colors dark:text-blue-400 dark:hover:text-blue-300"
                         >
                             <span className="flex items-center gap-1.5">
-                                <Sparkles className="size-3 text-[#1769E0] dark:text-blue-400" />
+                                <Sparkles className="size-3 text-[#078675] dark:text-blue-400" />
                                 <span>Register Your School</span>
                             </span>
                             <span className="transition-transform duration-150 group-hover:translate-x-1">&rarr;</span>

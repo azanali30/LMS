@@ -397,11 +397,11 @@ export default function RegisterOnboarding({
                     {/* Step Indicator Header (Steps 1 to 4) */}
                     {step < 5 && (
                         <div className="mx-auto max-w-3xl text-center mb-10 sm:mb-12">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/90 px-3.5 py-1 text-xs font-bold text-[#1769E0]">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-bold text-[#078675]">
                                 <Sparkles className="size-3.5" />
                                 <span>Official 30-Day Free Trial • Instant Multi-Campus Activation</span>
                             </div>
-                            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#0B1528] sm:text-4xl md:text-5xl">
+                            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-4xl md:text-5xl">
                                 Get Started with InstitutoPropio
                             </h1>
                             <p className="mt-3 text-sm text-slate-600 sm:text-base leading-relaxed">
@@ -432,7 +432,7 @@ export default function RegisterOnboarding({
                                                     <div
                                                         className={`flex size-8 sm:size-9 items-center justify-center rounded-full text-xs font-extrabold transition-all ${
                                                             isCurrent
-                                                                ? 'border-2 border-[#1769E0] bg-[#1769E0] text-white shadow-md shadow-blue-600/25 ring-2 ring-blue-500/20'
+                                                                ? 'border-2 border-[#078675] bg-[#173A5E] text-white shadow-md shadow-blue-600/25 ring-2 ring-blue-500/20'
                                                                 : isCompleted
                                                                 ? 'border border-emerald-500 bg-emerald-50 text-emerald-600'
                                                                 : 'border border-slate-200 bg-slate-100 text-slate-400'
@@ -443,7 +443,7 @@ export default function RegisterOnboarding({
                                                     <span
                                                         className={`mt-1.5 text-[11px] sm:text-xs font-bold ${
                                                             isCurrent
-                                                                ? 'text-[#1769E0]'
+                                                                ? 'text-[#078675]'
                                                                 : isCompleted
                                                                 ? 'text-emerald-700'
                                                                 : 'text-slate-400'
@@ -475,11 +475,11 @@ export default function RegisterOnboarding({
                                 <div className="p-6 sm:p-10 lg:col-span-7 flex flex-col justify-between">
                                     <div>
                                         <div className="mb-6 flex items-center gap-3">
-                                            <div className="flex size-11 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                                            <div className="flex size-11 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
                                                 <Mail className="size-5.5" />
                                             </div>
                                             <div>
-                                                <h2 className="text-xl font-bold text-[#0B1528]">Step 1 — Administrative Email</h2>
+                                                <h2 className="text-xl font-bold text-[#173A5E]">Step 1 — Administrative Email</h2>
                                                 <p className="text-xs text-slate-500 mt-0.5">
                                                     Only your primary work email is needed to start your application.
                                                 </p>
@@ -499,7 +499,7 @@ export default function RegisterOnboarding({
                                                             <div className="pt-1">
                                                                 <Link
                                                                     href={emailActionUrl}
-                                                                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#1769E0] px-3.5 py-1.5 font-bold text-white shadow-xs transition hover:bg-[#1256B8]"
+                                                                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#173A5E] px-3.5 py-1.5 font-bold text-white shadow-xs transition hover:bg-[#056b5e]"
                                                                 >
                                                                     <span>{emailActionLabel}</span>
                                                                 </Link>
@@ -535,7 +535,7 @@ export default function RegisterOnboarding({
                                                             setEmailActionUrl(null);
                                                         }}
                                                         placeholder="director@schoolname.edu"
-                                                        className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                                        className="h-11 w-full rounded-xl border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                                     />
                                                 </div>
                                                 <p className="mt-2 text-xs text-slate-500 leading-relaxed">
@@ -546,7 +546,7 @@ export default function RegisterOnboarding({
                                             <button
                                                 type="submit"
                                                 disabled={emailLoading}
-                                                className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#FF7A30] font-bold text-sm text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E] disabled:opacity-50"
+                                                className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#E49A2E] font-bold text-sm text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24] disabled:opacity-50"
                                             >
                                                 {emailLoading ? (
                                                     <>
@@ -566,13 +566,13 @@ export default function RegisterOnboarding({
                                     <div className="mt-8 border-t border-slate-100 pt-5 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
                                         <span>
                                             Already registered?{' '}
-                                            <Link href="/login" className="font-bold text-[#1769E0] hover:underline">
+                                            <Link href="/login" className="font-bold text-[#078675] hover:underline">
                                                 Sign In
                                             </Link>
                                         </span>
                                         <span>
                                             Have an application?{' '}
-                                            <Link href="/onboarding/status" className="font-bold text-[#1769E0] hover:underline">
+                                            <Link href="/onboarding/status" className="font-bold text-[#078675] hover:underline">
                                                 Track Status
                                             </Link>
                                         </span>
@@ -580,12 +580,12 @@ export default function RegisterOnboarding({
                                 </div>
 
                                 {/* Right Column: Benefits & Trust Panel */}
-                                <div className="border-t border-slate-200 bg-[#F7F9FC] p-6 sm:p-10 lg:col-span-5 lg:border-t-0 lg:border-l flex flex-col justify-between">
+                                <div className="border-t border-slate-200 bg-[#F5F8F7] p-6 sm:p-10 lg:col-span-5 lg:border-t-0 lg:border-l flex flex-col justify-between">
                                     <div>
-                                        <span className="text-xs font-bold uppercase tracking-wider text-[#1769E0]">
+                                        <span className="text-xs font-bold uppercase tracking-wider text-[#078675]">
                                             Why InstitutoPropio?
                                         </span>
-                                        <h3 className="mt-2 text-lg font-extrabold tracking-tight text-[#0B1528]">
+                                        <h3 className="mt-2 text-lg font-extrabold tracking-tight text-[#173A5E]">
                                             The Modern Operating System for Educational Campuses
                                         </h3>
                                         <p className="mt-2 text-xs text-slate-600 leading-relaxed">
@@ -613,7 +613,7 @@ export default function RegisterOnboarding({
                                                 const Icon = b.icon;
                                                 return (
                                                     <div key={i} className="flex items-start gap-3">
-                                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-100/70 text-[#1769E0]">
+                                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-100/70 text-[#078675]">
                                                             <Icon className="size-4" />
                                                         </div>
                                                         <div>
@@ -626,10 +626,10 @@ export default function RegisterOnboarding({
                                         </div>
                                     </div>
 
-                                    <div className="mt-8 rounded-xl border border-blue-200 bg-blue-50/60 p-4">
+                                    <div className="mt-8 rounded-xl border border-[#078675]/20 bg-[#078675]/10 p-4">
                                         <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                                             <span>Already submitted payment?</span>
-                                            <Link href="/onboarding/status" className="font-bold text-[#1769E0] hover:underline">
+                                            <Link href="/onboarding/status" className="font-bold text-[#078675] hover:underline">
                                                 Track Status &rarr;
                                             </Link>
                                         </div>
@@ -646,13 +646,13 @@ export default function RegisterOnboarding({
                             <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:px-6 shadow-xs">
                                 <div className="flex items-center gap-2 text-xs text-slate-600">
                                     <span className="font-medium">Applying as:</span>
-                                    <span className="rounded-lg bg-blue-50 px-2.5 py-1 font-mono font-bold text-[#1769E0]">
+                                    <span className="rounded-lg bg-[#078675]/10 px-2.5 py-1 font-mono font-bold text-[#078675]">
                                         {email}
                                     </span>
                                     <button
                                         type="button"
                                         onClick={() => goToStep(1)}
-                                        className="ml-2 text-xs font-semibold text-[#1769E0] underline hover:text-[#1256B8]"
+                                        className="ml-2 text-xs font-semibold text-[#078675] underline hover:text-[#056b5e]"
                                     >
                                         Change Email
                                     </button>
@@ -668,7 +668,7 @@ export default function RegisterOnboarding({
                                         }}
                                         className={`rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${
                                             billingInterval === 'monthly'
-                                                ? 'bg-[#1769E0] text-white shadow-xs'
+                                                ? 'bg-[#173A5E] text-white shadow-xs'
                                                 : 'text-slate-600 hover:text-slate-900'
                                         }`}
                                     >
@@ -682,7 +682,7 @@ export default function RegisterOnboarding({
                                         }}
                                         className={`relative rounded-lg px-3.5 py-1.5 text-xs font-bold transition ${
                                             billingInterval === 'annual'
-                                                ? 'bg-[#1769E0] text-white shadow-xs'
+                                                ? 'bg-[#173A5E] text-white shadow-xs'
                                                 : 'text-slate-600 hover:text-slate-900'
                                         }`}
                                     >
@@ -713,23 +713,23 @@ export default function RegisterOnboarding({
                                             }}
                                             className={`relative flex cursor-pointer flex-col justify-between rounded-3xl border p-7 transition-all duration-200 ${
                                                 isSelected
-                                                    ? 'border-[#1769E0] ring-2 ring-[#1769E0]/20 bg-white shadow-lg'
-                                                    : 'border-slate-200 bg-[#F7F9FC] hover:border-slate-300 hover:bg-white hover:shadow-md'
+                                                    ? 'border-[#078675] ring-2 ring-[#078675]/20 bg-white shadow-lg'
+                                                    : 'border-slate-200 bg-[#F5F8F7] hover:border-slate-300 hover:bg-white hover:shadow-md'
                                             }`}
                                         >
                                             {isPopular && (
-                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#FF7A30] px-3.5 py-0.5 text-[10px] font-extrabold text-white shadow-md shadow-orange-500/20">
+                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#E49A2E] px-3.5 py-0.5 text-[10px] font-extrabold text-white shadow-md shadow-[#E49A2E]/20">
                                                     Most Popular Choice
                                                 </div>
                                             )}
 
                                             <div>
                                                 <div className="flex items-center justify-between">
-                                                    <h3 className="text-xl font-black text-[#0B1528]">{p.name}</h3>
+                                                    <h3 className="text-xl font-black text-[#173A5E]">{p.name}</h3>
                                                     <div
                                                         className={`flex size-5 items-center justify-center rounded-full border ${
                                                             isSelected
-                                                                ? 'border-[#1769E0] bg-[#1769E0] text-white'
+                                                                ? 'border-[#078675] bg-[#173A5E] text-white'
                                                                 : 'border-slate-300 bg-white'
                                                         }`}
                                                     >
@@ -741,7 +741,7 @@ export default function RegisterOnboarding({
 
                                                 <div className="my-5 border-y border-slate-100 py-4">
                                                     <div className="flex items-baseline gap-1">
-                                                        <span className="text-3xl font-extrabold text-[#0B1528]">
+                                                        <span className="text-3xl font-extrabold text-[#173A5E]">
                                                             {displayPrice}
                                                         </span>
                                                         <span className="text-xs text-slate-500 font-medium">{displayInterval}</span>
@@ -751,7 +751,7 @@ export default function RegisterOnboarding({
                                                             Equivalent to ${(p.yearly_cents / 1200).toFixed(2)}/mo
                                                         </p>
                                                     )}
-                                                    <span className="mt-2 inline-block rounded-md border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-[#1769E0]">
+                                                    <span className="mt-2 inline-block rounded-md border border-[#078675]/20 bg-[#078675]/10 px-2.5 py-0.5 text-xs font-bold text-[#078675]">
                                                         {p.max_organizations} {p.max_organizations === 1 ? 'Campus Workspace' : 'Campuses Included'}
                                                     </span>
                                                 </div>
@@ -760,7 +760,7 @@ export default function RegisterOnboarding({
                                                     <div className="text-xs font-bold text-slate-800">Included Features:</div>
                                                     {p.features.map((feat, i) => (
                                                         <div key={i} className="flex items-start gap-2 text-xs text-slate-600">
-                                                            <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-[#1769E0]" />
+                                                            <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-[#078675]" />
                                                             <span>{feat}</span>
                                                         </div>
                                                     ))}
@@ -775,8 +775,8 @@ export default function RegisterOnboarding({
                                                 }}
                                                 className={`mt-6 w-full rounded-xl py-2.5 text-xs font-bold transition ${
                                                     isSelected
-                                                        ? 'bg-[#1769E0] text-white shadow-md shadow-blue-500/20'
-                                                        : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-[#1769E0]'
+                                                        ? 'bg-[#173A5E] text-white shadow-md shadow-[#078675]/20'
+                                                        : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-[#078675]'
                                                 }`}
                                             >
                                                 {isSelected ? 'Plan Selected' : 'Choose Plan'}
@@ -812,7 +812,7 @@ export default function RegisterOnboarding({
                                     <button
                                         type="button"
                                         onClick={handleContinueToStep3}
-                                        className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#FF7A30] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                        className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#E49A2E] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                                     >
                                         <span>Continue to Payment Instructions</span>
                                         <ArrowRight className="size-4" />
@@ -826,12 +826,12 @@ export default function RegisterOnboarding({
                     {step === 3 && (
                         <div className="space-y-8 max-w-5xl mx-auto">
                             {/* Selected Order Summary Pill */}
-                            <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-blue-200 bg-blue-50/80 p-5 shadow-xs">
+                            <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#078675]/20 bg-[#078675]/10 p-5 shadow-xs">
                                 <div>
-                                    <span className="text-[10px] font-bold tracking-wider text-[#1769E0] uppercase">
+                                    <span className="text-[10px] font-bold tracking-wider text-[#078675] uppercase">
                                         Selected Subscription Order
                                     </span>
-                                    <h2 className="text-lg font-bold text-[#0B1528]">
+                                    <h2 className="text-lg font-bold text-[#173A5E]">
                                         {selectedPlan.name} Plan — {currentPriceDisplay}.00 {currency} ({billingInterval === 'annual' ? 'Annual Billing' : 'Monthly Billing'})
                                     </h2>
                                     <p className="text-xs text-slate-600 mt-0.5">
@@ -845,7 +845,7 @@ export default function RegisterOnboarding({
                                     <button
                                         type="button"
                                         onClick={() => goToStep(2)}
-                                        className="text-xs font-semibold text-[#1769E0] underline hover:text-[#1256B8]"
+                                        className="text-xs font-semibold text-[#078675] underline hover:text-[#056b5e]"
                                     >
                                         Change Plan
                                     </button>
@@ -854,7 +854,7 @@ export default function RegisterOnboarding({
 
                             {/* Payment Method Selector & Coordinates Card */}
                             <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-xs">
-                                <h3 className="text-base font-bold text-[#0B1528]">
+                                <h3 className="text-base font-bold text-[#173A5E]">
                                     Step 3 — Select Your Preferred Payment Channel
                                 </h3>
                                 <p className="mt-1 text-xs text-slate-500">
@@ -874,17 +874,17 @@ export default function RegisterOnboarding({
                                                 }}
                                                 className={`flex cursor-pointer flex-col items-start rounded-2xl border p-4 text-left transition-all ${
                                                     active
-                                                        ? 'border-[#1769E0] bg-blue-50/80 ring-2 ring-[#1769E0]/20 shadow-xs'
-                                                        : 'border-slate-200 bg-[#F7F9FC] hover:border-slate-300 hover:bg-white'
+                                                        ? 'border-[#078675] bg-[#078675]/10 ring-2 ring-[#078675]/20 shadow-xs'
+                                                        : 'border-slate-200 bg-[#F5F8F7] hover:border-slate-300 hover:bg-white'
                                                 }`}
                                             >
                                                 <div className="flex w-full items-center justify-between">
-                                                    <CreditCard className={`size-4.5 ${active ? 'text-[#1769E0]' : 'text-slate-400'}`} />
-                                                    {active && <Check className="size-4 text-[#1769E0] stroke-[3]" />}
+                                                    <CreditCard className={`size-4.5 ${active ? 'text-[#078675]' : 'text-slate-400'}`} />
+                                                    {active && <Check className="size-4 text-[#078675] stroke-[3]" />}
                                                 </div>
-                                                <span className={`mt-2.5 text-xs font-bold ${active ? 'text-[#1769E0]' : 'text-slate-900'}`}>{m.name}</span>
+                                                <span className={`mt-2.5 text-xs font-bold ${active ? 'text-[#078675]' : 'text-slate-900'}`}>{m.name}</span>
                                                 {m.badge && (
-                                                    <span className="mt-1 rounded-md bg-blue-100/70 px-1.5 py-0.5 text-[10px] font-bold text-[#1769E0]">{m.badge}</span>
+                                                    <span className="mt-1 rounded-md bg-blue-100/70 px-1.5 py-0.5 text-[10px] font-bold text-[#078675]">{m.badge}</span>
                                                 )}
                                             </button>
                                         );
@@ -895,8 +895,8 @@ export default function RegisterOnboarding({
                                 <div className="mt-8 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-6 sm:p-8">
                                     <div className="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-4">
                                         <div className="flex items-center gap-2">
-                                            <Building2 className="size-5 text-[#1769E0]" />
-                                            <span className="text-sm font-bold text-[#0B1528]">
+                                            <Building2 className="size-5 text-[#078675]" />
+                                            <span className="text-sm font-bold text-[#173A5E]">
                                                 {selectedMethod.name} Coordinates
                                             </span>
                                         </div>
@@ -1003,8 +1003,8 @@ export default function RegisterOnboarding({
                                         </div>
                                     )}
 
-                                    <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-slate-700">
-                                        <div className="font-bold text-[#1769E0]">Important Payment Instructions:</div>
+                                    <div className="mt-5 rounded-xl border border-[#078675]/20 bg-[#078675]/10 p-4 text-xs text-slate-700">
+                                        <div className="font-bold text-[#078675]">Important Payment Instructions:</div>
                                         <p className="mt-1 text-slate-600 leading-relaxed">
                                             {selectedMethod.instructions || 'Please use your institution email address as the payment transfer remarks. Save your transaction receipt or reference ID to upload in the next step.'}
                                         </p>
@@ -1022,7 +1022,7 @@ export default function RegisterOnboarding({
                                     <button
                                         type="button"
                                         onClick={handleContinueToStep4}
-                                        className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#FF7A30] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                        className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#E49A2E] px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                                     >
                                         <span>I Have Completed Payment &rarr; Upload Proof</span>
                                     </button>
@@ -1036,18 +1036,18 @@ export default function RegisterOnboarding({
                         <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white shadow-xs overflow-hidden">
                             <div className="grid grid-cols-1 lg:grid-cols-12">
                                 {/* Left Column: Order Summary & Review */}
-                                <div className="border-b border-slate-200 bg-[#F7F9FC] p-6 sm:p-10 lg:col-span-5 lg:border-b-0 lg:border-r flex flex-col justify-between">
+                                <div className="border-b border-slate-200 bg-[#F5F8F7] p-6 sm:p-10 lg:col-span-5 lg:border-b-0 lg:border-r flex flex-col justify-between">
                                     <div>
-                                        <div className="flex size-11 items-center justify-center rounded-xl bg-blue-50 text-[#1769E0]">
+                                        <div className="flex size-11 items-center justify-center rounded-xl bg-[#078675]/10 text-[#078675]">
                                             <Upload className="size-5.5" />
                                         </div>
-                                        <h2 className="mt-4 text-xl font-bold text-[#0B1528]">Step 4 — Upload Payment Receipt</h2>
+                                        <h2 className="mt-4 text-xl font-bold text-[#173A5E]">Step 4 — Upload Payment Receipt</h2>
                                         <p className="mt-1 text-xs text-slate-500 leading-relaxed">
                                             Attach your deposit voucher or transfer screenshot so our finance team can verify and approve your registration.
                                         </p>
 
                                         <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 space-y-3 shadow-xs">
-                                            <div className="text-xs font-bold text-[#0B1528] border-b border-slate-100 pb-2">
+                                            <div className="text-xs font-bold text-[#173A5E] border-b border-slate-100 pb-2">
                                                 Application Summary
                                             </div>
                                             <div className="flex justify-between text-xs">
@@ -1056,7 +1056,7 @@ export default function RegisterOnboarding({
                                             </div>
                                             <div className="flex justify-between text-xs">
                                                 <span className="text-slate-500">Plan:</span>
-                                                <span className="font-bold text-[#1769E0]">{selectedPlan.name}</span>
+                                                <span className="font-bold text-[#078675]">{selectedPlan.name}</span>
                                             </div>
                                             <div className="flex justify-between text-xs">
                                                 <span className="text-slate-500">Billing:</span>
@@ -1074,8 +1074,8 @@ export default function RegisterOnboarding({
                                             </div>
                                         </div>
 
-                                        <div className="mt-6 flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-xs text-slate-700">
-                                            <ShieldCheck className="size-4 shrink-0 text-[#1769E0] mt-0.5" />
+                                        <div className="mt-6 flex items-start gap-3 rounded-xl border border-[#078675]/20 bg-[#078675]/10 p-4 text-xs text-slate-700">
+                                            <ShieldCheck className="size-4 shrink-0 text-[#078675] mt-0.5" />
                                             <span>
                                                 Submissions are reviewed by our operations desk in real time. Once verified, you will receive an automated invitation to activate your school.
                                             </span>
@@ -1083,7 +1083,7 @@ export default function RegisterOnboarding({
                                     </div>
 
                                     <div className="mt-8 text-xs text-slate-500">
-                                        Need help? <Link href="/contact" className="font-bold text-[#1769E0] hover:underline">Contact verification support</Link>
+                                        Need help? <Link href="/contact" className="font-bold text-[#078675] hover:underline">Contact verification support</Link>
                                     </div>
                                 </div>
 
@@ -1107,7 +1107,7 @@ export default function RegisterOnboarding({
                                                     readOnly
                                                     disabled
                                                     value={`${selectedPlan.name} Plan (${currentPriceDisplay}.00 ${currency})`}
-                                                    className="mt-1.5 h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs font-bold text-[#1769E0]"
+                                                    className="mt-1.5 h-10 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-xs font-bold text-[#078675]"
                                                 />
                                             </div>
                                             <div>
@@ -1120,7 +1120,7 @@ export default function RegisterOnboarding({
                                                         setSelectedMethodId(e.target.value);
                                                         persistProgress(4, { payment_method: e.target.value });
                                                     }}
-                                                    className="mt-1.5 h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                                    className="mt-1.5 h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                                 >
                                                     {paymentMethods.map((m) => (
                                                         <option key={m.id} value={m.id}>
@@ -1141,7 +1141,7 @@ export default function RegisterOnboarding({
                                                 value={txnReference}
                                                 onChange={(e) => setTxnReference(e.target.value)}
                                                 placeholder="e.g. FT2610319802 or TID-9823412 or 032187654"
-                                                className="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                                className="mt-1.5 h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                             />
                                             <p className="mt-1.5 text-xs text-slate-500">
                                                 Found on your bank SMS confirmation, electronic deposit voucher, or mobile receipt.
@@ -1153,7 +1153,7 @@ export default function RegisterOnboarding({
                                             <label className="block text-xs font-bold text-slate-700">
                                                 Upload Receipt / Deposit Slip <span className="text-rose-500">*</span>
                                             </label>
-                                            <div className="mt-1.5 rounded-2xl border-2 border-dashed border-slate-300 bg-[#F8FAFC] p-6 text-center transition hover:border-[#1769E0] hover:bg-blue-50/20">
+                                            <div className="mt-1.5 rounded-2xl border-2 border-dashed border-slate-300 bg-[#F8FAFC] p-6 text-center transition hover:border-[#078675] hover:bg-[#078675]/10">
                                                 {receiptPreview ? (
                                                     <div className="flex flex-col items-center">
                                                         <img
@@ -1164,7 +1164,7 @@ export default function RegisterOnboarding({
                                                         <p className="mt-2.5 text-xs font-bold text-slate-800">
                                                             {receiptFile?.name} ({(receiptFile!.size / 1024).toFixed(1)} KB)
                                                         </p>
-                                                        <label className="mt-2 inline-block cursor-pointer text-xs font-bold text-[#1769E0] hover:underline">
+                                                        <label className="mt-2 inline-block cursor-pointer text-xs font-bold text-[#078675] hover:underline">
                                                             Replace Image
                                                             <input
                                                                 type="file"
@@ -1176,11 +1176,11 @@ export default function RegisterOnboarding({
                                                     </div>
                                                 ) : receiptFile ? (
                                                     <div className="flex flex-col items-center">
-                                                        <FileText className="size-10 text-[#1769E0]" />
+                                                        <FileText className="size-10 text-[#078675]" />
                                                         <p className="mt-2.5 text-xs font-bold text-slate-800">
                                                             {receiptFile.name} ({(receiptFile.size / 1024).toFixed(1)} KB)
                                                         </p>
-                                                        <label className="mt-2 inline-block cursor-pointer text-xs font-bold text-[#1769E0] hover:underline">
+                                                        <label className="mt-2 inline-block cursor-pointer text-xs font-bold text-[#078675] hover:underline">
                                                             Change File
                                                             <input
                                                                 type="file"
@@ -1192,7 +1192,7 @@ export default function RegisterOnboarding({
                                                     </div>
                                                 ) : (
                                                     <label className="flex cursor-pointer flex-col items-center justify-center">
-                                                        <div className="flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-[#1769E0]">
+                                                        <div className="flex size-12 items-center justify-center rounded-2xl bg-[#078675]/10 text-[#078675]">
                                                             <Upload className="size-6" />
                                                         </div>
                                                         <p className="mt-3 text-xs font-bold text-slate-800">
@@ -1222,7 +1222,7 @@ export default function RegisterOnboarding({
                                                 value={notes}
                                                 onChange={(e) => setNotes(e.target.value)}
                                                 placeholder="e.g. Deposited via branch teller / depositor name"
-                                                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white py-2 px-3 text-xs text-slate-900 placeholder:text-slate-400 transition focus:border-[#1769E0] focus:outline-none focus:ring-1 focus:ring-[#1769E0]"
+                                                className="mt-1.5 w-full rounded-xl border border-slate-300 bg-white py-2 px-3 text-xs text-slate-900 placeholder:text-slate-400 transition focus:border-[#078675] focus:outline-none focus:ring-1 focus:ring-[#078675]"
                                             />
                                         </div>
 
@@ -1237,7 +1237,7 @@ export default function RegisterOnboarding({
                                             <button
                                                 type="submit"
                                                 disabled={submitting}
-                                                className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#FF7A30] px-7 py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E] disabled:opacity-50"
+                                                className="flex cursor-pointer items-center gap-2 rounded-xl bg-[#E49A2E] px-7 py-3 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24] disabled:opacity-50"
                                             >
                                                 {submitting ? (
                                                     <>
@@ -1265,7 +1265,7 @@ export default function RegisterOnboarding({
                                 <Clock className="size-8" />
                             </div>
 
-                            <h2 className="mt-5 text-2xl font-extrabold text-[#0B1528]">
+                            <h2 className="mt-5 text-2xl font-extrabold text-[#173A5E]">
                                 Payment Awaiting Verification
                             </h2>
                             <p className="mt-2 text-xs leading-relaxed text-slate-600 sm:text-sm">
@@ -1276,7 +1276,7 @@ export default function RegisterOnboarding({
                             <div className="my-6 space-y-3 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-5 text-left text-xs">
                                 <div className="flex justify-between border-b border-slate-200/80 pb-2">
                                     <span className="text-slate-500">Tracking Reference:</span>
-                                    <span className="font-mono font-bold text-[#1769E0]">{result.reference}</span>
+                                    <span className="font-mono font-bold text-[#078675]">{result.reference}</span>
                                 </div>
                                 <div className="flex justify-between border-b border-slate-200/80 pb-2">
                                     <span className="text-slate-500">Applicant Email:</span>
@@ -1301,7 +1301,7 @@ export default function RegisterOnboarding({
                             <div className="space-y-3">
                                 <Link
                                     href={`/onboarding/status?email=${encodeURIComponent(result.email)}`}
-                                    className="block w-full rounded-xl bg-[#FF7A30] py-3 text-xs font-bold text-white shadow-md shadow-orange-500/20 transition hover:bg-[#E5661E]"
+                                    className="block w-full rounded-xl bg-[#E49A2E] py-3 text-xs font-bold text-white shadow-md shadow-[#E49A2E]/20 transition hover:bg-[#d08a24]"
                                 >
                                     Check Live Approval Status &rarr;
                                 </Link>

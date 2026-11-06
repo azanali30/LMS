@@ -241,7 +241,7 @@ export default function SubscriptionBilling({
             case 'trialing':
             case 'trial':
                 return (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#1769E0] ring-1 ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-300">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#078675] ring-1 ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-300">
                         <Sparkles className="size-3.5" />
                         30-Day Free Trial
                     </span>
@@ -285,7 +285,7 @@ export default function SubscriptionBilling({
                 <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-center dark:border-slate-800">
                     <div>
                         <div className="flex items-center gap-2">
-                            <CreditCard className="size-6 text-[#1769E0]" />
+                            <CreditCard className="size-6 text-[#078675]" />
                             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                                 SaaS Subscription & Entitlements
                             </h1>
@@ -359,7 +359,7 @@ export default function SubscriptionBilling({
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Current Plan</span>
-                            <BadgeCheck className="size-4 text-[#1769E0]" />
+                            <BadgeCheck className="size-4 text-[#078675]" />
                         </div>
                         <div className="mt-3 flex items-baseline gap-2">
                             <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
@@ -443,7 +443,7 @@ export default function SubscriptionBilling({
                         onClick={() => setSelectedTab('overview')}
                         className={`cursor-pointer border-b-2 px-5 py-3 transition-colors ${
                             selectedTab === 'overview'
-                                ? 'border-[#1769E0] text-[#1769E0]'
+                                ? 'border-[#078675] text-[#078675]'
                                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                     >
@@ -454,7 +454,7 @@ export default function SubscriptionBilling({
                         onClick={() => setSelectedTab('invoice_request')}
                         className={`cursor-pointer border-b-2 px-5 py-3 transition-colors ${
                             selectedTab === 'invoice_request'
-                                ? 'border-[#1769E0] text-[#1769E0]'
+                                ? 'border-[#078675] text-[#078675]'
                                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                     >
@@ -465,7 +465,7 @@ export default function SubscriptionBilling({
                         onClick={() => setSelectedTab('history')}
                         className={`cursor-pointer border-b-2 px-5 py-3 transition-colors ${
                             selectedTab === 'history'
-                                ? 'border-[#1769E0] text-[#1769E0]'
+                                ? 'border-[#078675] text-[#078675]'
                                 : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                     >
@@ -498,7 +498,7 @@ export default function SubscriptionBilling({
                                         <select
                                             value={planForm.data.plan_id}
                                             onChange={(e) => planForm.setData('plan_id', Number(e.target.value))}
-                                            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#078675] focus:ring-1 focus:ring-[#078675] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                                         >
                                             {availablePlans.map((plan) => (
                                                 <option key={plan.id} value={plan.id}>
@@ -515,7 +515,7 @@ export default function SubscriptionBilling({
                                         <select
                                             value={planForm.data.billing_interval}
                                             onChange={(e) => planForm.setData('billing_interval', e.target.value as any)}
-                                            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#078675] focus:ring-1 focus:ring-[#078675] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                                         >
                                             <option value="monthly">Monthly Billing</option>
                                             <option value="annual">Annual Billing (2 Months Free / ~17% Off)</option>
@@ -529,7 +529,7 @@ export default function SubscriptionBilling({
                                     <Button
                                         type="submit"
                                         disabled={planForm.processing}
-                                        className="bg-[#1769E0] text-xs font-bold text-white hover:bg-[#1256B8] cursor-pointer"
+                                        className="bg-[#078675] text-xs font-bold text-white hover:bg-[#056b5e] cursor-pointer"
                                     >
                                         {planForm.processing ? 'Updating Plan...' : 'Save Subscription Changes'}
                                     </Button>
@@ -555,7 +555,7 @@ export default function SubscriptionBilling({
                                 <div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <CreditCard className="size-5 text-[#1769E0]" />
+                                            <CreditCard className="size-5 text-[#078675]" />
                                             <h3 className="text-base font-bold text-slate-900 dark:text-white">
                                                 Online Card & Gateway Billing
                                             </h3>
@@ -589,7 +589,7 @@ export default function SubscriptionBilling({
                                 <div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <FileText className="size-5 text-[#1769E0]" />
+                                            <FileText className="size-5 text-[#078675]" />
                                             <h3 className="text-base font-bold text-slate-900 dark:text-white">
                                                 Manual Invoice / Wire Transfer
                                             </h3>
@@ -605,15 +605,15 @@ export default function SubscriptionBilling({
 
                                     <ul className="mt-4 space-y-2 text-xs text-slate-600 dark:text-slate-400">
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-3.5 text-blue-600" />
+                                            <CheckCircle2 className="size-3.5 text-[#078675]" />
                                             <span>Formal institution purchase order documentation</span>
                                         </li>
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-3.5 text-blue-600" />
+                                            <CheckCircle2 className="size-3.5 text-[#078675]" />
                                             <span>Multi-campus billing consolidated in one invoice</span>
                                         </li>
                                         <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="size-3.5 text-blue-600" />
+                                            <CheckCircle2 className="size-3.5 text-[#078675]" />
                                             <span>Dedicated verification audit trail</span>
                                         </li>
                                     </ul>
@@ -622,7 +622,7 @@ export default function SubscriptionBilling({
                                 <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                                     <Button
                                         onClick={() => setSelectedTab('invoice_request')}
-                                        className="w-full bg-[#1769E0] text-xs font-bold text-white shadow-md shadow-blue-500/20 hover:bg-[#1256B8] cursor-pointer"
+                                        className="w-full bg-[#078675] text-xs font-bold text-white shadow-md shadow-[#078675]/20 hover:bg-[#056b5e] cursor-pointer"
                                     >
                                         <span>Request Official Invoice</span>
                                         <ArrowUpRight className="ml-1.5 size-4" />
@@ -646,7 +646,7 @@ export default function SubscriptionBilling({
                                         key={plan.id}
                                         className={`rounded-2xl border p-4 transition-all ${
                                             subscription?.plan?.id === plan.id
-                                                ? 'border-[#1769E0] bg-blue-50/30 ring-1 ring-[#1769E0] dark:bg-blue-950/20'
+                                                ? 'border-[#078675] bg-blue-50/30 ring-1 ring-[#078675] dark:bg-blue-950/20'
                                                 : 'border-slate-200 dark:border-slate-800'
                                         }`}
                                     >
@@ -660,7 +660,7 @@ export default function SubscriptionBilling({
                                                 </span>
                                             )}
                                         </div>
-                                        <div className="mt-2 text-xs font-bold text-[#1769E0]">
+                                        <div className="mt-2 text-xs font-bold text-[#078675]">
                                             {plan.organization_limit}
                                         </div>
                                         <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
@@ -693,7 +693,7 @@ export default function SubscriptionBilling({
                                         id="plan_select"
                                         value={invoiceForm.data.plan_id}
                                         onChange={(e) => invoiceForm.setData('plan_id', Number(e.target.value))}
-                                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#078675] focus:ring-1 focus:ring-[#078675] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                                     >
                                         {availablePlans.map((plan) => (
                                             <option key={plan.id} value={plan.id}>
@@ -711,7 +711,7 @@ export default function SubscriptionBilling({
                                     <select
                                         value={invoiceForm.data.billing_interval}
                                         onChange={(e) => invoiceForm.setData('billing_interval', e.target.value as any)}
-                                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none focus:border-[#078675] focus:ring-1 focus:ring-[#078675] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                                     >
                                         <option value="monthly">Monthly</option>
                                         <option value="annual">Annual (~16.67% Discount / 2 Months Free)</option>
@@ -728,7 +728,7 @@ export default function SubscriptionBilling({
                                         placeholder="Include PO Number, billing department contact, or campus details..."
                                         value={invoiceForm.data.notes}
                                         onChange={(e) => invoiceForm.setData('notes', e.target.value)}
-                                        className="w-full rounded-xl border border-slate-300 p-3 text-xs text-slate-900 outline-none focus:border-[#1769E0] focus:ring-1 focus:ring-[#1769E0] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                                        className="w-full rounded-xl border border-slate-300 p-3 text-xs text-slate-900 outline-none focus:border-[#078675] focus:ring-1 focus:ring-[#078675] dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                                     />
                                     <InputError message={invoiceForm.errors.notes} />
                                 </div>
@@ -742,7 +742,7 @@ export default function SubscriptionBilling({
                                 <Button
                                     type="submit"
                                     disabled={invoiceForm.processing}
-                                    className="bg-[#1769E0] text-xs font-bold text-white hover:bg-[#1256B8] cursor-pointer"
+                                    className="bg-[#078675] text-xs font-bold text-white hover:bg-[#056b5e] cursor-pointer"
                                 >
                                     {invoiceForm.processing ? 'Submitting Invoice Request...' : 'Submit Invoice Request'}
                                 </Button>
@@ -849,7 +849,7 @@ export default function SubscriptionBilling({
                             <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
                                 <div className="border-b border-slate-200 p-5 dark:border-slate-800">
                                     <div className="flex items-center gap-2">
-                                        <History className="size-4 text-[#1769E0]" />
+                                        <History className="size-4 text-[#078675]" />
                                         <h3 className="font-bold text-sm text-slate-900 dark:text-white">
                                             Subscription Audit Trail
                                         </h3>

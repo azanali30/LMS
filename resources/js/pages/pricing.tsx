@@ -370,17 +370,17 @@ export default function PricingPage({
     return (
         <PublicLayout title="Transparent International SaaS Pricing — InstitutoPropio">
             {/* HERO SECTION */}
-            <section className="bg-white pt-16 pb-12 sm:pt-24 sm:pb-16 border-b border-slate-100 text-center">
+            <section className="bg-gradient-hero pt-16 pb-12 sm:pt-24 sm:pb-16 border-b border-slate-100 text-center">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-bold text-[#078675]">
-                            <Sparkles className="size-3.5" />
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/25 bg-gradient-accent-pill px-3.5 py-1 text-xs font-bold text-[#173A5E] shadow-2xs">
+                            <Sparkles className="size-3.5 text-[#078675]" />
                             <span>Transparent Global SaaS Pricing • USD</span>
                         </div>
 
                         <h1 className="text-4xl font-extrabold tracking-tight text-[#173A5E] sm:text-6xl lg:text-7xl">
                             Empower Every School with{' '}
-                            <span className="text-[#078675]">
+                            <span className="text-gradient-primary">
                                 InstitutoPropio
                             </span>
                         </h1>
@@ -390,7 +390,7 @@ export default function PricingPage({
                         </p>
 
                         {/* Unlimited Students & Teachers Banner */}
-                        <div className="mx-auto mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-[#F8FAFC] px-6 py-3 text-sm font-medium text-slate-700 shadow-xs">
+                        <div className="mx-auto mt-8 inline-flex flex-wrap items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-xs px-6 py-3 text-sm font-medium text-slate-700 shadow-xs">
                             <span className="flex items-center gap-2 text-emerald-700 font-bold">
                                 <Users className="size-4 text-emerald-600" />
                                 Unlimited Students & Teachers
@@ -415,7 +415,7 @@ export default function PricingPage({
                                     onClick={() => setBillingInterval('monthly')}
                                     className={`cursor-pointer rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
                                         billingInterval === 'monthly'
-                                            ? 'bg-[#173A5E] text-white shadow-xs'
+                                            ? 'btn-gradient-primary text-white shadow-xs'
                                              : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
@@ -426,7 +426,7 @@ export default function PricingPage({
                                     onClick={() => setBillingInterval('annual')}
                                     className={`flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-bold transition-all duration-200 ${
                                         billingInterval === 'annual'
-                                            ? 'bg-[#173A5E] text-white shadow-xs'
+                                            ? 'btn-gradient-primary text-white shadow-xs'
                                             : 'text-slate-600 hover:text-slate-900'
                                     }`}
                                 >
@@ -500,13 +500,13 @@ export default function PricingPage({
                                     key={plan.slug}
                                     className={`group relative flex flex-col justify-between rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
                                         plan.is_popular
-                                            ? 'border-[#078675] ring-2 ring-[#078675]/20 bg-white shadow-xl'
+                                            ? 'border-2 border-[#078675] ring-4 ring-[#078675]/10 bg-white shadow-xl shadow-glow-primary'
                                             : 'border-slate-200 bg-white shadow-xs hover:border-slate-300'
                                     }`}
                                 >
                                     {plan.is_popular && (
                                         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E49A2E] px-4 py-1 text-xs font-extrabold text-white shadow-md shadow-[#E49A2E]/20">
+                                            <span className="inline-flex items-center gap-1.5 rounded-full btn-gradient-warm px-4 py-1 text-xs font-extrabold text-white shadow-md">
                                                 <Sparkles className="size-3.5" />
                                                 Most Popular Choice
                                             </span>
@@ -589,11 +589,11 @@ export default function PricingPage({
                                     <div className="mt-8 pt-4">
                                         <Link href={targetHref} className="block w-full">
                                             <Button
-                                                className={`w-full py-6 text-xs font-bold shadow-xs transition-all duration-200 cursor-pointer ${
+                                                className={`w-full py-6 text-xs font-bold transition-all duration-200 cursor-pointer ${
                                                     plan.is_popular
-                                                        ? 'bg-[#E49A2E] text-white hover:bg-[#d08a24] shadow-md shadow-[#E49A2E]/20'
+                                                        ? 'btn-gradient-cta text-white shadow-md active:scale-[0.98]'
                                                         : isEnterprise
-                                                        ? 'bg-[#173A5E] text-white hover:bg-[#056b5e]'
+                                                        ? 'btn-gradient-primary text-white shadow-md active:scale-[0.98]'
                                                         : 'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 hover:text-[#078675]'
                                                 }`}
                                             >
@@ -768,24 +768,36 @@ export default function PricingPage({
             </section>
 
             {/* BOTTOM CTA SECTION */}
-            <section className="bg-white py-16 sm:py-24 text-center">
-                <div className="mx-auto w-full max-w-4xl px-6 sm:px-8">
-                    <h2 className="text-3xl sm:text-5xl font-black text-[#173A5E] tracking-tight">
+            <section className="relative overflow-hidden bg-gradient-primary py-16 sm:py-24 text-center text-white shadow-glow-navy">
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -top-20 -left-20 size-80 rounded-full bg-white/10 blur-3xl"
+                />
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -bottom-20 -right-20 size-80 rounded-full bg-[#E49A2E]/20 blur-3xl"
+                />
+
+                <div className="relative mx-auto w-full max-w-4xl px-6 sm:px-8">
+                    <span className="inline-block rounded-full border border-white/25 bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide backdrop-blur-md">
+                        Start Your Free Trial
+                    </span>
+                    <h2 className="mt-4 text-3xl sm:text-5xl font-black text-white tracking-tight">
                         Ready to Transform Your Educational System?
                     </h2>
-                    <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-slate-600 leading-relaxed">
+                    <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-emerald-100 leading-relaxed">
                         Start your 30-day free trial today or consult our enterprise team for customized campus network rollouts.
                     </p>
                     <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                         <Link href="/register?journey=school&plan=growth">
-                            <Button className="h-12 bg-[#E49A2E] px-8 text-sm font-bold text-white hover:bg-[#d08a24] shadow-md shadow-[#E49A2E]/20 cursor-pointer">
+                            <Button className="h-12 btn-gradient-warm px-8 text-sm font-bold text-white shadow-lg active:scale-[0.98] cursor-pointer">
                                 <span>Get Started with 30-Day Free Trial</span>
                                 <ArrowRight className="ml-2 size-4" />
                             </Button>
                         </Link>
                         <Link href="/contact?subject=Sales+Inquiry">
-                            <Button variant="outline" className="h-12 border-slate-300 bg-white px-8 text-sm font-bold text-slate-700 hover:bg-slate-50 cursor-pointer">
-                                <PhoneCall className="mr-2 size-4 text-[#078675]" />
+                            <Button variant="outline" className="h-12 border-white/40 bg-white/10 px-8 text-sm font-bold text-white hover:bg-white/20 cursor-pointer">
+                                <PhoneCall className="mr-2 size-4 text-emerald-300" />
                                 <span>Talk to Sales</span>
                             </Button>
                         </Link>

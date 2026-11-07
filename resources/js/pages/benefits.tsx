@@ -84,17 +84,17 @@ export default function BenefitsPage() {
     return (
         <PublicLayout title="Platform Benefits — Enterprise Academic & E-Learning SaaS">
             {/* HERO HEADER */}
-            <section className="bg-white pt-16 pb-12 sm:pt-24 sm:pb-16 border-b border-slate-100">
+            <section className="bg-gradient-hero pt-16 pb-12 sm:pt-24 sm:pb-16 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
-                            <Layers className="size-3.5" />
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/25 bg-gradient-accent-pill px-3.5 py-1 text-xs font-semibold text-[#173A5E]">
+                            <Layers className="size-3.5 text-[#078675]" />
                             <span>Architectural Superiority & Value</span>
                         </div>
 
                         <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl lg:text-6xl">
                             Why Educational Institutions Choose Our{' '}
-                            <span className="text-[#078675]">Unified SaaS</span>
+                            <span className="text-gradient-primary">Unified SaaS</span>
                         </h1>
 
                         <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
@@ -231,19 +231,28 @@ export default function BenefitsPage() {
                     </div>
 
                     {/* BOTTOM CTA CARD */}
-                    <div className="mt-16 rounded-3xl bg-[#173A5E] p-8 text-center text-white shadow-xl sm:p-12">
-                        <div className="mx-auto max-w-2xl">
+                    <div className="relative mt-16 overflow-hidden rounded-3xl bg-gradient-primary p-8 text-center text-white shadow-glow-navy sm:p-12">
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -top-16 -left-16 size-64 rounded-full bg-white/10 blur-2xl"
+                        />
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -bottom-16 -right-16 size-64 rounded-full bg-[#E49A2E]/20 blur-2xl"
+                        />
+
+                        <div className="relative mx-auto max-w-2xl">
                             <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
                                 Ready to Upgrade Your Institution?
                             </h2>
-                            <p className="mt-2 text-xs text-blue-100 sm:text-sm">
+                            <p className="mt-2 text-xs text-emerald-100 sm:text-sm">
                                 Launch your school's dedicated tenant workspace in under 2 minutes or view our transparent pricing tiers.
                             </p>
                             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                                 <Button
                                     asChild
                                     size="lg"
-                                    className="bg-[#E49A2E] font-bold text-white shadow-md hover:bg-[#d08a24]"
+                                    className="btn-gradient-warm font-bold text-white shadow-md active:scale-[0.98] cursor-pointer"
                                 >
                                     <Link href="/register?journey=school">
                                         Create Your School Free
@@ -254,7 +263,7 @@ export default function BenefitsPage() {
                                     asChild
                                     variant="outline"
                                     size="lg"
-                                    className="border-white/40 bg-white/10 font-semibold text-white hover:bg-white/20"
+                                    className="border-white/40 bg-white/10 font-semibold text-white hover:bg-white/20 cursor-pointer"
                                 >
                                     <Link href="/pricing">
                                         View Pricing Plans

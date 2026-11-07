@@ -27,17 +27,17 @@ export default function DownloadPage() {
         <PublicLayout title="Windows Desktop Application — InstitutoPropio">
             <div className="relative overflow-hidden bg-white">
                 {/* Hero Header */}
-                <section className="relative mx-auto w-full max-w-[1720px] px-6 pt-16 pb-12 text-center sm:px-8 md:px-12 lg:px-16 xl:px-20 border-b border-slate-100">
+                <section className="relative mx-auto w-full max-w-[1720px] bg-gradient-hero px-6 pt-16 pb-12 text-center sm:px-8 md:px-12 lg:px-16 xl:px-20 border-b border-slate-100">
                     <div className="mx-auto max-w-4xl">
                     {/* Eyebrow badge */}
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/25 bg-gradient-accent-pill px-3.5 py-1 text-xs font-semibold text-[#173A5E]">
                         <Laptop className="size-3.5 text-[#078675]" />
                         <span>Windows Tauri Desktop Client</span>
                     </div>
 
                     <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl lg:text-6xl">
                         Dedicated Desktop Power for Your{' '}
-                        <span className="text-[#078675]">Campus Workspace</span>
+                        <span className="text-gradient-primary">Campus Workspace</span>
                     </h1>
 
                     <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">

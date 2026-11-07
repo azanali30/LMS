@@ -101,7 +101,10 @@ export default function Navbar({ user }: NavbarProps) {
                     : 'border-b border-slate-200/80 bg-white/90 backdrop-blur-sm'
             }`}
         >
-            {/* TOP UTILITY NAVIGATION BAR (RingCentral Layout) */}
+            {/* Top Brand Gradient Ribbon */}
+            <div className="h-[2.5px] w-full bg-gradient-to-r from-[#173A5E] via-[#078675] via-[#26965B] to-[#E49A2E]" />
+
+            {/* TOP UTILITY NAVIGATION BAR */}
             <div className="hidden border-b border-slate-100 bg-[#F5F8F7] py-1.5 text-xs text-slate-600 md:block">
                 <div className="mx-auto flex w-full max-w-[1720px] items-center justify-between px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     {/* Left: System Status & Desktop App Teaser */}
@@ -570,7 +573,7 @@ export default function Navbar({ user }: NavbarProps) {
                         <Button
                             asChild
                             size="sm"
-                            className="h-10 cursor-pointer bg-[#E49A2E] px-4 font-bold text-white shadow-md shadow-[#E49A2E]/20 hover:bg-[#d08a24]"
+                            className="h-10 cursor-pointer btn-gradient-warm px-4 font-bold text-white shadow-md active:scale-[0.98]"
                         >
                             <Link href={dashboard()}>
                                 <span>Dashboard</span>
@@ -591,7 +594,7 @@ export default function Navbar({ user }: NavbarProps) {
                             <Button
                                 asChild
                                 size="sm"
-                                className="h-10 cursor-pointer bg-[#E49A2E] px-5 font-bold text-white shadow-md shadow-[#E49A2E]/20 hover:bg-[#d08a24]"
+                                className="h-10 cursor-pointer btn-gradient-cta px-5 font-bold text-white shadow-md active:scale-[0.98]"
                             >
                                 <Link href={register()}>
                                     <span>Get Started Free</span>
@@ -791,7 +794,7 @@ export default function Navbar({ user }: NavbarProps) {
                     <div className="mt-5 space-y-2">
                         <Button
                             asChild
-                            className="w-full bg-[#E49A2E] font-bold text-white hover:bg-[#d08a24]"
+                            className="w-full btn-gradient-cta font-bold text-white cursor-pointer"
                         >
                             <Link
                                 href={register()}

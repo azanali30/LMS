@@ -113,23 +113,24 @@ export default function HowItWorksPage() {
 
     return (
         <PublicLayout title="How It Works — Institutional SaaS & Online Learning">
-            <div className="bg-white py-16 sm:py-24 border-b border-slate-100">
+            <div className="bg-gradient-hero py-16 sm:py-24 border-b border-slate-100">
                 {/* Hero Header */}
                 <section className="relative mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
-                            <Sparkles className="size-3.5" />
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/25 bg-gradient-accent-pill px-3.5 py-1 text-xs font-semibold text-[#173A5E]">
+                            <Sparkles className="size-3.5 text-[#078675]" />
                             <span>Platform Architecture & Workflows</span>
                         </div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl">
-                            How Our Platform Works for Every Role
+                            How Our Platform Works for{' '}
+                            <span className="text-gradient-primary">Every Role</span>
                         </h1>
                         <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg leading-relaxed">
                             Whether you are establishing a multi-campus academy, teaching daily classes, or learning independently, our system provides an intuitive, high-performance workflow.
                         </p>
 
                         {/* Role Selector Tabs */}
-                        <div className="mt-10 inline-flex flex-wrap justify-center rounded-2xl border border-slate-200 bg-slate-50 p-1.5 shadow-xs">
+                        <div className="mt-10 inline-flex flex-wrap justify-center rounded-2xl border border-slate-200 bg-white/90 backdrop-blur-xs p-1.5 shadow-xs">
                             {[
                                 { id: 'school', label: 'School Owners & Admins', icon: School },
                                 { id: 'teacher', label: 'Educators & Teachers', icon: GraduationCap },
@@ -144,7 +145,7 @@ export default function HowItWorksPage() {
                                         onClick={() => setActiveTab(t.id as any)}
                                         className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition sm:px-6 sm:text-sm cursor-pointer ${
                                             isSelected
-                                                ? 'bg-[#173A5E] text-white shadow-sm shadow-[#078675]/25'
+                                                ? 'btn-gradient-primary text-white shadow-sm'
                                                 : 'text-slate-600 hover:text-slate-900'
                                         }`}
                                     >
@@ -186,7 +187,7 @@ export default function HowItWorksPage() {
                                     className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:border-[#078675]/40 hover:shadow-xs"
                                 >
                                     <div>
-                                        <span className="mb-2 block font-mono text-2xl font-black text-[#078675]">
+                                        <span className="mb-2 block font-mono text-2xl font-black text-gradient-primary">
                                             {st.num}
                                         </span>
                                         <h3 className="mb-2 text-base font-bold text-slate-900">
@@ -207,7 +208,7 @@ export default function HowItWorksPage() {
                             </span>
                             <Button
                                 asChild
-                                className="bg-[#E49A2E] font-bold text-white shadow-md hover:bg-[#d08a24]"
+                                className="btn-gradient-cta font-bold text-white shadow-md active:scale-[0.98] cursor-pointer"
                             >
                                 <Link href={currentJourney.ctaLink}>
                                     <span>{currentJourney.ctaText}</span>

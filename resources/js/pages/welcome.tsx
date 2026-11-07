@@ -175,11 +175,11 @@ export default function Welcome() {
     return (
         <PublicLayout title={`${platformName} — One Platform for Smarter School Management & Online Learning`}>
             {/* A. HERO SECTION (RingCentral-Inspired Light B2B SaaS) */}
-            <section className="relative overflow-hidden bg-white pt-12 pb-16 md:pt-18 md:pb-24 lg:pt-22 lg:pb-28 border-b border-slate-100">
+            <section className="relative overflow-hidden bg-gradient-hero pt-12 pb-16 md:pt-18 md:pb-24 lg:pt-22 lg:pb-28 border-b border-slate-100">
                 {/* Subtle soft gradient background glow */}
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[550px] w-[950px] -translate-x-1/2 rounded-full bg-[#078675]/100/6 blur-[130px]"
+                    className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[550px] w-[950px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-[#078675]/15 via-[#26965B]/10 to-[#E49A2E]/15 blur-[120px]"
                 />
 
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
@@ -187,7 +187,7 @@ export default function Welcome() {
                         {/* Hero Text Content */}
                         <div className="space-y-6 text-center lg:col-span-6 lg:text-left">
                             {/* Eyebrow badge */}
-                            <div className="inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-bold text-[#078675] shadow-2xs">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-[#078675]/25 bg-gradient-accent-pill px-3.5 py-1 text-xs font-bold text-[#173A5E] shadow-2xs">
                                 <Sparkles className="size-3.5 text-[#078675]" />
                                 <span>The Modern Operating System for Schools & E-Learning</span>
                             </div>
@@ -195,10 +195,13 @@ export default function Welcome() {
                             {/* Main Headline */}
                             <h1 className="text-3xl font-black tracking-tight text-[#173A5E] sm:text-5xl lg:text-6xl leading-[1.12]">
                                 One Platform for{' '}
-                                <span className="text-[#078675]">
+                                <span className="text-gradient-primary">
                                     Smarter School Management
                                 </span>{' '}
-                                and Online Learning
+                                and{' '}
+                                <span className="text-gradient-secondary">
+                                    Online Learning
+                                </span>
                             </h1>
 
                             {/* Supporting Description */}
@@ -212,7 +215,7 @@ export default function Welcome() {
                                     <Button
                                         asChild
                                         size="lg"
-                                        className="h-12 w-full cursor-pointer bg-[#E49A2E] px-7 font-bold text-white shadow-lg shadow-[#E49A2E]/20 transition-all hover:bg-[#d08a24] sm:w-auto"
+                                        className="h-12 w-full cursor-pointer btn-gradient-warm px-7 font-bold text-white shadow-md active:scale-[0.98] sm:w-auto"
                                     >
                                         <Link href={dashboard()}>
                                             Go to Dashboard ({user.name})
@@ -224,7 +227,7 @@ export default function Welcome() {
                                         <Button
                                             asChild
                                             size="lg"
-                                            className="h-12 w-full cursor-pointer bg-[#E49A2E] px-8 font-bold text-white shadow-lg shadow-[#E49A2E]/25 transition-all hover:bg-[#d08a24] active:scale-[0.98] sm:w-auto"
+                                            className="h-12 w-full cursor-pointer btn-gradient-cta px-8 font-bold text-white shadow-md active:scale-[0.98] sm:w-auto"
                                         >
                                             <Link href={register()}>
                                                 Get Started Free
@@ -266,12 +269,18 @@ export default function Welcome() {
                         {/* Large High-Quality Dashboard Desktop & Mobile Composition */}
                         <div className="lg:col-span-6">
                             <div className="relative mx-auto max-w-lg lg:max-w-none">
+                                {/* Ambient Gradient Halo behind Mockup */}
+                                <div
+                                    aria-hidden="true"
+                                    className="pointer-events-none absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-tr from-[#078675]/25 via-[#26965B]/15 to-[#E49A2E]/25 blur-2xl opacity-75"
+                                />
+
                                 {/* Desktop Frame Mockup */}
-                                <div className="relative rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-900/10 sm:p-5">
+                                <div className="relative rounded-2xl border border-slate-200/90 bg-white/95 p-4 shadow-2xl shadow-slate-900/10 backdrop-blur-xs sm:p-5">
                                     {/* Mock Product Top Bar */}
                                     <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                                         <div className="flex items-center gap-2.5">
-                                            <div className="flex size-8 items-center justify-center rounded-xl bg-[#173A5E] text-white shadow-xs">
+                                            <div className="flex size-8 items-center justify-center rounded-xl bg-gradient-primary text-white shadow-xs">
                                                 <School className="size-4" />
                                             </div>
                                             <div>
@@ -410,7 +419,10 @@ export default function Welcome() {
                     </div>
 
                     {/* Platform Stats Strip */}
-                    <div className="mt-14 rounded-2xl border border-slate-200 bg-[#F5F8F7] p-6 shadow-xs sm:p-8">
+                    <div className="relative mt-14 overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-soft p-6 shadow-sm sm:p-8">
+                        {/* Top Accent Gradient Hairline */}
+                        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#173A5E] via-[#078675] via-[#26965B] to-[#E49A2E]" />
+
                         <div className="grid grid-cols-2 gap-6 md:grid-cols-4 md:divide-x md:divide-slate-200">
                             {PLATFORM_STATS.map((stat, idx) => (
                                 <div
@@ -419,7 +431,7 @@ export default function Welcome() {
                                         idx > 0 ? 'md:pl-6' : ''
                                     }`}
                                 >
-                                    <span className="text-2xl font-black tracking-tight text-[#173A5E] sm:text-3xl">
+                                    <span className="text-2xl font-black tracking-tight text-gradient-primary sm:text-3xl">
                                         {stat.value}
                                     </span>
                                     <span className="mt-0.5 text-xs font-bold text-slate-800">
@@ -963,7 +975,7 @@ export default function Welcome() {
                                     onClick={() => setActiveSolution(t.key as any)}
                                     className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all cursor-pointer ${
                                         isSelected
-                                            ? 'bg-[#173A5E] text-white shadow-md shadow-[#078675]/20'
+                                            ? 'btn-gradient-primary text-white shadow-md active:scale-[0.98]'
                                             : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
                                     }`}
                                 >
@@ -1001,7 +1013,7 @@ export default function Welcome() {
                                     <div className="pt-4">
                                         <Button
                                             asChild
-                                            className="bg-[#173A5E] font-bold text-white hover:bg-[#056b5e]"
+                                            className="btn-gradient-primary font-bold text-white shadow-md cursor-pointer hover:opacity-95"
                                         >
                                             <Link href={solutionsData[activeSolution].href}>
                                                 {solutionsData[activeSolution].cta}
@@ -1274,7 +1286,7 @@ export default function Welcome() {
                                 onClick={() => setSelectedCategory(category)}
                                 className={`cursor-pointer rounded-xl px-4 py-2 text-xs font-bold transition-all ${
                                     selectedCategory === category
-                                        ? 'bg-[#173A5E] text-white shadow-sm shadow-[#078675]/25'
+                                        ? 'btn-gradient-primary text-white shadow-sm'
                                         : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                                 }`}
                             >
@@ -1309,11 +1321,14 @@ export default function Welcome() {
             {/* H. WINDOWS DESKTOP APP SPOTLIGHT BANNER */}
             <section className="bg-white py-16 sm:py-20 border-b border-slate-100">
                 <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-                    <div className="rounded-3xl border border-slate-200 bg-[#F5F8F7] p-8 sm:p-12 shadow-sm">
+                    <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-soft p-8 sm:p-12 shadow-sm">
+                        {/* Top Hairline Accent */}
+                        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#173A5E] via-[#078675] to-[#E49A2E]" />
+
                         <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
                             <div className="space-y-4 lg:col-span-8">
-                                <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100/80 px-3 py-1 text-xs font-bold text-[#078675]">
-                                    <Laptop className="size-3.5" />
+                                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#078675]/20 bg-gradient-accent-pill px-3 py-1 text-xs font-bold text-[#173A5E]">
+                                    <Laptop className="size-3.5 text-[#078675]" />
                                     <span>Tauri Windows Client · Coming Soon</span>
                                 </span>
                                 <h3 className="text-2xl font-extrabold tracking-tight text-[#173A5E] sm:text-3xl">
@@ -1342,14 +1357,14 @@ export default function Welcome() {
                                 <Button
                                     asChild
                                     size="lg"
-                                    className="bg-[#E49A2E] font-bold text-white shadow-md hover:bg-[#d08a24]"
+                                    className="btn-gradient-cta font-bold text-white shadow-md active:scale-[0.98] cursor-pointer"
                                 >
                                     <Link href="/download">
                                         Learn About Desktop App
                                         <ArrowRight className="ml-1.5 size-4" />
                                     </Link>
                                 </Button>
-                                <span className="text-[11px] text-slate-400">
+                                <span className="text-[11px] text-slate-500">
                                     Connects to your school's LMS server instance
                                 </span>
                             </div>
@@ -1408,15 +1423,25 @@ export default function Welcome() {
             </section>
 
             {/* FINAL CONVERSION CTA BANNER */}
-            <section className="bg-[#173A5E] py-16 sm:py-20 text-white">
-                <div className="mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
-                    <span className="rounded-full bg-white/20 px-3.5 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm">
+            <section className="relative overflow-hidden bg-gradient-primary py-16 sm:py-24 text-white shadow-glow-navy">
+                {/* Ambient Soft Glow Elements */}
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -top-24 -left-24 size-96 rounded-full bg-white/10 blur-3xl"
+                />
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute -bottom-24 -right-24 size-96 rounded-full bg-[#E49A2E]/20 blur-3xl"
+                />
+
+                <div className="relative mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
+                    <span className="inline-block rounded-full border border-white/25 bg-white/15 px-4 py-1 text-xs font-semibold tracking-wide backdrop-blur-md">
                         Zero Complex Setup
                     </span>
                     <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
                         Ready to Unify Your School Management and E-Learning?
                     </h2>
-                    <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-blue-100 sm:text-base">
+                    <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-emerald-100 sm:text-base">
                         Provision your institutional workspace in under two minutes. Experience tenant isolation, effortless roll calls, and online courses.
                     </p>
 
@@ -1424,7 +1449,7 @@ export default function Welcome() {
                         <Button
                             asChild
                             size="lg"
-                            className="h-12 w-full cursor-pointer bg-[#E49A2E] px-8 font-bold text-white shadow-lg shadow-black/20 hover:bg-[#d08a24] sm:w-auto"
+                            className="h-12 w-full cursor-pointer btn-gradient-warm px-8 font-bold text-white shadow-lg shadow-black/20 active:scale-[0.98] sm:w-auto"
                         >
                             <Link href={register()}>
                                 Get Started Free
@@ -1435,7 +1460,7 @@ export default function Welcome() {
                             asChild
                             variant="outline"
                             size="lg"
-                            className="h-12 w-full border-white/40 bg-white/10 px-6 font-semibold text-white hover:bg-white/20 sm:w-auto"
+                            className="h-12 w-full cursor-pointer border-white/40 bg-white/10 px-6 font-semibold text-white hover:bg-white/20 sm:w-auto"
                         >
                             <Link href="/contact">
                                 Talk to an Education Specialist

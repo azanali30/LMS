@@ -13,6 +13,9 @@ export default function Footer() {
             id="contact"
             className="border-t border-slate-200 bg-white text-slate-600"
         >
+            {/* Top Brand Gradient Ribbon */}
+            <div className="h-[2.5px] w-full bg-gradient-to-r from-[#173A5E] via-[#078675] via-[#26965B] to-[#E49A2E]" />
+
             <div className="mx-auto w-full max-w-[1720px] px-6 py-16 sm:px-8 md:px-12 lg:px-16 xl:px-20">
                 <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-6">
                     {/* Platform Brand Column */}

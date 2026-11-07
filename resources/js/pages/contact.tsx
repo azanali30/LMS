@@ -66,16 +66,17 @@ export default function ContactPage() {
 
     return (
         <PublicLayout title="Contact Us & Talk to Sales — InstitutoPropio">
-            <div className="bg-white py-16 sm:py-24 border-b border-slate-100">
+            <div className="bg-gradient-hero py-16 sm:py-24 border-b border-slate-100">
                 {/* Hero Header */}
                 <section className="relative mx-auto w-full max-w-[1720px] px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 text-center">
                     <div className="mx-auto max-w-4xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
-                            <MessageSquare className="size-3.5" />
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/25 bg-gradient-accent-pill px-3.5 py-1 text-xs font-semibold text-[#173A5E]">
+                            <MessageSquare className="size-3.5 text-[#078675]" />
                             <span>Direct Institutional Communication</span>
                         </div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-5xl">
-                            We're Here to Support Your Campus
+                            We're Here to Support Your{' '}
+                            <span className="text-gradient-primary">Campus</span>
                         </h1>
                         <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg leading-relaxed">
                             Whether you are an institution director evaluating deployment, a faculty educator needing assistance, or a student with questions, our education specialists are ready to help.
@@ -258,7 +259,7 @@ export default function ContactPage() {
                                     <Button
                                         type="submit"
                                         disabled={processing}
-                                        className="w-full h-11 bg-[#E49A2E] font-bold text-white shadow-md hover:bg-[#d08a24] disabled:opacity-60 cursor-pointer"
+                                        className="w-full h-11 btn-gradient-cta font-bold text-white shadow-md active:scale-[0.98] disabled:opacity-60 cursor-pointer"
                                     >
                                         {processing ? (
                                             <>

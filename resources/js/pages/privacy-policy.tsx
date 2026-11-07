@@ -15,12 +15,12 @@ import {
 export default function PrivacyPolicyPage() {
     return (
         <PublicLayout title="Privacy Policy — InstitutoPropio">
-            <div className="border-b border-slate-100 bg-white py-14 sm:py-20">
+            <div className="border-b border-slate-100 bg-gradient-hero py-14 sm:py-20">
                 {/* Header */}
                 <section className="mx-auto w-full max-w-[1720px] px-6 text-center sm:px-8 md:px-12 lg:px-16 xl:px-20">
                     <div className="mx-auto max-w-3xl">
-                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/20 bg-[#078675]/10 px-3.5 py-1 text-xs font-semibold text-[#078675]">
-                            <ShieldCheck className="size-3.5" />
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#078675]/25 bg-gradient-accent-pill px-3.5 py-1 text-xs font-semibold text-[#173A5E]">
+                            <ShieldCheck className="size-3.5 text-[#078675]" />
                             <span>Data Protection & Privacy Commitment</span>
                         </div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-[#173A5E] sm:text-4xl lg:text-5xl">

@@ -176,3 +176,117 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* =========================================================================
+   Official InstitutoPropio Premium Gradient System
+   Inspired by sophisticated SaaS visual hierarchy (e.g. RingCentral)
+   Strictly preserving InstitutoPropio Brand Colors:
+   - Primary Navy:   #173A5E
+   - Primary Teal:   #078675
+   - Growth Green:   #26965B
+   - Golden Orange:  #E49A2E
+   ========================================================================= */
+
+@utility bg-gradient-primary {
+    background-image: linear-gradient(115deg, #173a5e 0%, #078675 55%, #26965b 100%);
+}
+
+@utility bg-gradient-secondary {
+    background-image: linear-gradient(115deg, #078675 0%, #26965b 55%, #e49a2e 100%);
+}
+
+@utility bg-gradient-soft {
+    background-image: linear-gradient(120deg, #f5f8f7 0%, #e4f3ef 55%, #fff3df 100%);
+}
+
+@utility bg-gradient-hero {
+    background-image: radial-gradient(80% 120% at 50% -10%, rgba(228, 243, 239, 0.75) 0%, rgba(255, 243, 223, 0.4) 45%, #ffffff 85%);
+}
+
+@utility bg-gradient-card {
+    background-image: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 248, 247, 0.7) 100%);
+}
+
+@utility bg-gradient-card-hover {
+    background-image: linear-gradient(145deg, rgba(255, 255, 255, 1) 0%, rgba(228, 243, 239, 0.5) 100%);
+}
+
+@utility bg-gradient-accent-pill {
+    background-image: linear-gradient(115deg, rgba(7, 134, 117, 0.12) 0%, rgba(38, 150, 91, 0.1) 50%, rgba(228, 154, 46, 0.12) 100%);
+}
+
+@utility text-gradient-primary {
+    background-image: linear-gradient(115deg, #173a5e 0%, #078675 55%, #26965b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+@utility text-gradient-secondary {
+    background-image: linear-gradient(115deg, #078675 0%, #26965b 55%, #e49a2e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+@utility text-gradient-warm {
+    background-image: linear-gradient(115deg, #078675 0%, #e49a2e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+@utility shadow-glow-primary {
+    box-shadow: 0 14px 34px -10px rgba(7, 134, 117, 0.35);
+}
+
+@utility shadow-glow-secondary {
+    box-shadow: 0 14px 34px -10px rgba(228, 154, 46, 0.38);
+}
+
+@utility shadow-glow-navy {
+    box-shadow: 0 20px 45px -15px rgba(23, 58, 94, 0.35);
+}
+
+/* Reusable Interactive Gradient Button Utilities */
+.btn-gradient-cta {
+    background: linear-gradient(115deg, #078675 0%, #26965b 50%, #e49a2e 100%);
+    background-size: 160% auto;
+    color: #ffffff;
+    box-shadow: 0 10px 25px -6px rgba(7, 134, 117, 0.35);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-gradient-cta:hover {
+    background-position: right center;
+    box-shadow: 0 14px 30px -6px rgba(228, 154, 46, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-gradient-warm {
+    background: linear-gradient(115deg, #e49a2e 0%, #d08a24 50%, #26965b 100%);
+    background-size: 160% auto;
+    color: #ffffff;
+    box-shadow: 0 10px 25px -6px rgba(228, 154, 46, 0.35);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-gradient-warm:hover {
+    background-position: right center;
+    box-shadow: 0 14px 30px -6px rgba(7, 134, 117, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-gradient-primary {
+    background: linear-gradient(115deg, #173a5e 0%, #078675 55%, #26965b 100%);
+    background-size: 160% auto;
+    color: #ffffff;
+    box-shadow: 0 10px 25px -6px rgba(23, 58, 94, 0.35);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-gradient-primary:hover {
+    background-position: right center;
+    box-shadow: 0 14px 30px -6px rgba(7, 134, 117, 0.45);
+    transform: translateY(-1px);
+}

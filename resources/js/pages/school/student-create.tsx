@@ -1128,6 +1128,18 @@ export default function StudentCreatePage({
                                 </div>
                             </div>
 
+                            {classes.length === 0 && (
+                                <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300">
+                                    <div className="flex items-center gap-2">
+                                        <Info className="size-4 shrink-0 text-amber-600" />
+                                        <span>No classes have been configured yet. Please set up your school classes and sections before admitting students.</span>
+                                    </div>
+                                    <Link href="/school/classes" className="font-bold underline hover:text-amber-950 dark:hover:text-amber-200">
+                                        Set up Classes &rarr;
+                                    </Link>
+                                </div>
+                            )}
+
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                 <div>
                                     <label className="mb-1 block text-xs font-semibold text-slate-700 uppercase tracking-wider dark:text-slate-300">

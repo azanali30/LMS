@@ -245,8 +245,10 @@ class StudentController extends Controller
         } else {
             $rollSeq = StudentEnrollment::withoutTenantScope()->where('organization_id', $organization->id)->count() + 1;
         }
+        $suggestedRollNumber = sprintf('STU-%03d', $rollSeq);
+
         $classFeeStructures = ClassFeeStructure::where('organization_id', $organization->id)
-            ->where('academic_year_id', $currentAcademicYear->id)
+            ->where('academic_year_id', $currentAcademicYear?->id)
             ->get();
 
         return Inertia::render('school/student-create', [

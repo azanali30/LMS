@@ -212,6 +212,20 @@ class SchoolManagementAndLearningTest extends TestCase
             'capacity' => 30,
         ]);
 
+        // First test visiting the create form
+        $createResponse = $this->actingAs($this->owner)
+            ->withSession(['current_organization_id' => $this->org->id])
+            ->get('/school/students/create');
+
+        $createResponse->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('school/student-create')
+                ->has('classes')
+                ->has('sections')
+                ->has('suggestedAdmissionNumber')
+                ->has('suggestedRollNumber')
+            );
+
         $response = $this->actingAs($this->owner)
             ->withSession(['current_organization_id' => $this->org->id])
             ->post('/school/students', [
@@ -229,6 +243,60 @@ class SchoolManagementAndLearningTest extends TestCase
             'class_section_id' => $section->id,
             'roll_number' => 'CW-101',
         ]);
+    }
+
+    public function test_owner_can_open_admission_form_in_empty_organization(): void
+    {
+        // Brand new organization with no classes, sections, students, or academic years
+        $emptyOrg = Organization::create([
+            'name' => 'Empty Academy',
+            'slug' => 'empty-academy-'.Str::random(5),
+            'organization_type' => 'school',
+            'status' => 'active',
+            'created_by' => $this->owner->id,
+        ]);
+
+        \App\Models\OrganizationUser::create([
+            'organization_id' => $emptyOrg->id,
+            'user_id' => $this->owner->id,
+            'role' => 'owner',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($this->owner)
+            ->withSession(['current_organization_id' => $emptyOrg->id])
+            ->get('/school/students/create');
+
+        $response->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('school/student-create')
+                ->where('suggestedRollNumber', 'STU-001')
+                ->where('classes', [])
+                ->where('sections', [])
+            );
+
+        // Verify fallback academic session was created
+        $this->assertDatabaseHas('academic_years', [
+            'organization_id' => $emptyOrg->id,
+            'is_current' => true,
+        ]);
+    }
+
+    public function test_unauthorized_user_cannot_access_student_admission_form(): void
+    {
+        // Teacher without admin/owner permission cannot open admission form
+        $response = $this->actingAs($this->teacher)
+            ->withSession(['current_organization_id' => $this->org->id])
+            ->get('/school/students/create');
+
+        $response->assertForbidden();
+
+        // Student cannot open admission form
+        $studentResponse = $this->actingAs($this->student)
+            ->withSession(['current_organization_id' => $this->org->id])
+            ->get('/school/students/create');
+
+        $studentResponse->assertForbidden();
     }
 
     public function test_teacher_can_record_daily_attendance(): void

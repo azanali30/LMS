@@ -1,5 +1,5 @@
 import { Link, usePage, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     LayoutDashboard,
     GraduationCap,
@@ -58,6 +58,26 @@ export default function TenantLayout({
     const [headerOrgDropdownOpen, setHeaderOrgDropdownOpen] = useState(false);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
     const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+    const [navigatingHref, setNavigatingHref] = useState<string | null>(null);
+
+    useEffect(() => {
+        const removeStart = router.on('start', (event) => {
+            try {
+                const url = new URL(event.detail.visit.url.toString(), window.location.origin);
+                setNavigatingHref(url.pathname);
+            } catch {
+                setNavigatingHref('__pending__');
+            }
+        });
+        const removeFinish = router.on('finish', () => {
+            setNavigatingHref(null);
+        });
+
+        return () => {
+            removeStart();
+            removeFinish();
+        };
+    }, []);
 
     const notifications = (page.props as any).notifications as
         | {
@@ -512,21 +532,34 @@ export default function TenantLayout({
                     </div>
                     {filteredNavItems.map((item) => {
                         const Icon = item.icon;
+                        const isNavigatingThis = navigatingHref === item.href;
                         return (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                onClick={() => setMobileOpen(false)}
-                                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition-all ${
+                                prefetch
+                                onClick={(e) => {
+                                    if (navigatingHref === item.href) {
+                                        e.preventDefault();
+                                        return;
+                                    }
+                                    setMobileOpen(false);
+                                }}
+                                className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition-all ${
                                     item.active
                                         ? 'border border-purple-200 bg-purple-50 font-semibold text-purple-700 shadow-xs dark:border-purple-500/30 dark:bg-gradient-to-r dark:from-purple-600/25 dark:to-indigo-600/15 dark:text-white dark:shadow-purple-950'
                                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-slate-200'
                                 }`}
                             >
-                                <Icon
-                                    className={`size-4 ${item.active ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'}`}
-                                />
-                                <span>{item.title}</span>
+                                <span className="flex items-center gap-3 min-w-0">
+                                    <Icon
+                                        className={`size-4 shrink-0 ${item.active ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'}`}
+                                    />
+                                    <span className="truncate">{item.title}</span>
+                                </span>
+                                {isNavigatingThis && (
+                                    <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-[#078675]/30 border-t-[#078675]" />
+                                )}
                             </Link>
                         );
                     })}

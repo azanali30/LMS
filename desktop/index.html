@@ -379,7 +379,22 @@
 
   <!-- Main Container -->
   <main class="main-wrapper">
-    <div class="card">
+    <!-- Lightweight Startup Loading Splash (prevents Sign-In flash while restoring session) -->
+    <div id="splashCard" class="card" style="text-align: center; padding: 48px 36px;">
+      <div class="logo-hero" style="margin-bottom: 24px;">
+        <img src="./logo.png" alt="InstitutoPropio Logo">
+      </div>
+      <div style="display: inline-flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--brand-navy);">
+        <span class="spinner" style="border-color: rgba(7, 134, 117, 0.25); border-top-color: var(--brand-teal); width: 18px; height: 18px;"></span>
+        <span id="splashText">Restoring your workspace...</span>
+      </div>
+      <p style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
+        Verifying your persistent desktop session
+      </p>
+    </div>
+
+    <!-- Fallback Welcome / Sign-In Card (shown only if offline or deep-link auth requires interaction) -->
+    <div id="welcomeCard" class="card" style="display: none;">
       <div class="logo-hero">
         <img src="./logo.png" alt="InstitutoPropio Logo">
       </div>
@@ -471,6 +486,8 @@
     const APP_WEB_URL = (localStorage.getItem('instituto_server_url') || DEFAULT_WEB_URL).replace(/\/+$/, "");
 
     // DOM Elements
+    const splashCard = document.getElementById('splashCard');
+    const welcomeCard = document.getElementById('welcomeCard');
     const btnLogin = document.getElementById('btnLogin');
     const btnRegister = document.getElementById('btnRegister');
     const btnOpenWeb = document.getElementById('btnOpenWeb');
@@ -533,8 +550,14 @@
       window.open(url, '_blank');
     }
 
+    function revealWelcomeCard() {
+      if (splashCard) splashCard.style.display = 'none';
+      if (welcomeCard) welcomeCard.style.display = 'block';
+    }
+
     // State Display Helpers
     function showError(msg) {
+      revealWelcomeCard();
       stateWaiting.classList.remove('active');
       stateSuccess.classList.remove('active');
       errorMessage.textContent = msg;
@@ -542,12 +565,18 @@
     }
 
     function showWaiting() {
+      revealWelcomeCard();
       stateError.classList.remove('active');
       stateSuccess.classList.remove('active');
       stateWaiting.classList.add('active');
     }
 
     function showSuccess(msg) {
+      if (splashCard && splashCard.style.display !== 'none') {
+        const splashText = document.getElementById('splashText');
+        if (splashText && msg) splashText.textContent = msg.replace(/^✓\s*/, '');
+        return;
+      }
       stateError.classList.remove('active');
       stateWaiting.classList.remove('active');
       if (msg) {
@@ -671,27 +700,14 @@
         return;
       }
 
-      // 4. Probe remote /desktop entrypoint before navigating so we never land on a 404 page.
-      // When /desktop is available, top-level navigation restores valid sessions to /dashboard
-      // or renders the dedicated desktop welcome screen.
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
-        const probe = await fetch(`${APP_WEB_URL}/desktop`, {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'no-store',
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-
-        if (probe.ok) {
-          window.location.replace(`${APP_WEB_URL}/desktop`);
-        }
-      } catch (e) {
-        // Remote /desktop not reachable or not yet deployed — stay safely on local Welcome screen
-        console.info("Staying on local desktop welcome screen:", e && e.message ? e.message : e);
+      // 4. Transition directly to /desktop in a single round-trip while splash is shown.
+      // Valid sessions redirect 302 -> /dashboard; expired/logged-out sessions render desktop/welcome.
+      if (navigator.onLine === false) {
+        showError("You appear to be offline. Connect to the internet and click 'Sign In' to continue.");
+        return;
       }
+
+      window.location.replace(`${APP_WEB_URL}/desktop`);
     }
 
     initDesktopTauri();

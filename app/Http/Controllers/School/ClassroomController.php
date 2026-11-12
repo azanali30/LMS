@@ -31,7 +31,7 @@ class ClassroomController extends Controller
         $userRole = TenantContext::currentRole($user);
         $canManage = true;
 
-        $classes = SchoolClass::with(['sections.studentEnrollments'])
+        $classes = SchoolClass::with(['sections' => fn ($q) => $q->withCount('studentEnrollments')])
             ->where('organization_id', $organization->id)
             ->latest()
             ->paginate(10);

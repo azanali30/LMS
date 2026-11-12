@@ -68,42 +68,61 @@ class SetTenantContext
         } else {
             // Central platform domain (marketing, super admin, or user hub)
             $organization = null;
+            $userOrgs = null;
 
             if ($user) {
+                $userOrgs = $user->organizations()
+                    ->where('organizations.status', 'active')
+                    ->wherePivot('status', 'active')
+                    ->withPivot('role', 'title', 'status')
+                    ->get([
+                        'organizations.id',
+                        'organizations.name',
+                        'organizations.slug',
+                        'organizations.organization_type',
+                        'organizations.logo_path',
+                        'organizations.primary_color',
+                        'organizations.accent_color',
+                        'organizations.timezone',
+                        'organizations.status',
+                    ]);
+
+                // Cache loaded active organizations on the user instance for this request
+                $user->setRelation('organizations', $userOrgs);
+
                 // 1. Check if route has an organization model binding or slug (e.g. org switch)
                 if ($orgParam = $request->route('organization')) {
                     if ($orgParam instanceof Organization) {
                         $organization = $orgParam;
                     } elseif (is_numeric($orgParam)) {
-                        $organization = Organization::find($orgParam);
+                        $organization = $userOrgs->firstWhere('id', (int) $orgParam)
+                            ?? Organization::find($orgParam);
                     } else {
-                        $organization = Organization::where('slug', $orgParam)->first();
+                        $organization = $userOrgs->firstWhere('slug', $orgParam)
+                            ?? Organization::where('slug', $orgParam)->first();
                     }
                 }
 
                 // 2. Check session if not found from route
                 if (! $organization && $sessionOrgId = $request->session()->get('current_organization_id')) {
-                    $organization = Organization::where('id', $sessionOrgId)->where('status', 'active')->first();
+                    $organization = $userOrgs->firstWhere('id', (int) $sessionOrgId);
                 }
 
                 // 3. Fallback to user's first active organization
                 if (! $organization) {
-                    $organization = $user->organizations()
-                        ->where('organizations.status', 'active')
-                        ->wherePivot('status', 'active')
-                        ->first();
+                    $organization = $userOrgs->first();
                 }
 
-                // 4. Verify membership permission
+                // 4. Verify membership permission (resolved in memory from $userOrgs when possible)
                 if ($organization && $organization->status === 'active') {
-                    $isMember = $user->organizations()
-                        ->where('organizations.id', $organization->id)
-                        ->where('organizations.status', 'active')
-                        ->wherePivot('status', 'active')
-                        ->exists();
+                    $matchedMemberOrg = $userOrgs->firstWhere('id', $organization->id);
+                    $isMember = $matchedMemberOrg !== null;
 
                     if ($isMember || $user->isSuperAdmin()) {
                         TenantContext::set($organization);
+                        if ($matchedMemberOrg && ! $user->isSuperAdmin()) {
+                            TenantContext::setRole($user->id, $organization->id, $matchedMemberOrg->pivot?->role);
+                        }
                         $request->session()->put('current_organization_id', $organization->id);
                     } else {
                         TenantContext::set(null);
@@ -120,6 +139,7 @@ class SetTenantContext
 
         // Share tenant data with Inertia for both guests (e.g. school login) and authenticated users
         $currentOrg = TenantContext::current();
+        $subscription = ($currentOrg && $user) ? rescue(fn () => $currentOrg->subscription, null, false) : null;
 
         Inertia::share([
             'tenant' => fn () => rescue(function () use ($currentOrg) {
@@ -139,26 +159,26 @@ class SetTenantContext
                 'id', 'name', 'slug', 'organization_type', 'logo_path', 'primary_color', 'accent_color', 'timezone', 'status',
             ]), null, false),
             'currentRole' => fn () => rescue(fn () => TenantContext::currentRole($user), null, false),
-            'tenantSubscription' => fn () => rescue(function () use ($currentOrg) {
-                $sub = $currentOrg?->subscription;
-                return $sub ? [
-                    'status' => $sub->status,
-                    'has_access' => (bool) $sub->hasAccess(),
-                    'is_trialing' => (bool) $sub->isTrialing(),
-                    'is_expired' => (bool) $sub->isTrialExpired(),
-                    'days_remaining' => (int) $sub->daysRemainingInTrial(),
-                ] : null;
-            }, null, false),
-            'userOrganizations' => fn () => $user ? rescue(fn () => $user->organizations()
-                ->where('organizations.status', 'active')
-                ->wherePivot('status', 'active')
-                ->withPivot('role', 'title', 'status')
-                ->get(['organizations.id', 'organizations.name', 'organizations.slug', 'organizations.organization_type', 'organizations.status']), [], false) : [],
+            'tenantSubscription' => fn () => $subscription ? [
+                'status' => $subscription->status,
+                'has_access' => (bool) $subscription->hasAccess(),
+                'is_trialing' => (bool) $subscription->isTrialing(),
+                'is_expired' => (bool) $subscription->isTrialExpired(),
+                'days_remaining' => (int) $subscription->daysRemainingInTrial(),
+            ] : null,
+            'userOrganizations' => fn () => $user ? (
+                $user->relationLoaded('organizations')
+                    ? $user->getRelation('organizations')
+                    : rescue(fn () => $user->organizations()
+                        ->where('organizations.status', 'active')
+                        ->wherePivot('status', 'active')
+                        ->withPivot('role', 'title', 'status')
+                        ->get(['organizations.id', 'organizations.name', 'organizations.slug', 'organizations.organization_type', 'organizations.status']), [], false)
+            ) : [],
         ]);
 
         // Enforce subscription access and configured expiry policy (read-only vs locked)
         if ($currentOrg && $user && ! $user->isSuperAdmin()) {
-            $subscription = rescue(fn () => $currentOrg->subscription, null, false);
             if ($subscription && ! $subscription->hasAccess()) {
                 $policy = config('billing.expiry_policy', 'read_only');
 

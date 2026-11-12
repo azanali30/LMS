@@ -57,13 +57,15 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user,
                 'currentOrganization' => fn () => rescue(fn () => \App\Services\TenantContext::current(), null, false),
-                'userOrganizations' => fn () => $user
-                    ? rescue(fn () => $user->organizations()
-                        ->where('organizations.status', 'active')
-                        ->wherePivot('status', 'active')
-                        ->withPivot('role', 'title', 'status')
-                        ->get(['organizations.id', 'organizations.name', 'organizations.slug', 'organizations.organization_type', 'organizations.status']), [], false)
-                    : [],
+                'userOrganizations' => fn () => $user ? (
+                    $user->relationLoaded('organizations')
+                        ? $user->getRelation('organizations')
+                        : rescue(fn () => $user->organizations()
+                            ->where('organizations.status', 'active')
+                            ->wherePivot('status', 'active')
+                            ->withPivot('role', 'title', 'status')
+                            ->get(['organizations.id', 'organizations.name', 'organizations.slug', 'organizations.organization_type', 'organizations.status']), [], false)
+                ) : [],
                 'organizationRole' => fn () => rescue(fn () => \App\Services\TenantContext::currentRole($user), null, false),
                 'isSuperAdmin' => fn () => rescue(fn () => \App\Services\TenantContext::isSuperAdmin($user), false, false),
                 'canCreateOrganization' => fn () => $user ? rescue(fn () => $user->canCreateOrganization(), true, false) : false,

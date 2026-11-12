@@ -22,6 +22,7 @@ interface ClassSection {
     name: string;
     room?: string;
     capacity: number;
+    student_enrollments_count?: number;
     student_enrollments?: Array<unknown>;
 }
 
@@ -224,7 +225,7 @@ export default function ClassesPage({ classes, canManage = false }: ClassesProps
                     classes.data.map((cls) => {
                         const totalCapacity = cls.sections.reduce((acc, s) => acc + (s.capacity || 0), 0);
                         const totalEnrolled = cls.sections.reduce(
-                            (acc, s) => acc + (s.student_enrollments?.length || 0),
+                            (acc, s) => acc + (s.student_enrollments_count ?? s.student_enrollments?.length ?? 0),
                             0
                         );
 
@@ -348,7 +349,7 @@ export default function ClassesPage({ classes, canManage = false }: ClassesProps
                                                         <div className="flex items-center gap-1.5">
                                                             <Users className="size-3 text-slate-400 dark:text-slate-500" />
                                                             <span>
-                                                                Enrolled: {sec.student_enrollments?.length || 0} / {sec.capacity}
+                                                                Enrolled: {sec.student_enrollments_count ?? sec.student_enrollments?.length ?? 0} / {sec.capacity}
                                                             </span>
                                                         </div>
                                                         {sec.room && (
@@ -459,7 +460,7 @@ export default function ClassesPage({ classes, canManage = false }: ClassesProps
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <span className="rounded bg-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                                                        {s.student_enrollments?.length || 0} / {s.capacity} Students
+                                                        {s.student_enrollments_count ?? s.student_enrollments?.length ?? 0} / {s.capacity} Students
                                                     </span>
                                                     <Link
                                                         href={`/school/students?section_id=${s.id}`}

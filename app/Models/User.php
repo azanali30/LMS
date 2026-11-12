@@ -166,6 +166,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             ->first();
     }
 
+    protected ?bool $cachedCanCreateOrganization = null;
+
     /**
      * Determine if the user is authorized to create a new organization.
      * Allowed: Platform Super Admins and Organization Owners who have not reached their plan's organization limit.
@@ -173,37 +175,41 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      */
     public function canCreateOrganization(): bool
     {
-        if ($this->isSuperAdmin()) {
-            return true;
+        if ($this->cachedCanCreateOrganization !== null) {
+            return $this->cachedCanCreateOrganization;
         }
 
-        $totalMemberships = $this->organizations()->count();
+        if ($this->isSuperAdmin()) {
+            return $this->cachedCanCreateOrganization = true;
+        }
+
+        $stats = \Illuminate\Support\Facades\DB::table('organization_user')
+            ->join('organizations', 'organizations.id', '=', 'organization_user.organization_id')
+            ->where('organization_user.user_id', $this->id)
+            ->selectRaw("
+                COUNT(*) as total_memberships,
+                SUM(CASE WHEN organizations.status = 'active' AND organization_user.status = 'active' AND organization_user.role = 'owner' THEN 1 ELSE 0 END) as active_owner_count,
+                SUM(CASE WHEN organization_user.role = 'owner' THEN 1 ELSE 0 END) as owned_count
+            ")
+            ->first();
+
+        $totalMemberships = (int) ($stats->total_memberships ?? 0);
+        $activeOwnerCount = (int) ($stats->active_owner_count ?? 0);
+        $ownedCount = (int) ($stats->owned_count ?? 0);
 
         // If user belongs to organizations but none as an active owner (e.g. teacher/student/parent)
-        if ($totalMemberships > 0) {
-            $isOwner = $this->organizations()
-                ->where('organizations.status', 'active')
-                ->wherePivot('status', 'active')
-                ->wherePivot('role', 'owner')
-                ->exists();
-
-            if (! $isOwner) {
-                return false;
-            }
+        if ($totalMemberships > 0 && $activeOwnerCount === 0) {
+            return $this->cachedCanCreateOrganization = false;
         }
-
-        $ownedCount = $this->organizations()
-            ->wherePivot('role', 'owner')
-            ->count();
 
         $limit = $this->maxOrganizationEntitlement();
 
         // null = unlimited (Premium or initial creation)
         if ($limit === null) {
-            return true;
+            return $this->cachedCanCreateOrganization = true;
         }
 
-        return $ownedCount < $limit;
+        return $this->cachedCanCreateOrganization = ($ownedCount < $limit);
     }
 
     /**

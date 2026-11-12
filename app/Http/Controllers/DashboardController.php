@@ -145,29 +145,36 @@ class DashboardController extends Controller
      */
     private function adminDashboard(Organization $organization): Response
     {
-        $totalStudents = rescue(fn () => OrganizationUser::where('organization_id', $organization->id)
-            ->where('role', 'student')
-            ->count(), 0, false);
+        $memberCounts = rescue(fn () => OrganizationUser::where('organization_id', $organization->id)
+            ->selectRaw("
+                SUM(CASE WHEN role = 'student' THEN 1 ELSE 0 END) as students_count,
+                SUM(CASE WHEN role = 'teacher' THEN 1 ELSE 0 END) as teachers_count
+            ")
+            ->first(), null, false);
 
-        $totalTeachers = rescue(fn () => OrganizationUser::where('organization_id', $organization->id)
-            ->where('role', 'teacher')
-            ->count(), 0, false);
+        $totalStudents = (int) ($memberCounts->students_count ?? 0);
+        $totalTeachers = (int) ($memberCounts->teachers_count ?? 0);
 
         $totalClasses = rescue(fn () => SchoolClass::where('organization_id', $organization->id)->count(), 0, false);
         $totalSections = rescue(fn () => ClassSection::where('organization_id', $organization->id)->count(), 0, false);
         $totalCourses = rescue(fn () => Course::where('organization_id', $organization->id)->count(), 0, false);
 
         $attendanceRate = rescue(function () use ($organization) {
-            $todayAttendance = Attendance::where('organization_id', $organization->id)
+            $stats = Attendance::where('organization_id', $organization->id)
                 ->whereDate('date', now()->toDateString())
-                ->get();
+                ->selectRaw("
+                    COUNT(*) as total_marked,
+                    SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present_count
+                ")
+                ->first();
 
-            $presentCount = $todayAttendance->where('status', 'present')->count();
-            $totalMarked = $todayAttendance->count();
+            $totalMarked = (int) ($stats->total_marked ?? 0);
+            $presentCount = (int) ($stats->present_count ?? 0);
+
             return $totalMarked > 0 ? round(($presentCount / $totalMarked) * 100, 1) : 100.0;
         }, 100.0, false);
 
-        $recentMembers = rescue(fn () => OrganizationUser::with('user')
+        $recentMembers = rescue(fn () => OrganizationUser::with('user:id,name,email')
             ->where('organization_id', $organization->id)
             ->latest()
             ->take(6)

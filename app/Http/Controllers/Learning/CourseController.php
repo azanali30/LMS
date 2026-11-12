@@ -86,8 +86,11 @@ class CourseController extends Controller
         $courses = $query->latest()->paginate(12)->withQueryString();
         $categories = CourseCategory::all();
 
-        $totalCourses = Course::where('organization_id', $organization->id)->count();
-        $publishedCourses = Course::where('organization_id', $organization->id)->where('is_published', true)->count();
+        $courseStats = Course::where('organization_id', $organization->id)
+            ->selectRaw('COUNT(*) as total_courses, SUM(CASE WHEN is_published = 1 THEN 1 ELSE 0 END) as published_courses')
+            ->first();
+        $totalCourses = (int) ($courseStats->total_courses ?? 0);
+        $publishedCourses = (int) ($courseStats->published_courses ?? 0);
         $totalModules = CourseModule::where('organization_id', $organization->id)->count();
         $totalEnrollments = CourseEnrollment::where('organization_id', $organization->id)->count();
 

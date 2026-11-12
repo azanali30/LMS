@@ -12,6 +12,9 @@ class TenantContext
 
     private static bool $isBypassed = false;
 
+    /** @var array<string, ?string> */
+    private static array $roleCache = [];
+
     /**
      * Get the currently active organization.
      */
@@ -42,6 +45,15 @@ class TenantContext
     public static function set(?Organization $organization): void
     {
         self::$currentOrganization = $organization;
+        self::$roleCache = [];
+    }
+
+    /**
+     * Prime the per-request role cache when membership has already been resolved.
+     */
+    public static function setRole(int $userId, int $organizationId, ?string $role): void
+    {
+        self::$roleCache["{$userId}:{$organizationId}"] = $role;
     }
 
     /**
@@ -95,12 +107,17 @@ class TenantContext
             return 'super_admin';
         }
 
+        $cacheKey = "{$user->id}:" . self::$currentOrganization->id;
+        if (array_key_exists($cacheKey, self::$roleCache)) {
+            return self::$roleCache[$cacheKey];
+        }
+
         $membership = $user->organizationMemberships()
             ->where('organization_id', self::$currentOrganization->id)
             ->where('status', 'active')
-            ->first();
+            ->first(['role']);
 
-        return $membership?->role;
+        return self::$roleCache[$cacheKey] = $membership?->role;
     }
 
     /**

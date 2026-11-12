@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,6 +31,30 @@ class Organization extends Model
         'allow_attendance_editing',
         'created_by',
     ];
+
+    /**
+     * Normalize legacy absolute localhost/127.0.0.1 logo URLs to domain-relative /storage paths.
+     */
+    protected function logoPath(): Attribute
+    {
+        return Attribute::make(
+            get: function (?string $value): ?string {
+                if (! $value) {
+                    return null;
+                }
+
+                if (preg_match('#^https?://(?:localhost|127\.0\.0\.1)(?::\d+)?(/storage/.+)$#i', $value, $matches)) {
+                    return $matches[1];
+                }
+
+                if (str_starts_with($value, 'logos/')) {
+                    return '/storage/' . $value;
+                }
+
+                return $value;
+            }
+        );
+    }
 
     /**
      * Build the fully qualified subdomain URL for this organization.

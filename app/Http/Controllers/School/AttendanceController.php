@@ -53,12 +53,23 @@ class AttendanceController extends Controller
                 ->orderBy('date', 'desc')
                 ->paginate(30);
 
+            $statsRow = Attendance::where('organization_id', $organization->id)
+                ->where('student_id', $user->id)
+                ->selectRaw("
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present_count,
+                    SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent_count,
+                    SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late_count,
+                    SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused_count
+                ")
+                ->first();
+
             $stats = [
-                'total' => Attendance::where('organization_id', $organization->id)->where('student_id', $user->id)->count(),
-                'present' => Attendance::where('organization_id', $organization->id)->where('student_id', $user->id)->where('status', 'present')->count(),
-                'absent' => Attendance::where('organization_id', $organization->id)->where('student_id', $user->id)->where('status', 'absent')->count(),
-                'late' => Attendance::where('organization_id', $organization->id)->where('student_id', $user->id)->where('status', 'late')->count(),
-                'excused' => Attendance::where('organization_id', $organization->id)->where('student_id', $user->id)->where('status', 'excused')->count(),
+                'total' => (int) ($statsRow->total ?? 0),
+                'present' => (int) ($statsRow->present_count ?? 0),
+                'absent' => (int) ($statsRow->absent_count ?? 0),
+                'late' => (int) ($statsRow->late_count ?? 0),
+                'excused' => (int) ($statsRow->excused_count ?? 0),
             ];
 
             return Inertia::render('school/attendance', [

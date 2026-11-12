@@ -1,5 +1,5 @@
 import { Head, useForm, router } from '@inertiajs/react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import TenantLayout from '@/layouts/tenant-layout';
 import {
     Settings,
@@ -49,6 +49,10 @@ export default function OrganizationSettings({ organization }: SettingsProps) {
     const [logoPreview, setLogoPreview] = useState<string | null>(
         organization.logo_path || null
     );
+
+    useEffect(() => {
+        setLogoPreview(organization.logo_path || null);
+    }, [organization.logo_path]);
 
     const { data, setData, processing, errors } = useForm({
         name: organization.name || '',

@@ -32,6 +32,20 @@ Route::get('/about', [PublicController::class, 'about'])->name('about');
 Route::get('/download', [PublicController::class, 'download'])->name('download');
 Route::get('/contact', [PublicController::class, 'contact'])->name('contact');
 Route::post('/contact', [PublicController::class, 'storeContact'])->name('contact.store');
+Route::get('/storage/logos/{filename}', function (string $filename) {
+    $safeFilename = basename($filename);
+    $disk = \Illuminate\Support\Facades\Storage::disk('public');
+    $path = "logos/{$safeFilename}";
+
+    if (! $disk->exists($path)) {
+        abort(404);
+    }
+
+    return $disk->response($path, $safeFilename, [
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->where('filename', '[A-Za-z0-9._-]+')->name('organizations.logo.show');
+
 Route::get('/terms', [PublicController::class, 'terms'])->name('terms');
 Route::get('/privacy-policy', [PublicController::class, 'privacyPolicy'])->name('privacy-policy');
 Route::get('/refund-policy', [PublicController::class, 'refundPolicy'])->name('refund-policy');

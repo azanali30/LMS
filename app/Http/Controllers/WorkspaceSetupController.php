@@ -35,13 +35,18 @@ class WorkspaceSetupController extends Controller
             ->wherePivot('role', 'owner')
             ->get();
 
-        if ($ownedOrganizations->isNotEmpty() && ! $request->has('new')) {
+        if ($ownedOrganizations->isNotEmpty() && $request->routeIs('workspace.setup') && ! $request->has('new')) {
             return redirect()->route('dashboard')
                 ->with('info', "Your school workspace '{$ownedOrganizations->first()->name}' is already active. You can customize branding and settings anytime.");
         }
 
         if (! $user->canCreateOrganization()) {
-            abort(403, 'Unauthorized. You have reached the maximum organization limit allowed by your subscription plan. Please upgrade your plan to create additional workspaces.');
+            if ($ownedOrganizations->isNotEmpty()) {
+                return redirect()->route('organizations.billing.index')
+                    ->with('error', 'You have reached the maximum organization limit allowed by your subscription plan. Please upgrade your plan to create additional workspaces.');
+            }
+
+            abort(403, 'Unauthorized. You do not have permission to create an organization.');
         }
 
         $plans = SubscriptionPlan::where('is_active', true)
@@ -192,7 +197,7 @@ class WorkspaceSetupController extends Controller
         $logoPath = $validated['logo_path'] ?? null;
         if ($request->hasFile('logo')) {
             $path = $request->file('logo')->store('logos', 'public');
-            $logoPath = Storage::url($path);
+            $logoPath = '/storage/' . ltrim($path, '/');
         }
 
         $organization = DB::transaction(function () use ($validated, $user, $logoPath) {

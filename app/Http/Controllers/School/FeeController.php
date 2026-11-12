@@ -134,15 +134,20 @@ class FeeController extends Controller
             $metricsBase->whereDate('billing_month', Carbon::parse($filterMonth)->startOfMonth()->toDateString());
         }
 
-        $totalInvoiced = (float) (clone $metricsBase)->sum('total_amount');
-        $totalCollected = (float) (clone $metricsBase)->sum('paid_amount');
-        $totalOutstanding = (float) (clone $metricsBase)->sum('balance_due');
+        $today = now()->toDateString();
+        $metricsAgg = (clone $metricsBase)
+            ->selectRaw("
+                COALESCE(SUM(total_amount), 0) as total_invoiced,
+                COALESCE(SUM(paid_amount), 0) as total_collected,
+                COALESCE(SUM(balance_due), 0) as total_outstanding,
+                COALESCE(SUM(CASE WHEN status != 'paid' AND balance_due > 0 AND DATE(due_date) < ? THEN balance_due ELSE 0 END), 0) as overdue_balance
+            ", [$today])
+            ->first();
 
-        $overdueBalance = (float) (clone $metricsBase)
-            ->where('status', '!=', 'paid')
-            ->where('balance_due', '>', 0)
-            ->whereDate('due_date', '<', now()->toDateString())
-            ->sum('balance_due');
+        $totalInvoiced = (float) ($metricsAgg->total_invoiced ?? 0);
+        $totalCollected = (float) ($metricsAgg->total_collected ?? 0);
+        $totalOutstanding = (float) ($metricsAgg->total_outstanding ?? 0);
+        $overdueBalance = (float) ($metricsAgg->overdue_balance ?? 0);
 
         $collectionRate = $totalInvoiced > 0
             ? round(($totalCollected / $totalInvoiced) * 100, 1)

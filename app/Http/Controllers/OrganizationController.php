@@ -235,8 +235,13 @@ class OrganizationController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
+            $oldLogo = $organization->getRawOriginal('logo_path');
+            if ($oldLogo && preg_match('#(?:^|/storage/)(logos/[A-Za-z0-9._-]+)$#', $oldLogo, $m)) {
+                Storage::disk('public')->delete($m[1]);
+            }
+
             $path = $request->file('logo')->store('logos', 'public');
-            $validated['logo_path'] = Storage::url($path);
+            $validated['logo_path'] = '/storage/' . ltrim($path, '/');
         }
 
         if (! empty($validated['currency'])) {

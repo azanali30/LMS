@@ -37,6 +37,63 @@ interface TenantLayoutProps {
     children: React.ReactNode;
 }
 
+function OrgAvatar({
+    name,
+    logoPath,
+    size = 'md',
+    variant = 'initial',
+}: {
+    name?: string | null;
+    logoPath?: string | null;
+    size?: 'xs' | 'sm' | 'md';
+    variant?: 'initial' | 'icon';
+}) {
+    const [failed, setFailed] = useState(false);
+
+    useEffect(() => {
+        setFailed(false);
+    }, [logoPath]);
+
+    const sizeClasses = {
+        xs: 'size-4 rounded',
+        sm: 'size-5 rounded',
+        md: 'size-10 rounded-xl',
+    }[size];
+
+    if (logoPath && !failed) {
+        return (
+            <div
+                className={`flex shrink-0 items-center justify-center overflow-hidden border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900 ${size === 'md' ? 'p-1' : 'p-0.5'} ${sizeClasses}`}
+            >
+                <img
+                    src={logoPath}
+                    alt={name || 'Organization'}
+                    onError={() => setFailed(true)}
+                    className="size-full object-contain"
+                />
+            </div>
+        );
+    }
+
+    if (variant === 'icon') {
+        return <Building2 className={size === 'xs' ? 'size-3.5 text-purple-600 dark:text-purple-400' : 'size-4 text-purple-600 dark:text-purple-400'} />;
+    }
+
+    if (size === 'md') {
+        return (
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 via-violet-500 to-indigo-500 text-sm font-extrabold text-white shadow-md shadow-purple-600/30 transition-transform group-hover:scale-105">
+                {name ? name.charAt(0).toUpperCase() : <GraduationCap className="size-5" />}
+            </div>
+        );
+    }
+
+    return (
+        <div className={`flex shrink-0 items-center justify-center bg-purple-100 text-[10px] font-bold text-purple-600 dark:bg-purple-900/40 dark:text-purple-300 ${sizeClasses}`}>
+            {name ? name.charAt(0).toUpperCase() : <Building2 className="size-3" />}
+        </div>
+    );
+}
+
 export default function TenantLayout({
     title = 'Dashboard',
     children,
@@ -387,19 +444,7 @@ export default function TenantLayout({
                                     className="group flex min-w-0 flex-1 items-center gap-3"
                                     title={currentOrg.name}
                                 >
-                                    {currentOrg.logo_path ? (
-                                        <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-sm transition-transform group-hover:scale-105 dark:border-slate-800 dark:bg-slate-900">
-                                            <img
-                                                src={currentOrg.logo_path}
-                                                alt={currentOrg.name}
-                                                className="size-full object-contain"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-purple-600 via-violet-500 to-indigo-500 text-sm font-extrabold text-white shadow-md shadow-purple-600/30 transition-transform group-hover:scale-105">
-                                            {currentOrg.name ? currentOrg.name.charAt(0).toUpperCase() : <GraduationCap className="size-5" />}
-                                        </div>
-                                    )}
+                                    <OrgAvatar name={currentOrg.name} logoPath={currentOrg.logo_path} size="md" />
                                     <div className="min-w-0 flex-1">
                                         <span className="block truncate text-base font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-purple-600 dark:text-white dark:group-hover:text-purple-400">
                                             {currentOrg.name}
@@ -456,17 +501,7 @@ export default function TenantLayout({
                                                     }`}
                                                 >
                                                     <div className="flex items-center gap-2 min-w-0">
-                                                        {org.logo_path ? (
-                                                            <img
-                                                                src={org.logo_path}
-                                                                alt={org.name}
-                                                                className="size-5 shrink-0 rounded object-contain border border-slate-200 dark:border-slate-800"
-                                                            />
-                                                        ) : (
-                                                            <div className="flex size-5 shrink-0 items-center justify-center rounded bg-purple-100 text-[10px] font-bold text-purple-600 dark:bg-purple-900/40 dark:text-purple-300">
-                                                                {org.name.charAt(0).toUpperCase()}
-                                                            </div>
-                                                        )}
+                                                        <OrgAvatar name={org.name} logoPath={org.logo_path} size="sm" />
                                                         <div className="flex flex-col text-left min-w-0">
                                                             <span className="truncate">
                                                                 {org.name}
@@ -675,11 +710,7 @@ export default function TenantLayout({
                                     className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-800 transition hover:border-purple-400 hover:bg-slate-100 focus:outline-none dark:border-slate-800 dark:bg-slate-900/90 dark:text-white dark:hover:border-purple-500/40 dark:hover:bg-slate-900"
                                     title="Switch active organization"
                                 >
-                                    {currentOrg.logo_path ? (
-                                        <img src={currentOrg.logo_path} alt={currentOrg.name} className="size-4 rounded object-contain" />
-                                    ) : (
-                                        <Building2 className="size-3.5 text-purple-600 dark:text-purple-400" />
-                                    )}
+                                    <OrgAvatar name={currentOrg.name} logoPath={currentOrg.logo_path} size="xs" variant="icon" />
                                     <span className="max-w-[150px] truncate font-semibold">{currentOrg.name}</span>
                                     <span className={`rounded border px-1.5 py-0.2 text-[9px] font-semibold ${roleBadge.color}`}>
                                         {roleBadge.label}
@@ -714,13 +745,16 @@ export default function TenantLayout({
                                                                 : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white'
                                                         }`}
                                                     >
-                                                        <div className="flex flex-col text-left min-w-0">
-                                                            <span className="truncate font-medium">{org.name}</span>
-                                                            {org.pivot?.role && (
-                                                                <span className="text-[10px] text-slate-500 capitalize dark:text-slate-400">
-                                                                    Role: {org.pivot.role}
-                                                                </span>
-                                                            )}
+                                                        <div className="flex items-center gap-2 min-w-0">
+                                                            <OrgAvatar name={org.name} logoPath={org.logo_path} size="sm" />
+                                                            <div className="flex flex-col text-left min-w-0">
+                                                                <span className="truncate font-medium">{org.name}</span>
+                                                                {org.pivot?.role && (
+                                                                    <span className="text-[10px] text-slate-500 capitalize dark:text-slate-400">
+                                                                        Role: {org.pivot.role}
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                         {org.id === currentOrg.id && (
                                                             <Check className="size-3.5 shrink-0 text-purple-600 dark:text-purple-400" />

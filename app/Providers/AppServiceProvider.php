@@ -27,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
 
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Organization::class, \App\Policies\OrganizationPolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\App\Models\FeeInvoice::class, \App\Policies\FeeInvoicePolicy::class);
+        \Illuminate\Support\Facades\Event::listen(
+            \Illuminate\Notifications\Events\NotificationSent::class,
+            \App\Listeners\BroadcastSavedNotification::class
+        );
 
         // Branded HTML Password Reset Notification
         \Illuminate\Auth\Notifications\ResetPassword::toMailUsing(function ($notifiable, string $token) {

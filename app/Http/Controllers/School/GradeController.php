@@ -310,6 +310,29 @@ class GradeController extends Controller
             'due_date' => $validated['due_date'] ?? null,
         ]);
 
+        $studentIds = \App\Models\StudentEnrollment::where('organization_id', $organization->id)
+            ->where('class_section_id', $validated['class_section_id'])
+            ->pluck('student_id')
+            ->unique();
+
+        if ($studentIds->isNotEmpty()) {
+            $isAssignment = in_array(strtolower((string) $assessment->type), ['assignment', 'homework', 'project'], true);
+            $category = $isAssignment ? 'assignments' : 'academics';
+            $dueNote = $assessment->due_date ? ' Due: '.Carbon::parse($assessment->due_date)->format('M d, Y').'.' : '';
+
+            app(\App\Services\NotificationDispatcher::class)->toUsers(
+                recipients: \App\Models\User::whereIn('id', $studentIds)->get(),
+                organizationId: $organization->id,
+                category: $category,
+                title: ($isAssignment ? 'New Assignment: ' : 'New Assessment: ').$assessment->title,
+                message: "{$assessment->title} has been published.{$dueNote}",
+                url: '/school/grades',
+                icon: $isAssignment ? 'file-text' : 'graduation-cap',
+                severity: 'info',
+                meta: ['assessment_id' => $assessment->id],
+            );
+        }
+
         return redirect()->route('school.grades.index', ['assessment_id' => $assessment->id])
             ->with('success', "Assessment {$assessment->title} created.");
     }
@@ -356,6 +379,7 @@ class GradeController extends Controller
 
         $graderId = $user->id;
 
+        $dispatcher = app(\App\Services\NotificationDispatcher::class);
         foreach ($validated['grades'] as $item) {
             Grade::updateOrCreate(
                 [
@@ -368,6 +392,19 @@ class GradeController extends Controller
                     'feedback' => $item['feedback'] ?? null,
                     'graded_by' => $graderId,
                 ]
+            );
+
+            $dispatcher->toStudentAndParents(
+                organizationId: $organization->id,
+                studentId: (int) $item['student_id'],
+                category: 'academics',
+                title: "Result Published: {$assessment->title}",
+                message: "Your result for {$assessment->title} is now available.",
+                parentMessage: "Examination/assessment result for {$assessment->title} has been published.",
+                url: '/school/grades',
+                icon: 'award',
+                severity: 'success',
+                meta: ['assessment_id' => $assessment->id],
             );
         }
 

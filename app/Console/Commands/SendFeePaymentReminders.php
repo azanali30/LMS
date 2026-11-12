@@ -12,6 +12,7 @@ class SendFeePaymentReminders extends Command
      */
     protected $signature = 'fees:send-reminders 
                             {--org= : Filter by specific Organization ID}
+                            {--local-hour= : Minimum local hour (0-23) in each organization timezone before dispatching}
                             {--dry-run : Preview matching reminders without actually dispatching notifications}';
 
     /**
@@ -25,11 +26,12 @@ class SendFeePaymentReminders extends Command
     public function handle(FeeReminderService $service): int
     {
         $orgId = $this->option('org') ? (int) $this->option('org') : null;
+        $localHour = $this->option('local-hour') !== null ? (int) $this->option('local-hour') : null;
         $isDryRun = (bool) $this->option('dry-run');
 
         $this->info("Scanning eligible fee invoices for reminder dispatches..." . ($isDryRun ? " (DRY RUN MODE)" : ""));
 
-        $result = $service->processReminders($orgId, $isDryRun);
+        $result = $service->processReminders($orgId, $isDryRun, $localHour);
 
         $this->table(
             ['Metric', 'Count'],

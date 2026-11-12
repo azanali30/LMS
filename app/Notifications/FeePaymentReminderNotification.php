@@ -3,11 +3,15 @@
 namespace App\Notifications;
 
 use App\Models\FeeInvoice;
+use App\Models\NotificationPreference;
+use App\Models\User;
+use App\Notifications\Channels\TenantDatabaseChannel;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FeePaymentReminderNotification extends Notification
+class FeePaymentReminderNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -22,10 +26,20 @@ class FeePaymentReminderNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        $channels = ['database'];
+        $channels = [];
+        $isCritical = $this->reminderType === 'overdue_10';
+        $prefs = $notifiable instanceof User
+            ? NotificationPreference::resolveFor($notifiable->id, $this->invoice->organization_id, 'fees', $isCritical)
+            : ['in_app' => true, 'browser' => false, 'email' => true];
 
-        // Add mail if recipient has email address
-        if (! empty($notifiable->email)) {
+        if ($prefs['in_app']) {
+            $channels[] = TenantDatabaseChannel::class;
+        }
+
+        $mailer = config('mail.default');
+        $mailConfigured = ! in_array($mailer, ['log', 'null', null, ''], true);
+
+        if (($prefs['email'] || $isCritical) && $mailConfigured && ! empty($notifiable->email)) {
             $channels[] = 'mail';
         }
 
@@ -80,6 +94,9 @@ class FeePaymentReminderNotification extends Notification
 
         return [
             'type' => 'fee_reminder',
+            'category' => 'fees',
+            'scope' => 'organization',
+            'organization_id' => $invoice->organization_id,
             'reminder_type' => $this->reminderType,
             'recipient_role' => $this->recipientRole,
             'fee_invoice_id' => $invoice->id,
@@ -95,6 +112,8 @@ class FeePaymentReminderNotification extends Notification
             'title' => $this->getSubjectLine(),
             'message' => $this->getInAppMessage(),
             'url' => '/school/my-fees',
+            'icon' => 'credit-card',
+            'severity' => $this->reminderType === 'overdue_10' ? 'error' : ($this->reminderType === 'due_today' ? 'warning' : 'info'),
         ];
     }
 

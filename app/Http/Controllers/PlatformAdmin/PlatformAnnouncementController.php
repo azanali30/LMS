@@ -99,6 +99,24 @@ class PlatformAnnouncementController extends Controller
                 request: $request
             );
 
+            $recipients = match ($announcement->target_audience) {
+                'owners' => \App\Models\User::whereHas('organizations', fn ($q) => $q->where('organization_user.role', 'owner')->where('organization_user.status', 'active'))->get(),
+                'teachers' => \App\Models\User::whereHas('organizations', fn ($q) => $q->where('organization_user.role', 'teacher')->where('organization_user.status', 'active'))->get(),
+                'students' => \App\Models\User::whereHas('organizations', fn ($q) => $q->where('organization_user.role', 'student')->where('organization_user.status', 'active'))->get(),
+                default => \App\Models\User::query()->get(),
+            };
+
+            app(\App\Services\NotificationDispatcher::class)->toPlatformUsers(
+                recipients: $recipients,
+                category: 'announcements',
+                title: $announcement->title,
+                message: \Illuminate\Support\Str::limit(strip_tags((string) $announcement->content), 160),
+                url: '/notifications',
+                icon: 'megaphone',
+                severity: 'info',
+                meta: ['platform_announcement_id' => $announcement->id],
+            );
+
             return back()->with('success', "Announcement '{$announcement->title}' published.");
         });
     }

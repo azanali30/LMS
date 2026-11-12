@@ -30,7 +30,9 @@ import {
 } from 'lucide-react';
 import type { Auth, Flash, Organization } from '@/types';
 import AppLogoIcon from '@/components/app-logo-icon';
+import { NotificationIcon } from '@/components/notifications/notification-icon';
 import { useAppearance } from '@/hooks/use-appearance';
+import { useNotifications } from '@/hooks/use-notifications';
 
 interface TenantLayoutProps {
     title?: string;
@@ -136,48 +138,18 @@ export default function TenantLayout({
         };
     }, []);
 
-    const notifications = (page.props as any).notifications as
-        | {
-              unreadCount: number;
-              recent: Array<{
-                  id: string;
-                  type: string;
-                  data: {
-                      type?: string;
-                      title?: string;
-                      message?: string;
-                      url?: string;
-                      balance_due?: number;
-                      currency?: string;
-                      reminder_type?: string;
-                  };
-                  read_at: string | null;
-                  created_at: string;
-              }>;
-          }
-        | undefined;
-
-    const unreadCount = notifications?.unreadCount || 0;
-    const recentNotifs = notifications?.recent || [];
+    const {
+        unreadCount,
+        recent: recentNotifs,
+        markAsRead,
+        markAllAsRead: markAllNotificationsAsRead,
+    } = useNotifications();
 
     const markNotificationAsRead = (id: string, targetUrl?: string) => {
-        router.post(
-            `/notifications/${id}/read`,
-            {},
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    if (targetUrl) {
-                        setNotifDropdownOpen(false);
-                        router.visit(targetUrl);
-                    }
-                },
-            }
-        );
-    };
-
-    const markAllNotificationsAsRead = () => {
-        router.post('/notifications/read-all', {}, { preserveScroll: true });
+        if (targetUrl) {
+            setNotifDropdownOpen(false);
+        }
+        markAsRead(id, targetUrl);
     };
 
     const toggleTheme = () => {
@@ -866,11 +838,11 @@ export default function TenantLayout({
                                                         >
                                                             <div className="flex items-start justify-between gap-2">
                                                                 <div className="flex items-center gap-1.5">
-                                                                    {isFee ? (
-                                                                        <CreditCard className="size-3.5 text-purple-600 dark:text-purple-400" />
-                                                                    ) : (
-                                                                        <Bell className="size-3.5 text-slate-400" />
-                                                                    )}
+                                                                    <NotificationIcon
+                                                                        icon={n.data?.icon}
+                                                                        category={n.category || n.data?.category || (isFee ? 'fees' : undefined)}
+                                                                        className="size-3.5 text-purple-600 dark:text-purple-400"
+                                                                    />
                                                                     <span className="font-bold text-slate-900 dark:text-white">
                                                                         {n.data?.title || 'System Notification'}
                                                                     </span>
@@ -908,11 +880,11 @@ export default function TenantLayout({
 
                                         <div className="border-t border-slate-200 p-2 text-center dark:border-slate-800">
                                             <Link
-                                                href={role === 'student' ? '/school/my-fees' : '/school/fees'}
+                                                href="/notifications"
                                                 onClick={() => setNotifDropdownOpen(false)}
                                                 className="block rounded-lg py-1.5 text-[11px] font-bold text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-500/10"
                                             >
-                                                {role === 'student' ? 'Go to My Fees & Payments' : 'Go to Fee Management Ledger'}
+                                                View All Notifications &rarr;
                                             </Link>
                                         </div>
                                     </div>

@@ -273,8 +273,10 @@ class AttendanceController extends Controller
         }
 
         $markedBy = $user->id;
+        $absentStudentIds = [];
+        $correctedStudentIds = [];
 
-        DB::transaction(function () use ($organization, $validated, $timetableEntryId, $markedBy, $isPeriodWise) {
+        DB::transaction(function () use ($organization, $validated, $timetableEntryId, $markedBy, &$absentStudentIds, &$correctedStudentIds) {
             foreach ($validated['attendances'] as $record) {
                 $query = Attendance::where('organization_id', $organization->id)
                     ->where('class_section_id', $validated['class_section_id'])
@@ -290,12 +292,19 @@ class AttendanceController extends Controller
                 $existing = $query->first();
 
                 if ($existing) {
+                    $previousStatus = $existing->status;
                     $existing->update([
                         'timetable_entry_id' => $timetableEntryId,
                         'marked_by' => $markedBy,
                         'status' => $record['status'],
                         'remarks' => $record['remarks'] ?? null,
                     ]);
+
+                    if ($previousStatus === 'absent' && in_array($record['status'], ['present', 'excused'], true)) {
+                        $correctedStudentIds[] = (int) $record['student_id'];
+                    } elseif ($previousStatus !== 'absent' && $record['status'] === 'absent') {
+                        $absentStudentIds[] = (int) $record['student_id'];
+                    }
                 } else {
                     Attendance::create([
                         'organization_id' => $organization->id,
@@ -307,9 +316,60 @@ class AttendanceController extends Controller
                         'status' => $record['status'],
                         'remarks' => $record['remarks'] ?? null,
                     ]);
+
+                    if ($record['status'] === 'absent') {
+                        $absentStudentIds[] = (int) $record['student_id'];
+                    }
                 }
             }
         });
+
+        $dispatcher = app(\App\Services\NotificationDispatcher::class);
+        $formattedDate = Carbon::parse($date)->format('M d, Y');
+
+        foreach (array_unique($absentStudentIds) as $studentId) {
+            $dispatcher->toStudentAndParents(
+                organizationId: $organization->id,
+                studentId: $studentId,
+                category: 'attendance',
+                title: "Attendance Alert: Marked Absent ({$formattedDate})",
+                message: "You were marked absent for {$section->name} on {$formattedDate}.",
+                parentMessage: "Your child was marked absent in {$section->name} on {$formattedDate}.",
+                url: '/school/attendance',
+                icon: 'user-x',
+                severity: 'warning',
+                meta: ['type' => 'attendance_absent', 'date' => $date, 'class_section_id' => $section->id],
+            );
+        }
+
+        foreach (array_unique($correctedStudentIds) as $studentId) {
+            $dispatcher->toStudentAndParents(
+                organizationId: $organization->id,
+                studentId: $studentId,
+                category: 'attendance',
+                title: "Attendance Corrected ({$formattedDate})",
+                message: "Your attendance record for {$section->name} on {$formattedDate} has been updated.",
+                parentMessage: "Your child's attendance record in {$section->name} on {$formattedDate} has been corrected.",
+                url: '/school/attendance',
+                icon: 'check-circle',
+                severity: 'info',
+                meta: ['type' => 'attendance_corrected', 'date' => $date, 'class_section_id' => $section->id],
+            );
+        }
+
+        $dispatcher->toOrganizationRoles(
+            organizationId: $organization->id,
+            roles: ['owner', 'admin'],
+            category: 'attendance',
+            title: "Attendance Submitted: {$section->name}",
+            message: "{$user->name} submitted attendance for {$section->name} ({$formattedDate}).",
+            url: '/school/attendance',
+            icon: 'clipboard-check',
+            severity: 'info',
+            excludeUserId: $user->id,
+        );
+
+        $dispatcher->broadcastDomainUpdate($organization->id, 'attendance', ['owner', 'admin']);
 
         return back()->with('success', 'Attendance submitted successfully.');
     }
@@ -335,7 +395,7 @@ class AttendanceController extends Controller
         ]);
 
         // Verify section belongs to organization
-        ClassSection::where('organization_id', $organization->id)->findOrFail($validated['class_section_id']);
+        $section = ClassSection::where('organization_id', $organization->id)->findOrFail($validated['class_section_id']);
 
         // Verify substitute belongs to organization as teacher/admin
         $isMember = OrganizationUser::where('organization_id', $organization->id)
@@ -360,6 +420,19 @@ class AttendanceController extends Controller
                 'notes' => $validated['notes'] ?? null,
             ]
         );
+
+        if ($subTeacher = \App\Models\User::find($validated['substitute_teacher_id'])) {
+            app(\App\Services\NotificationDispatcher::class)->toUsers(
+                recipients: $subTeacher,
+                organizationId: $organization->id,
+                category: 'attendance',
+                title: "Substitute Assignment: {$section->name}",
+                message: "You have been assigned as substitute teacher for {$section->name} on {$validated['date']}.",
+                url: '/school/attendance',
+                icon: 'calendar-check',
+                severity: 'info',
+            );
+        }
 
         return back()->with('success', 'Substitute teacher authorized successfully.');
     }

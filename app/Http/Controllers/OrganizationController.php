@@ -252,6 +252,20 @@ class OrganizationController extends Controller
 
         $organization->update($validated);
 
+        $dispatcher = app(\App\Services\NotificationDispatcher::class);
+        $dispatcher->toOrganizationRoles(
+            organizationId: $organization->id,
+            roles: ['owner', 'admin'],
+            category: 'organization_activity',
+            title: 'Organization Settings Updated',
+            message: "{$request->user()->name} updated settings for {$organization->name}.",
+            url: '/organizations/settings',
+            icon: 'settings',
+            severity: 'info',
+            excludeUserId: $request->user()->id,
+        );
+        $dispatcher->broadcastDomainUpdate($organization->id, 'organization', ['owner', 'admin']);
+
         return back()->with('success', 'Organization settings updated successfully.');
     }
 
@@ -402,13 +416,38 @@ class OrganizationController extends Controller
             'user_id' => $user->id,
             'role' => $validated['role'],
             'status' => 'active',
-            'title' => $validated['title'] ?: ($validated['role'] === 'teacher' ? 'Faculty / Instructor' : 'Staff Admin'),
+            'title' => ($validated['title'] ?? null) ?: ($validated['role'] === 'teacher' ? 'Faculty / Instructor' : 'Staff Admin'),
         ]);
 
         // Delete any pending invitations for this email in this org
         OrganizationInvitation::where('organization_id', $organization->id)
             ->where('email', $validated['email'])
             ->delete();
+
+        $dispatcher = app(\App\Services\NotificationDispatcher::class);
+        $roleLabel = ucfirst($validated['role']);
+        $dispatcher->toOrganizationRoles(
+            organizationId: $organization->id,
+            roles: ['owner', 'admin'],
+            category: 'organization_activity',
+            title: "New {$roleLabel} Added: {$user->name}",
+            message: "{$user->name} joined {$organization->name} as {$roleLabel}.",
+            url: '/organizations/members',
+            icon: 'users',
+            severity: 'success',
+            excludeUserId: $request->user()->id,
+        );
+
+        $dispatcher->toUsers(
+            recipients: $user,
+            organizationId: $organization->id,
+            category: 'system',
+            title: "Welcome to {$organization->name}",
+            message: "Your {$roleLabel} account is now active in {$organization->name}.",
+            url: '/dashboard',
+            icon: 'sparkles',
+            severity: 'success',
+        );
 
         return back()->with('success', "Member {$user->name} ({$validated['role']}) added directly and activated! They can now log in immediately.");
     }

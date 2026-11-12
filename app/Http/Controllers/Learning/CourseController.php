@@ -356,6 +356,24 @@ class CourseController extends Controller
             'order' => $maxOrder + 1,
         ]);
 
+        $enrolledUserIds = \App\Models\CourseEnrollment::where('organization_id', $organization->id)
+            ->where('course_id', $module->course_id)
+            ->pluck('user_id')
+            ->unique();
+
+        if ($enrolledUserIds->isNotEmpty()) {
+            app(\App\Services\NotificationDispatcher::class)->toUsers(
+                recipients: \App\Models\User::whereIn('id', $enrolledUserIds)->get(),
+                organizationId: $organization->id,
+                category: 'academics',
+                title: "New Learning Material: {$validated['title']}",
+                message: "A new lesson '{$validated['title']}' has been added to your course.",
+                url: "/courses/{$module->course_id}",
+                icon: 'book-open',
+                severity: 'info',
+            );
+        }
+
         return back()->with('success', 'Lesson added to syllabus successfully.');
     }
 

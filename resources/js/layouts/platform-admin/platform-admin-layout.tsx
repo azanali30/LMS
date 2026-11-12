@@ -21,7 +21,10 @@ import {
     CheckCircle2,
     AlertCircle,
     Sparkles,
+    Inbox,
 } from 'lucide-react';
+import { NotificationIcon } from '@/components/notifications/notification-icon';
+import { useNotifications } from '@/hooks/use-notifications';
 
 interface PlatformAdminLayoutProps {
     title?: string;
@@ -35,6 +38,14 @@ export default function PlatformAdminLayout({
     const page = usePage<any>();
     const { auth, flash } = page.props || {};
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [notifOpen, setNotifOpen] = useState(false);
+
+    const {
+        unreadCount,
+        recent: recentNotifs,
+        markAsRead,
+        markAllAsRead,
+    } = useNotifications({ scope: 'platform' });
 
     const user = auth?.user;
     const currentUrl = page.url || (typeof window !== 'undefined' ? window.location.pathname : '') || '';
@@ -198,6 +209,88 @@ export default function PlatformAdminLayout({
                         <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
                             <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             <span>Multi-Tenant Platform Active</span>
+                        </div>
+
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setNotifOpen(!notifOpen)}
+                                title="Platform Notifications"
+                                className="relative p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition"
+                            >
+                                <Bell className="size-4" />
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white">
+                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                    </span>
+                                )}
+                            </button>
+
+                            {notifOpen && (
+                                <>
+                                    <div className="fixed inset-0 z-30" onClick={() => setNotifOpen(false)} />
+                                    <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-2xl border border-slate-200 bg-white shadow-xl z-40 overflow-hidden">
+                                        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+                                            <span className="text-xs font-bold text-slate-900">Platform Notifications</span>
+                                            {unreadCount > 0 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={markAllAsRead}
+                                                    className="text-[11px] font-semibold text-blue-600 hover:underline"
+                                                >
+                                                    Mark all as read
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="max-h-72 overflow-y-auto divide-y divide-slate-100">
+                                            {recentNotifs.length === 0 ? (
+                                                <div className="py-8 text-center text-xs text-slate-500">
+                                                    <Inbox className="mx-auto size-6 text-slate-400 mb-1" />
+                                                    No platform notifications yet.
+                                                </div>
+                                            ) : (
+                                                recentNotifs.map((n) => (
+                                                    <div
+                                                        key={n.id}
+                                                        className={`p-3 text-xs ${!n.read_at ? 'bg-blue-50/50' : ''}`}
+                                                    >
+                                                        <div className="flex items-start justify-between gap-2">
+                                                            <div className="flex items-center gap-1.5 font-semibold text-slate-900">
+                                                                <NotificationIcon
+                                                                    icon={n.data?.icon}
+                                                                    category={n.category || n.data?.category}
+                                                                    className="size-3.5 text-blue-600"
+                                                                />
+                                                                <span>{n.data?.title || 'Platform Notice'}</span>
+                                                            </div>
+                                                            <span className="text-[10px] text-slate-400 shrink-0">{n.created_at}</span>
+                                                        </div>
+                                                        <p className="mt-1 text-[11px] text-slate-600">{n.data?.message || ''}</p>
+                                                        {!n.read_at && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => markAsRead(n.id, n.data?.url)}
+                                                                className="mt-1.5 text-[11px] font-semibold text-blue-600 hover:underline"
+                                                            >
+                                                                Mark read
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                        <div className="border-t border-slate-200 p-2 text-center">
+                                            <Link
+                                                href="/platform-admin/notifications"
+                                                onClick={() => setNotifOpen(false)}
+                                                className="block rounded-lg py-1.5 text-[11px] font-bold text-blue-600 hover:bg-blue-50"
+                                            >
+                                                View All Platform Notifications &rarr;
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <Link

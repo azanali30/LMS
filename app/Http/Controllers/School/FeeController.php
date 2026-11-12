@@ -710,6 +710,49 @@ class FeeController extends Controller
         });
 
         $currency = $invoice->currency ?: ($organization->currency ?? 'USD');
+
+        $dispatcher = app(\App\Services\NotificationDispatcher::class);
+        $studentName = $invoice->student?->name ?? 'Student';
+        $formattedAmount = number_format($amount, 2)." {$currency}";
+
+        $dispatcher->toStudentAndParents(
+            organizationId: $organization->id,
+            studentId: $invoice->student_id,
+            category: 'fees',
+            title: "Payment Confirmed: {$invoice->invoice_number}",
+            message: "Payment of {$formattedAmount} (Receipt #{$payment->payment_number}) has been recorded.",
+            parentMessage: "Payment of {$formattedAmount} for {$studentName} (Receipt #{$payment->payment_number}) has been confirmed.",
+            url: '/school/my-fees',
+            icon: 'check-circle',
+            severity: 'success',
+            isCritical: true,
+            meta: [
+                'type' => 'fee_payment_confirmed',
+                'fee_invoice_id' => $invoice->id,
+                'payment_id' => $payment->id,
+            ],
+        );
+
+        $dispatcher->toOrganizationRoles(
+            organizationId: $organization->id,
+            roles: ['owner', 'admin'],
+            category: 'fees',
+            title: "Fee Payment Received: {$invoice->invoice_number}",
+            message: "{$studentName} paid {$formattedAmount} (Receipt #{$payment->payment_number}).",
+            url: '/school/fees',
+            icon: 'credit-card',
+            severity: 'success',
+            isCritical: false,
+            meta: [
+                'type' => 'fee_payment_received',
+                'fee_invoice_id' => $invoice->id,
+                'payment_id' => $payment->id,
+            ],
+            excludeUserId: $request->user()->id,
+        );
+
+        $dispatcher->broadcastDomainUpdate($organization->id, 'fees', ['owner', 'admin']);
+
         return back()->with('success', "Verified payment of {$amount} {$currency} recorded successfully (Receipt #{$payment->payment_number}). Balance updated.");
     }
 

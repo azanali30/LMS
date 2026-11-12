@@ -240,6 +240,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::patch('notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::put('notifications/preferences', [NotificationController::class, 'updatePreferences'])->name('notifications.preferences.update');
 
     // Online Learning Actions & LMS Routes
     Route::prefix('learning')->group(function () {
@@ -280,6 +282,7 @@ Route::post('/platform-admin/logout', [\App\Http\Controllers\PlatformAdmin\Platf
 Route::middleware(['web', 'super_admin'])->prefix('platform-admin')->name('platform-admin.')->group(function () {
     // 1. Overview Dashboard
     Route::get('dashboard', [\App\Http\Controllers\PlatformAdmin\PlatformDashboardController::class, 'index'])->name('dashboard');
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
 
     // 2. Organizations
     Route::get('organizations', [\App\Http\Controllers\PlatformAdmin\PlatformOrganizationController::class, 'index'])->name('organizations.index');

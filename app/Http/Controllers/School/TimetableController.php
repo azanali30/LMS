@@ -251,6 +251,7 @@ class TimetableController extends Controller
             'room' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:300',
             'is_published' => 'boolean',
+            'is_cancelled' => 'boolean',
         ]);
 
         // Tenant Scoping Verification
@@ -395,6 +396,7 @@ class TimetableController extends Controller
             'room' => 'nullable|string|max:50',
             'notes' => 'nullable|string|max:300',
             'is_published' => 'boolean',
+            'is_cancelled' => 'boolean',
         ]);
 
         $startTime = $validated['start_time'] . ':00';
@@ -457,6 +459,8 @@ class TimetableController extends Controller
                 }
             }
 
+            $previousTeacherId = $entry->teacher_id;
+
             $entry->update([
                 'academic_year_id' => $validated['academic_year_id'],
                 'school_class_id' => $validated['school_class_id'],
@@ -470,7 +474,46 @@ class TimetableController extends Controller
                 'room' => $validated['room'] ?? null,
                 'notes' => $validated['notes'] ?? null,
                 'is_published' => $validated['is_published'] ?? true,
+                'is_cancelled' => $validated['is_cancelled'] ?? $entry->is_cancelled ?? false,
             ]);
+
+            $dispatcher = app(\App\Services\NotificationDispatcher::class);
+            $entry->load(['subject', 'schoolClass', 'classSection']);
+            $subjectName = $entry->subject?->name ?? 'Period';
+            $dayLabel = ucfirst($day);
+
+            if ($previousTeacherId && (int) $previousTeacherId !== (int) ($entry->teacher_id ?? 0)) {
+                if ($oldTeacher = \App\Models\User::find($previousTeacherId)) {
+                    $dispatcher->toUsers(
+                        recipients: $oldTeacher,
+                        organizationId: $organization->id,
+                        category: 'timetable',
+                        title: "Period Reassigned: {$subjectName}",
+                        message: "You are no longer assigned to {$subjectName} on {$dayLabel} ({$startTime}).",
+                        url: '/school/timetable',
+                        icon: 'calendar',
+                        severity: 'info',
+                    );
+                }
+            }
+
+            if ($entry->teacher_id && ($newTeacher = \App\Models\User::find($entry->teacher_id))) {
+                $isCancelled = (bool) $entry->is_cancelled;
+                $dispatcher->toUsers(
+                    recipients: $newTeacher,
+                    organizationId: $organization->id,
+                    category: 'timetable',
+                    title: $isCancelled ? "Period Cancelled: {$subjectName}" : "Timetable Updated: {$subjectName}",
+                    message: $isCancelled
+                        ? "{$subjectName} on {$dayLabel} ({$startTime}) has been cancelled."
+                        : "{$subjectName} on {$dayLabel} ({$startTime} - {$endTime}) has been updated.",
+                    url: '/school/timetable',
+                    icon: 'calendar',
+                    severity: $isCancelled ? 'warning' : 'info',
+                );
+            }
+
+            $dispatcher->broadcastDomainUpdate($organization->id, 'timetable', ['owner', 'admin', 'teacher', 'student']);
         });
 
         return back()->with('success', 'Timetable period updated.');
@@ -488,7 +531,28 @@ class TimetableController extends Controller
 
         $this->authorize('manageAcademics', $organization);
 
+        $teacherId = $entry->teacher_id;
+        $subjectName = $entry->subject?->name ?? 'Scheduled Period';
+        $dayLabel = ucfirst((string) $entry->day_of_week);
+        $startTime = $entry->start_time;
+
         $entry->delete();
+
+        $dispatcher = app(\App\Services\NotificationDispatcher::class);
+        if ($teacherId && ($teacher = \App\Models\User::find($teacherId))) {
+            $dispatcher->toUsers(
+                recipients: $teacher,
+                organizationId: $organization->id,
+                category: 'timetable',
+                title: "Period Cancelled: {$subjectName}",
+                message: "{$subjectName} on {$dayLabel} ({$startTime}) has been removed from the timetable.",
+                url: '/school/timetable',
+                icon: 'calendar-x',
+                severity: 'warning',
+            );
+        }
+
+        $dispatcher->broadcastDomainUpdate($organization->id, 'timetable', ['owner', 'admin', 'teacher', 'student']);
 
         return back()->with('success', 'Period removed from schedule.');
     }
@@ -517,6 +581,49 @@ class TimetableController extends Controller
         Timetable::where('organization_id', $organization->id)
             ->where('class_section_id', $validated['class_section_id'])
             ->update(['is_published' => $validated['is_published']]);
+
+        if ($validated['is_published']) {
+            $dispatcher = app(\App\Services\NotificationDispatcher::class);
+            $section = ClassSection::find($validated['class_section_id']);
+            $sectionName = $section?->name ?? 'your section';
+
+            $teacherIds = TimetableEntry::where('organization_id', $organization->id)
+                ->where('class_section_id', $validated['class_section_id'])
+                ->whereNotNull('teacher_id')
+                ->pluck('teacher_id')
+                ->unique();
+
+            if ($teacherIds->isNotEmpty()) {
+                $dispatcher->toUsers(
+                    recipients: \App\Models\User::whereIn('id', $teacherIds)->get(),
+                    organizationId: $organization->id,
+                    category: 'timetable',
+                    title: "Timetable Published: {$sectionName}",
+                    message: "The class timetable for {$sectionName} has been published.",
+                    url: '/school/timetable',
+                    icon: 'calendar',
+                );
+            }
+
+            $studentIds = \App\Models\StudentEnrollment::where('organization_id', $organization->id)
+                ->where('class_section_id', $validated['class_section_id'])
+                ->pluck('student_id')
+                ->unique();
+
+            if ($studentIds->isNotEmpty()) {
+                $dispatcher->toUsers(
+                    recipients: \App\Models\User::whereIn('id', $studentIds)->get(),
+                    organizationId: $organization->id,
+                    category: 'timetable',
+                    title: "Timetable Updated: {$sectionName}",
+                    message: "Your class timetable for {$sectionName} is now available.",
+                    url: '/school/timetable',
+                    icon: 'calendar',
+                );
+            }
+
+            $dispatcher->broadcastDomainUpdate($organization->id, 'timetable', ['owner', 'admin', 'teacher', 'student']);
+        }
 
         $statusStr = $validated['is_published'] ? 'published' : 'draft';
         return back()->with('success', "Timetable status updated to {$statusStr}.");

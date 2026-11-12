@@ -642,6 +642,18 @@ class StudentController extends Controller
             return $user;
         });
 
+        app(\App\Services\NotificationDispatcher::class)->toOrganizationRoles(
+            organizationId: $organization->id,
+            roles: ['owner', 'admin'],
+            category: 'organization_activity',
+            title: "New Student Admitted: {$studentUser->name}",
+            message: "{$studentUser->name} was admitted (Admission #{$validated['admission_number']}).",
+            url: route('school.students.show', $studentUser->id, false),
+            icon: 'user-plus',
+            severity: 'success',
+            excludeUserId: $request->user()->id,
+        );
+
         return redirect()->route('school.students.show', $studentUser->id)
             ->with('success', "Student {$studentUser->name} admitted successfully with Admission #{$validated['admission_number']}. Student credentials and records are active.");
     }
@@ -872,6 +884,18 @@ class StudentController extends Controller
             'roll_number' => $validated['roll_number'] ?? null,
             'status' => $validated['status'],
         ]);
+
+        app(\App\Services\NotificationDispatcher::class)->toOrganizationRoles(
+            organizationId: $organization->id,
+            roles: ['owner', 'admin'],
+            category: 'organization_activity',
+            title: "Student Profile Updated: {$validated['name']}",
+            message: "Enrollment and profile details for {$validated['name']} were updated.",
+            url: route('school.students.show', $enrollment->student_id, false),
+            icon: 'user-check',
+            severity: 'info',
+            excludeUserId: $request->user()->id,
+        );
 
         return back()->with('success', "Student {$validated['name']} updated successfully.");
     }

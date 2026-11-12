@@ -74,12 +74,26 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
-            'notifications' => fn () => $user ? rescue(function () use ($user) {
+            'notifications' => fn () => $user ? rescue(function () use ($user, $request) {
+                $org = \App\Services\TenantContext::current();
+                $isPlatform = $org === null || $request->is('platform-admin*');
+
+                $baseQuery = $user->notifications()->latest();
+                if ($isPlatform) {
+                    $baseQuery->where('scope', 'platform');
+                } else {
+                    $baseQuery->where('scope', 'organization')
+                        ->where('organization_id', $org->id);
+                }
+
                 return [
-                    'unreadCount' => $user->unreadNotifications()->count(),
-                    'recent' => $user->notifications()->take(10)->get()->map(fn ($n) => [
+                    'unreadCount' => (clone $baseQuery)->whereNull('read_at')->count(),
+                    'recent' => (clone $baseQuery)->take(10)->get()->map(fn ($n) => [
                         'id' => $n->id,
                         'type' => $n->type,
+                        'category' => $n->category ?? ($n->data['category'] ?? 'system'),
+                        'scope' => $n->scope ?? ($n->data['scope'] ?? 'organization'),
+                        'organization_id' => $n->organization_id ?? ($n->data['organization_id'] ?? null),
                         'data' => $n->data,
                         'read_at' => $n->read_at ? $n->read_at->toIso8601String() : null,
                         'created_at' => $n->created_at ? $n->created_at->diffForHumans() : '',
@@ -89,6 +103,14 @@ class HandleInertiaRequests extends Middleware
                 'unreadCount' => 0,
                 'recent' => [],
             ], false) : null,
+            'realtime' => fn () => [
+                'driver' => config('broadcasting.default', 'log'),
+                'enabled' => config('broadcasting.default') === 'reverb' && ! empty(config('broadcasting.connections.reverb.key')),
+                'key' => config('broadcasting.default') === 'reverb' ? config('broadcasting.connections.reverb.key') : null,
+                'host' => config('broadcasting.connections.reverb.options.host'),
+                'port' => config('broadcasting.connections.reverb.options.port'),
+                'scheme' => config('broadcasting.connections.reverb.options.scheme'),
+            ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

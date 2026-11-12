@@ -26,12 +26,14 @@ class TimetableEntry extends Model
         'room',
         'notes',
         'is_published',
+        'is_cancelled',
     ];
 
     protected function casts(): array
     {
         return [
             'is_published' => 'boolean',
+            'is_cancelled' => 'boolean',
         ];
     }
 

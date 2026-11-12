@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\FeeInvoice;
 use App\Models\FeeReminderLog;
 use App\Models\Organization;
+use App\Models\ParentStudent;
 use App\Models\StudentGuardian;
 use App\Models\User;
 use App\Notifications\FeePaymentReminderNotification;
@@ -18,7 +19,7 @@ class FeeReminderService
      *
      * @return array Summary of processed reminders
      */
-    public function processReminders(?int $organizationId = null, bool $dryRun = false): array
+    public function processReminders(?int $organizationId = null, bool $dryRun = false, ?int $localHour = null): array
     {
         $orgQuery = Organization::where('status', 'active');
         if ($organizationId) {
@@ -37,7 +38,7 @@ class FeeReminderService
         ];
 
         foreach ($organizations as $org) {
-            $stats = $this->processForOrganization($org, $dryRun);
+            $stats = $this->processForOrganization($org, $dryRun, $localHour);
             $totalStats['invoices_scanned'] += $stats['invoices_scanned'];
             $totalStats['reminders_dispatched'] += $stats['reminders_dispatched'];
             $totalStats['skipped_already_sent'] += $stats['skipped_already_sent'];
@@ -52,10 +53,11 @@ class FeeReminderService
     /**
      * Process reminders for a single active organization respecting its timezone.
      */
-    public function processForOrganization(Organization $organization, bool $dryRun = false): array
+    public function processForOrganization(Organization $organization, bool $dryRun = false, ?int $localHour = null): array
     {
         $timezone = $organization->timezone ?: 'UTC';
-        $today = Carbon::now($timezone)->startOfDay();
+        $nowLocal = Carbon::now($timezone);
+        $today = $nowLocal->copy()->startOfDay();
 
         $stats = [
             'invoices_scanned' => 0,
@@ -64,6 +66,10 @@ class FeeReminderService
             'skipped_fully_paid' => 0,
             'failed' => 0,
         ];
+
+        if ($localHour !== null && $nowLocal->hour < $localHour) {
+            return $stats;
+        }
 
         // Retrieve all open/unpaid/partially paid invoices
         $invoices = FeeInvoice::withoutGlobalScopes()
@@ -99,8 +105,8 @@ class FeeReminderService
             } elseif ($diffInDays === 0) {
                 // Rule 2: Exactly on due date
                 $applicableReminderType = 'due_today';
-            } elseif ($diffInDays === -10) {
-                // Rule 3: Exactly 10 calendar days overdue
+            } elseif ($diffInDays < 0) {
+                // Rule 3: Overdue after due date (sent once via FeeReminderLog idempotency)
                 $applicableReminderType = 'overdue_10';
             }
 
@@ -131,8 +137,13 @@ class FeeReminderService
                 })
                 ->get();
 
+            $notifiedGuardianUserIds = [];
+
             foreach ($guardians as $guardian) {
                 $guardianUser = $guardian->user_id ? User::find($guardian->user_id) : null;
+                if ($guardianUser) {
+                    $notifiedGuardianUserIds[] = $guardianUser->id;
+                }
                 $recipientTarget = $guardianUser ?: (object) [
                     'name' => $guardian->name,
                     'email' => $guardian->email,
@@ -148,6 +159,28 @@ class FeeReminderService
                     stats: $stats,
                     dryRun: $dryRun,
                     guardianModel: $guardian
+                );
+            }
+
+            // 3. Also dispatch to ParentStudent linked users not already covered by StudentGuardian
+            $linkedParents = ParentStudent::withoutGlobalScopes()
+                ->where('organization_id', $organization->id)
+                ->where('student_id', $invoice->student_id)
+                ->whereNotIn('parent_id', $notifiedGuardianUserIds)
+                ->with('parent')
+                ->get()
+                ->pluck('parent')
+                ->filter(fn ($u) => $u instanceof User);
+
+            foreach ($linkedParents as $parentUser) {
+                $this->dispatchNotification(
+                    organization: $organization,
+                    invoice: $invoice,
+                    recipient: $parentUser,
+                    recipientType: 'guardian',
+                    reminderType: $applicableReminderType,
+                    stats: $stats,
+                    dryRun: $dryRun
                 );
             }
         }

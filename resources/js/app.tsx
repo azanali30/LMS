@@ -23,6 +23,7 @@ void createInertiaApp({
             'terms',
             'privacy-policy',
             'refund-policy',
+            'desktop/welcome',
             'courses',
             'learning/courses',
             'learning/course-show',

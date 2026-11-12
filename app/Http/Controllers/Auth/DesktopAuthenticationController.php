@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -186,6 +187,21 @@ class DesktopAuthenticationController extends Controller
         Auth::guard('web')->login($user, remember: true);
         $request->session()->regenerate();
 
+        // Mark session and cookie as desktop client
+        $request->session()->put('is_desktop', true);
+        cookie()->queue(cookie('is_desktop_client', '1', 525600, null, null, null, true));
+
+        // Ensure active organization is set in session for seamless tenant context
+        $defaultOrg = $user->currentOrganization() ?? $user->organizations()->where('organizations.status', 'active')->wherePivot('status', 'active')->first();
+        if ($defaultOrg) {
+            $request->session()->put('current_organization_id', $defaultOrg->id);
+        }
+
+        Log::info('Desktop session established via PKCE consume', [
+            'user_id' => $user->id,
+            'organization_id' => $defaultOrg?->id,
+        ]);
+
         $targetUrl = route('dashboard');
 
         if ($request->wantsJson()) {
@@ -205,22 +221,85 @@ class DesktopAuthenticationController extends Controller
     }
 
     /**
+     * Determine whether the incoming request originates from the desktop application.
+     */
+    public static function isDesktopClient(Request $request): bool
+    {
+        $userAgent = $request->header('User-Agent', '');
+        if (str_contains($userAgent, 'InstitutoPropio-Desktop')) {
+            return true;
+        }
+
+        if ($request->session()->get('is_desktop', false)) {
+            return true;
+        }
+
+        if ($request->cookie('is_desktop_client') === '1') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Dedicated desktop application Welcome / Sign-In screen.
+     */
+    public function welcome(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+        if (Auth::guard('web')->check()) {
+            Log::info('Desktop welcome: active session detected, redirecting to dashboard', [
+                'user_id' => Auth::id(),
+            ]);
+
+            return redirect()->route('dashboard');
+        }
+
+        Log::info('Desktop welcome: unauthenticated desktop view rendered', [
+            'is_desktop' => self::isDesktopClient($request),
+        ]);
+
+        $response = Inertia::render('desktop/welcome', [
+            'appName' => config('app.name', 'InstitutoPropio'),
+            'webUrl' => $request->getSchemeAndHttpHost(),
+            'isDesktop' => self::isDesktopClient($request),
+        ])->toResponse($request);
+
+        $origin = $request->header('Origin');
+        $allowedTauriOrigins = [
+            'http://tauri.localhost',
+            'https://tauri.localhost',
+            'tauri://localhost',
+        ];
+        if ($origin && in_array($origin, $allowedTauriOrigins, true)) {
+            $response->headers->set('Access-Control-Allow-Origin', $origin);
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+            $response->headers->set('Vary', 'Origin');
+        }
+
+        return $response;
+    }
+
+    /**
      * Terminate the desktop application session cleanly.
      */
     public function logout(Request $request): RedirectResponse|JsonResponse
     {
+        $isDesktop = self::isDesktopClient($request);
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
+        $targetUrl = $isDesktop ? route('desktop.welcome') : route('home');
+
         if ($request->wantsJson()) {
             return response()->json([
                 'logged_out' => true,
-                'redirect_url' => route('home'),
+                'redirect_url' => $targetUrl,
             ]);
         }
 
-        return redirect()->route('home');
+        return redirect($targetUrl);
     }
 }

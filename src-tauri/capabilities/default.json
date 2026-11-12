@@ -5,7 +5,17 @@
   "windows": [
     "main"
   ],
+  "remote": {
+    "urls": [
+      "https://institutopropio.laravel.cloud/*",
+      "https://*.laravel.cloud/*",
+      "http://127.0.0.1:8000/*",
+      "http://localhost:8000/*"
+    ]
+  },
   "permissions": [
-    "core:default"
+    "core:default",
+    "deep-link:default",
+    "opener:default"
   ]
 }

@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-        $middleware->validateCsrfTokens(except: ['paddle/webhook', 'paddle/*']);
+        $middleware->validateCsrfTokens(except: ['paddle/webhook', 'paddle/*', 'api/desktop/exchange']);
 
         $middleware->web(append: [
             HandleAppearance::class,

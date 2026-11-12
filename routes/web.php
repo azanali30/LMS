@@ -56,6 +56,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 });
 
 Route::middleware('web')->group(function () {
+    Route::get('/desktop', [DesktopAuthenticationController::class, 'welcome'])->name('desktop.welcome');
     Route::get('/desktop/consume', [DesktopAuthenticationController::class, 'consume'])->name('desktop.consume');
     Route::post('/api/desktop/exchange', [DesktopAuthenticationController::class, 'consume'])->name('desktop.exchange');
     Route::post('/desktop/logout', [DesktopAuthenticationController::class, 'logout'])->name('desktop.logout');

@@ -223,12 +223,135 @@ class DesktopAuthenticationHandoffTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_desktop_logout_terminates_session(): void
+    public function test_api_desktop_exchange_authenticates_session_and_preserves_tenant_context(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/desktop/logout');
+        $org = Organization::create([
+            'name' => 'St. Jude Academy',
+            'slug' => 'st-jude-academy',
+            'organization_type' => 'school',
+            'status' => 'active',
+            'created_by' => $user->id,
+        ]);
+
+        OrganizationUser::create([
+            'organization_id' => $org->id,
+            'user_id' => $user->id,
+            'role' => 'owner',
+            'status' => 'active',
+        ]);
+
+        $pkce = $this->generatePkcePair();
+
+        $authCode = DesktopAuthCode::issue(
+            user: $user,
+            codeChallenge: $pkce['challenge'],
+            state: $pkce['state'],
+            ttlMinutes: 5
+        );
+
+        $this->assertGuest();
+
+        // Desktop sends unauthenticated POST to /api/desktop/exchange (exempt from web CSRF)
+        $response = $this->postJson('/api/desktop/exchange', [
+            'code' => $authCode->code,
+            'code_verifier' => $pkce['verifier'],
+            'state' => $pkce['state'],
+        ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'authenticated' => true,
+            'redirect_url' => route('dashboard'),
+            'user' => [
+                'id' => $user->id,
+                'email' => $user->email,
+            ],
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertSame($org->id, session('current_organization_id'));
+
+        $authCode->refresh();
+        $this->assertTrue($authCode->isUsed());
+    }
+
+    public function test_desktop_logout_redirects_to_desktop_welcome_for_desktop_client(): void
+    {
+        $user = User::factory()->create();
+
+        // Desktop client with desktop User-Agent header
+        $response = $this->actingAs($user)
+            ->withHeader('User-Agent', 'Mozilla/5.0 InstitutoPropio-Desktop/1.0.0')
+            ->post('/desktop/logout');
+
+        $response->assertRedirect(route('desktop.welcome'));
+        $this->assertGuest();
+    }
+
+    public function test_standard_web_logout_redirects_to_home_for_browser(): void
+    {
+        $user = User::factory()->create();
+
+        // Standard web browser without desktop header
+        $response = $this->actingAs($user)
+            ->withHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36')
+            ->post('/logout');
+
         $response->assertRedirect(route('home'));
+        $this->assertGuest();
+    }
+
+    public function test_fortify_logout_redirects_to_desktop_welcome_when_desktop_session(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->withHeader('User-Agent', 'Mozilla/5.0 InstitutoPropio-Desktop/1.0.0')
+            ->post('/logout');
+
+        $response->assertRedirect(route('desktop.welcome'));
+        $this->assertGuest();
+    }
+
+    public function test_desktop_welcome_route_shows_dedicated_screen_for_guest(): void
+    {
+        $response = $this->get('/desktop');
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('desktop/welcome')
+            ->where('appName', config('app.name', 'InstitutoPropio'))
+        );
+    }
+
+    public function test_desktop_welcome_route_redirects_to_dashboard_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/desktop');
+        $response->assertRedirect(route('dashboard'));
+    }
+
+    public function test_desktop_welcome_route_sets_cors_header_for_tauri_origin(): void
+    {
+        $response = $this->withHeader('Origin', 'http://tauri.localhost')
+            ->get('/desktop');
+
+        $response->assertOk();
+        $response->assertHeader('Access-Control-Allow-Origin', 'http://tauri.localhost');
+    }
+
+    public function test_normal_browser_logout_redirects_to_public_homepage(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->withHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36')
+            ->post('/logout');
+
+        $response->assertRedirect('/');
         $this->assertGuest();
     }
 }

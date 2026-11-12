@@ -386,7 +386,7 @@
 
       <h1>Welcome to InstitutoPropio</h1>
       <p class="subtitle">
-        The unified operating system for educational campuses. Sign in through your default browser to launch your secure institution workspace.
+        Your unified campus and e-learning platform.
       </p>
 
       <!-- Waiting Status Banner -->
@@ -425,7 +425,7 @@
             <polyline points="10 17 15 12 10 7"/>
             <line x1="15" y1="12" x2="3" y2="12"/>
           </svg>
-          <span>Sign In via Web Browser</span>
+          <span>Sign In</span>
         </button>
 
         <button id="btnRegister" class="btn btn-secondary">
@@ -467,8 +467,8 @@
 
   <script>
     // Centralized Base Web URL (Configurable for Custom Domain or Local Dev)
-    const RAW_WEB_URL = "https://institutopropio-production-nkljkm.laravel.cloud";
-    const APP_WEB_URL = RAW_WEB_URL.replace(/\/+$/, "");
+    const DEFAULT_WEB_URL = "https://institutopropio.laravel.cloud";
+    const APP_WEB_URL = (localStorage.getItem('instituto_server_url') || DEFAULT_WEB_URL).replace(/\/+$/, "");
 
     // DOM Elements
     const btnLogin = document.getElementById('btnLogin');
@@ -547,9 +547,12 @@
       stateWaiting.classList.add('active');
     }
 
-    function showSuccess() {
+    function showSuccess(msg) {
       stateError.classList.remove('active');
       stateWaiting.classList.remove('active');
+      if (msg) {
+        stateSuccess.textContent = msg;
+      }
       stateSuccess.classList.add('active');
     }
 
@@ -560,7 +563,7 @@
         const challenge = await createPkceChallenge(verifier);
         const state = generateRandomString(32);
 
-        // Store PKCE verifier and state
+        // Store PKCE verifier and state across both session and local storage
         sessionStorage.setItem('pkce_verifier', verifier);
         sessionStorage.setItem('pkce_state', state);
         localStorage.setItem('pkce_verifier', verifier);
@@ -579,24 +582,26 @@
     }
 
     // Consume Authorization Code & Establish Genuine Web Session
-    async function consumeAuthCode(code, state) {
+    let isConsumingAuth = false;
+
+    function consumeAuthCode(code, state) {
+      if (isConsumingAuth) return;
+
       const storedState = sessionStorage.getItem('pkce_state') || localStorage.getItem('pkce_state');
       const verifier = sessionStorage.getItem('pkce_verifier') || localStorage.getItem('pkce_verifier');
 
       if (!verifier) {
-        showError("Session verifier not found. Please click 'Sign In via Web Browser' again.");
+        showError("Session verifier not found. Please click 'Sign In' to start a fresh login.");
         return;
       }
 
       if (state && storedState && state !== storedState) {
-        showError("State validation mismatch. Potential CSRF detected. Please retry login.");
+        showError("Security state validation mismatch (CSRF defense). Please click 'Sign In' to retry.");
         return;
       }
 
-      showSuccess();
-
-      // Establish session inside WebView by navigating directly to consume endpoint
-      const consumeUrl = `${APP_WEB_URL}/desktop/consume?code=${encodeURIComponent(code)}&code_verifier=${encodeURIComponent(verifier)}&state=${encodeURIComponent(state || storedState)}`;
+      isConsumingAuth = true;
+      showSuccess("✓ Authorization verified! Loading your dashboard...");
 
       // Clear one-time verifier from storage
       sessionStorage.removeItem('pkce_verifier');
@@ -604,9 +609,10 @@
       localStorage.removeItem('pkce_verifier');
       localStorage.removeItem('pkce_state');
 
-      setTimeout(() => {
-        window.location.href = consumeUrl;
-      }, 500);
+      // Top-level document navigation to /desktop/consume establishes genuine first-party session cookie
+      const consumeUrl = `${APP_WEB_URL}/desktop/consume?code=${encodeURIComponent(code)}&code_verifier=${encodeURIComponent(verifier)}&state=${encodeURIComponent(state || storedState)}`;
+
+      window.location.href = consumeUrl;
     }
 
     // Deep Link & URL Callback Handler
@@ -626,16 +632,69 @@
       }
     }
 
-    // Setup Tauri Deep Link Listener if available
-    if (window.__TAURI__ && window.__TAURI__.deepLink) {
-      window.__TAURI__.deepLink.onOpenUrl((urls) => {
-        if (Array.isArray(urls)) {
-          urls.forEach(handleDeepLinkUrl);
-        } else {
-          handleDeepLinkUrl(urls);
+    // Initialize Tauri Events and Cold-Start Deep Links
+    async function initDesktopTauri() {
+      window.handleDesktopDeepLink = function(urlStr) {
+        handleDeepLinkUrl(urlStr);
+      };
+
+      // 1. Listen for deep link events emitted from Rust single-instance or deep-link plugin
+      if (window.__TAURI__ && window.__TAURI__.event) {
+        try {
+          await window.__TAURI__.event.listen('deep-link-received', (event) => {
+            console.log("Deep link received via Tauri event:", event.payload);
+            handleDeepLinkUrl(event.payload);
+          });
+        } catch (e) {
+          console.warn("Could not attach deep-link-received event listener:", e);
         }
-      });
+      }
+
+      // 2. Check if the app was launched by a deep link on cold start
+      if (window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke) {
+        try {
+          const cliLink = await window.__TAURI__.core.invoke('get_cli_deep_link');
+          if (cliLink) {
+            console.log("Deep link received via CLI argument:", cliLink);
+            handleDeepLinkUrl(cliLink);
+            return;
+          }
+        } catch (e) {
+          console.warn("Could not invoke get_cli_deep_link:", e);
+        }
+      }
+
+      // 3. Fallback: check query params on current window.location
+      const currentParams = new URLSearchParams(window.location.search);
+      if (currentParams.has('code')) {
+        consumeAuthCode(currentParams.get('code'), currentParams.get('state'));
+        return;
+      }
+
+      // 4. Probe remote /desktop entrypoint before navigating so we never land on a 404 page.
+      // When /desktop is available, top-level navigation restores valid sessions to /dashboard
+      // or renders the dedicated desktop welcome screen.
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const probe = await fetch(`${APP_WEB_URL}/desktop`, {
+          method: 'GET',
+          mode: 'cors',
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        if (probe.ok) {
+          window.location.replace(`${APP_WEB_URL}/desktop`);
+        }
+      } catch (e) {
+        // Remote /desktop not reachable or not yet deployed — stay safely on local Welcome screen
+        console.info("Staying on local desktop welcome screen:", e && e.message ? e.message : e);
+      }
     }
+
+    initDesktopTauri();
 
     // Event Listeners
     btnLogin.addEventListener('click', startLoginFlow);

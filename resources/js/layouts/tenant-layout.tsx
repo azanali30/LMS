@@ -339,9 +339,9 @@ export default function TenantLayout({
     const roleBadge = getRoleBadge(role);
 
     return (
-        <div className="flex h-screen h-[100dvh] w-full flex-col overflow-hidden bg-slate-50 font-sans text-slate-900 selection:bg-purple-500 selection:text-white md:flex-row dark:bg-[#070b14] dark:text-slate-100">
+        <div className="flex h-screen h-[100dvh] w-full flex-col overflow-hidden bg-slate-50 font-sans text-slate-900 selection:bg-purple-500 selection:text-white md:flex-row dark:bg-[#080D18] dark:text-[#F8FAFC]">
             {/* Mobile Header */}
-            <div className="sticky top-0 z-50 flex shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur-md md:hidden dark:border-slate-800 dark:bg-[#0B1220]/95">
+            <div className="sticky top-0 z-50 flex shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur-md md:hidden dark:border-[#26364D] dark:bg-[#0D1423]/95">
                 <Link href="/dashboard" className="flex items-center gap-2.5">
                     {currentOrg?.logo_path ? (
                         <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white p-0.5 shadow-xs dark:border-slate-800 dark:bg-slate-900">
@@ -402,12 +402,12 @@ export default function TenantLayout({
 
             {/* Sidebar Navigation */}
             <aside
-                className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out md:static md:h-full md:translate-x-0 dark:border-slate-800/80 dark:bg-[#0B1220] ${
+                className={`fixed inset-y-0 left-0 z-40 flex h-full w-72 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out md:static md:h-full md:translate-x-0 dark:border-[#26364D] dark:bg-[#0D1423] ${
                     mobileOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
                 {/* School Brand & Workspace Header */}
-                <div className="shrink-0 border-b border-slate-200 p-4 dark:border-slate-800/80">
+                <div className="shrink-0 border-b border-slate-200 p-4 dark:border-[#26364D]">
                     {currentOrg ? (
                         <div className="relative">
                             <div className="flex items-center justify-between gap-2">
@@ -554,18 +554,18 @@ export default function TenantLayout({
                                 }}
                                 className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition-all ${
                                     item.active
-                                        ? 'border border-purple-200 bg-purple-50 font-semibold text-purple-700 shadow-xs dark:border-purple-500/30 dark:bg-gradient-to-r dark:from-purple-600/25 dark:to-indigo-600/15 dark:text-white dark:shadow-purple-950'
-                                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-slate-200'
+                                        ? 'border border-purple-200 bg-purple-50 font-semibold text-purple-700 shadow-xs dark:border-[#C084FC]/40 dark:bg-gradient-to-r dark:from-[#A020F0]/30 dark:to-indigo-600/20 dark:text-white dark:shadow-[0_0_15px_rgba(160,32,240,0.2)]'
+                                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-[#94A3B8] dark:hover:bg-[#162338] dark:hover:text-[#F8FAFC]'
                                 }`}
                             >
                                 <span className="flex items-center gap-3 min-w-0">
                                     <Icon
-                                        className={`size-4 shrink-0 ${item.active ? 'text-purple-600 dark:text-purple-400' : 'text-slate-400'}`}
+                                        className={`size-4 shrink-0 ${item.active ? 'text-purple-600 dark:text-[#C084FC]' : 'text-slate-400 dark:text-[#64748B]'}`}
                                     />
                                     <span className="truncate">{item.title}</span>
                                 </span>
                                 {isNavigatingThis && (
-                                    <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-[#078675]/30 border-t-[#078675]" />
+                                    <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-purple-400/30 border-t-purple-400" />
                                 )}
                             </Link>
                         );
@@ -667,9 +667,9 @@ export default function TenantLayout({
             {/* Main Content Area */}
             <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
                 {/* Top Desktop Bar */}
-                <header className="relative z-20 hidden shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-8 py-3.5 backdrop-blur-md md:flex dark:border-slate-800/80 dark:bg-[#0B1220]/95">
+                <header className="relative z-20 hidden shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-8 py-3.5 backdrop-blur-md md:flex dark:border-[#26364D] dark:bg-[#101827]/95">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                        <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-[#F8FAFC]">
                             {title}
                         </h1>
 
@@ -679,7 +679,7 @@ export default function TenantLayout({
                                 <button
                                     type="button"
                                     onClick={() => setHeaderOrgDropdownOpen(!headerOrgDropdownOpen)}
-                                    className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-800 transition hover:border-purple-400 hover:bg-slate-100 focus:outline-none dark:border-slate-800 dark:bg-slate-900/90 dark:text-white dark:hover:border-purple-500/40 dark:hover:bg-slate-900"
+                                    className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-800 transition hover:border-purple-400 hover:bg-slate-100 focus:outline-none dark:border-[#26364D] dark:bg-[#111B2C] dark:text-[#F8FAFC] dark:hover:border-purple-500/50 dark:hover:bg-[#162338]"
                                     title="Switch active organization"
                                 >
                                     <OrgAvatar name={currentOrg.name} logoPath={currentOrg.logo_path} size="xs" variant="icon" />
@@ -768,11 +768,11 @@ export default function TenantLayout({
                                 type="button"
                                 onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
                                 title="Notifications & Fee Reminders"
-                                className="relative flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-purple-300 hover:text-purple-600 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-purple-500/40 dark:hover:text-white"
+                                className="relative flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-purple-300 hover:text-purple-600 focus:outline-none dark:border-[#26364D] dark:bg-[#111B2C] dark:text-[#94A3B8] dark:hover:border-purple-500/50 dark:hover:text-[#F8FAFC]"
                             >
                                 <Bell className="size-4" />
                                 {unreadCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white shadow-md shadow-rose-600/30 ring-2 ring-white dark:ring-[#0B1220]">
+                                    <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white shadow-md shadow-rose-600/30 ring-2 ring-white dark:ring-[#111B2C]">
                                         {unreadCount > 99 ? '99+' : unreadCount}
                                     </span>
                                 )}
@@ -784,15 +784,15 @@ export default function TenantLayout({
                                         className="fixed inset-0 z-30"
                                         onClick={() => setNotifDropdownOpen(false)}
                                     />
-                                    <div className="absolute right-0 top-full mt-2 w-84 sm:w-96 animate-in rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop-blur-xl zoom-in-95 fade-in z-40 dark:border-slate-700/80 dark:bg-[#0e1626]">
-                                        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-800">
+                                    <div className="absolute right-0 top-full mt-2 w-84 sm:w-96 animate-in rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl backdrop-blur-xl zoom-in-95 fade-in z-40 dark:border-[#26364D] dark:bg-[#111B2C]">
+                                        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-[#26364D]">
                                             <div className="flex items-center gap-2">
-                                                <Bell className="size-4 text-purple-600 dark:text-purple-400" />
-                                                <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                                                <Bell className="size-4 text-purple-600 dark:text-[#C084FC]" />
+                                                <h4 className="text-xs font-bold text-slate-900 dark:text-[#F8FAFC]">
                                                     Notifications Center
                                                 </h4>
                                                 {unreadCount > 0 && (
-                                                    <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-extrabold text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
+                                                    <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-extrabold text-rose-700 dark:bg-rose-500/20 dark:text-rose-400">
                                                         {unreadCount} unread
                                                     </span>
                                                 )}
@@ -800,7 +800,7 @@ export default function TenantLayout({
                                             {unreadCount > 0 && (
                                                 <button
                                                     onClick={markAllNotificationsAsRead}
-                                                    className="text-[11px] font-semibold text-purple-600 hover:text-purple-700 hover:underline dark:text-purple-400"
+                                                    className="text-[11px] font-semibold text-purple-600 hover:text-purple-700 hover:underline dark:text-[#C084FC]"
                                                 >
                                                     Mark all as read
                                                 </button>
@@ -878,11 +878,11 @@ export default function TenantLayout({
                                             )}
                                         </div>
 
-                                        <div className="border-t border-slate-200 p-2 text-center dark:border-slate-800">
+                                        <div className="border-t border-slate-200 p-2 text-center dark:border-[#26364D]">
                                             <Link
                                                 href="/notifications"
                                                 onClick={() => setNotifDropdownOpen(false)}
-                                                className="block rounded-lg py-1.5 text-[11px] font-bold text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-500/10"
+                                                className="block rounded-lg py-1.5 text-[11px] font-bold text-purple-600 hover:bg-purple-50 dark:text-[#C084FC] dark:hover:bg-purple-500/10"
                                             >
                                                 View All Notifications &rarr;
                                             </Link>
@@ -897,7 +897,7 @@ export default function TenantLayout({
                             type="button"
                             onClick={toggleTheme}
                             title={`Switch to ${resolvedAppearance === 'dark' ? 'light' : 'dark'} mode`}
-                            className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-purple-300 hover:text-purple-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-purple-500/40 dark:hover:text-white"
+                            className="flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-purple-300 hover:text-purple-600 dark:border-[#26364D] dark:bg-[#111B2C] dark:text-[#94A3B8] dark:hover:border-purple-500/50 dark:hover:text-[#F8FAFC]"
                         >
                             {resolvedAppearance === 'dark' ? (
                                 <Sun className="size-4 text-amber-400" />
@@ -909,7 +909,7 @@ export default function TenantLayout({
                         <Link
                             href="/"
                             target="_blank"
-                            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-purple-300 hover:text-purple-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:text-purple-400"
+                            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-purple-300 hover:text-purple-600 dark:border-[#26364D] dark:bg-[#111B2C] dark:text-[#94A3B8] dark:hover:border-purple-500/50 dark:hover:text-[#F8FAFC]"
                         >
                             View Public Portal &rarr;
                         </Link>

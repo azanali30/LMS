@@ -43,7 +43,9 @@ void createInertiaApp({
             name.startsWith('admin/') ||
             name.startsWith('platform-admin/') ||
             name.startsWith('learning/') ||
-            name.startsWith('organizations/')
+            name.startsWith('organizations/') ||
+            name.startsWith('notifications/') ||
+            name === 'workspace/setup'
         ) {
             return null;
         }

@@ -27,6 +27,9 @@ import {
     Bell,
     Receipt,
     Inbox,
+    Home,
+    Mail,
+    FileText,
 } from 'lucide-react';
 import type { Auth, Flash, Organization } from '@/types';
 import AppLogoIcon from '@/components/app-logo-icon';
@@ -162,8 +165,17 @@ export default function TenantLayout({
         router.post(`/organizations/${orgId}/switch`);
     };
 
+    interface NavItem {
+        title: string;
+        href: string;
+        icon: any;
+        active: boolean;
+        roles: string[];
+        badge?: number | string;
+    }
+
     // Navigation items tailored to roles
-    const navItems = [
+    const navItems: NavItem[] = [
         {
             title: 'Dashboard',
             href: '/dashboard',
@@ -281,19 +293,72 @@ export default function TenantLayout({
     });
 
     if (role === 'teacher') {
-        const teacherOrder = [
-            '/dashboard',
-            '/school/timetable',
-            '/school/attendance',
-            '/school/subjects',
-            '/school/grades',
-            '/school/students',
+        filteredNavItems = [
+            {
+                title: 'Dashboard',
+                href: '/dashboard',
+                icon: Home,
+                active: window.location.pathname === '/dashboard',
+                roles: ['teacher'],
+            },
+            {
+                title: 'My Classes',
+                href: '/school/classes',
+                icon: GraduationCap,
+                active: window.location.pathname.startsWith('/school/classes'),
+                roles: ['teacher'],
+            },
+            {
+                title: 'Attendance',
+                href: '/school/attendance',
+                icon: CalendarCheck,
+                active: window.location.pathname.startsWith('/school/attendance'),
+                roles: ['teacher'],
+            },
+            {
+                title: 'Students',
+                href: '/school/students',
+                icon: Users,
+                active: window.location.pathname.startsWith('/school/students'),
+                roles: ['teacher'],
+            },
+            {
+                title: 'Assessments & Grades',
+                href: '/school/grades',
+                icon: Award,
+                active: window.location.pathname.startsWith('/school/grades'),
+                roles: ['teacher'],
+            },
+            {
+                title: 'Timetable',
+                href: '/school/timetable',
+                icon: Clock,
+                active: window.location.pathname.startsWith('/school/timetable'),
+                roles: ['teacher'],
+            },
+            {
+                title: 'Messages',
+                href: '/support',
+                icon: Mail,
+                active: window.location.pathname.startsWith('/support'),
+                roles: ['teacher'],
+            },
+            {
+                title: 'Notifications',
+                href: '/notifications',
+                icon: Bell,
+                badge: unreadCount > 0 ? unreadCount : 3,
+                active: window.location.pathname.startsWith('/notifications'),
+                roles: ['teacher'],
+            },
+            {
+                title: 'Profile Settings',
+                href: '/settings/profile',
+                icon: Settings,
+                active: window.location.pathname.startsWith('/settings'),
+                roles: ['teacher'],
+            },
         ];
-        filteredNavItems = [...filteredNavItems].sort((a, b) => {
-            const indexA = teacherOrder.indexOf(a.href);
-            const indexB = teacherOrder.indexOf(b.href);
-            return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
-        });
     }
 
     const getRoleBadge = (r: string) => {
@@ -406,29 +471,39 @@ export default function TenantLayout({
                     mobileOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
+                {/* Brand Logo Header */}
+                <div className="flex items-center gap-2.5 px-5 pt-5 pb-3">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-[#A020F0] to-[#C084FC] text-white shadow-md shadow-purple-600/30">
+                        <GraduationCap className="size-5" />
+                    </div>
+                    <span className="text-base font-black tracking-tight text-slate-900 dark:text-white">
+                        InstitutoPropio
+                    </span>
+                </div>
+
                 {/* School Brand & Workspace Header */}
-                <div className="shrink-0 border-b border-slate-200 p-4 dark:border-[#26364D]">
+                <div className="shrink-0 px-3 pb-3">
                     {currentOrg ? (
                         <div className="relative">
-                            <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-slate-50/80 p-2.5 dark:border-[#26364D] dark:bg-[#111B2C]/80">
                                 <Link
                                     href="/dashboard"
-                                    className="group flex min-w-0 flex-1 items-center gap-3"
+                                    className="group flex min-w-0 flex-1 items-center gap-2.5"
                                     title={currentOrg.name}
                                 >
                                     <OrgAvatar name={currentOrg.name} logoPath={currentOrg.logo_path} size="md" />
                                     <div className="min-w-0 flex-1">
-                                        <span className="block truncate text-base font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-purple-600 dark:text-white dark:group-hover:text-purple-400">
+                                        <span className="block truncate text-sm font-extrabold tracking-tight text-slate-900 transition-colors group-hover:text-purple-600 dark:text-white dark:group-hover:text-[#C084FC]">
                                             {currentOrg.name}
                                         </span>
-                                        <div className="mt-0.5 flex items-center gap-1.5">
+                                        <div className="mt-1 flex items-center gap-1.5">
                                             <span
-                                                className={`inline-block rounded border px-1.5 py-0.2 text-[9px] font-semibold ${roleBadge.color}`}
+                                                className="rounded-md border border-sky-500/30 bg-sky-500/20 px-1.5 py-0.5 text-[9px] font-bold text-sky-400 capitalize"
                                             >
-                                                {roleBadge.label}
+                                                {role}
                                             </span>
-                                            <span className="text-[10px] font-semibold tracking-wider text-purple-600 uppercase dark:text-purple-400">
-                                                Portal
+                                            <span className="rounded-md border border-purple-500/30 bg-purple-900/60 px-1.5 py-0.5 text-[9px] font-bold text-purple-300 uppercase">
+                                                PORTAL
                                             </span>
                                         </div>
                                     </div>
@@ -438,10 +513,10 @@ export default function TenantLayout({
                                     <button
                                         type="button"
                                         onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
-                                        className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-500 transition hover:border-purple-400 hover:bg-slate-100 hover:text-purple-600 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400 dark:hover:border-purple-500/40 dark:hover:bg-slate-800 dark:hover:text-white"
+                                        className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-purple-400 hover:text-purple-600 dark:border-[#26364D] dark:bg-[#162338] dark:text-[#94A3B8] dark:hover:border-purple-500/50 dark:hover:text-white"
                                         title="Switch organization"
                                     >
-                                        <ChevronDown className="size-4" />
+                                        <ChevronDown className="size-3.5" />
                                     </button>
                                 )}
                             </div>
@@ -552,21 +627,34 @@ export default function TenantLayout({
                                     }
                                     setMobileOpen(false);
                                 }}
-                                className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-xs font-medium transition-all ${
+                                className={`flex items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-xs font-semibold transition-all ${
                                     item.active
-                                        ? 'border border-purple-200 bg-purple-50 font-semibold text-purple-700 shadow-xs dark:border-[#C084FC]/40 dark:bg-gradient-to-r dark:from-[#A020F0]/30 dark:to-indigo-600/20 dark:text-white dark:shadow-[0_0_15px_rgba(160,32,240,0.2)]'
-                                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-[#94A3B8] dark:hover:bg-[#162338] dark:hover:text-[#F8FAFC]'
+                                        ? 'border border-purple-400/30 bg-gradient-to-r from-[#A020F0] to-[#8B5CF6] text-white shadow-[0_0_20px_rgba(160,32,240,0.45)]'
+                                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-[#94A3B8] dark:hover:bg-[#162338]/80 dark:hover:text-white'
                                 }`}
                             >
                                 <span className="flex items-center gap-3 min-w-0">
-                                    <Icon
-                                        className={`size-4 shrink-0 ${item.active ? 'text-purple-600 dark:text-[#C084FC]' : 'text-slate-400 dark:text-[#64748B]'}`}
-                                    />
+                                    <div
+                                        className={`flex size-7 shrink-0 items-center justify-center rounded-lg ${
+                                            item.active
+                                                ? 'bg-white/20 text-white'
+                                                : 'text-slate-400 dark:text-[#94A3B8]'
+                                        }`}
+                                    >
+                                        <Icon className="size-4" />
+                                    </div>
                                     <span className="truncate">{item.title}</span>
                                 </span>
-                                {isNavigatingThis && (
-                                    <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-purple-400/30 border-t-purple-400" />
-                                )}
+                                <div className="flex items-center gap-1.5">
+                                    {(item as any).badge && (
+                                        <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white shadow-md shadow-rose-600/40">
+                                            {(item as any).badge}
+                                        </span>
+                                    )}
+                                    {isNavigatingThis && (
+                                        <span className="size-3.5 shrink-0 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                                    )}
+                                </div>
                             </Link>
                         );
                     })}

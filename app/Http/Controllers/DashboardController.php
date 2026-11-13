@@ -364,6 +364,7 @@ class DashboardController extends Controller
             'pendingGradingTasks' => $pendingGradingTasks,
             'teacherCourses' => $teacherCourses,
             'recentGradesGiven' => $recentGradesGiven,
+            'currentAcademicYear' => $organization->academicYears()->where('is_current', true)->first(),
         ]);
     }
 

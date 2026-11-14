@@ -349,12 +349,85 @@ class DashboardController extends Controller
             ->withCount('enrollments')
             ->get();
 
+        // 8. Unique students across teacher's assigned classes (avoid duplicate counts)
+        $uniqueStudentsCount = StudentEnrollment::where('organization_id', $organization->id)
+            ->whereIn('class_section_id', $assignedSectionIds)
+            ->where('status', 'active')
+            ->distinct('student_id')
+            ->count('student_id');
+
+        // 9. Real Attendance Rate Today
+        $todayAttendanceQuery = Attendance::where('organization_id', $organization->id)
+            ->whereIn('class_section_id', $assignedSectionIds)
+            ->whereDate('date', $todayDate);
+
+        $totalRecordsToday = (clone $todayAttendanceQuery)->count();
+        $presentRecordsToday = (clone $todayAttendanceQuery)->whereIn('status', ['present', 'late'])->count();
+        $attendanceTodayRate = $totalRecordsToday > 0 ? (int) round(($presentRecordsToday / $totalRecordsToday) * 100) : null;
+
+        // 10. Weekly Attendance Breakdown (Mon - Sun)
+        $startOfWeek = now()->startOfWeek(Carbon::MONDAY);
+        $weeklyAttendance = [];
+        $daysOfWeekNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        for ($i = 0; $i < 7; $i++) {
+            $loopDate = $startOfWeek->copy()->addDays($i)->toDateString();
+            $dayAttendanceQuery = Attendance::where('organization_id', $organization->id)
+                ->whereIn('class_section_id', $assignedSectionIds)
+                ->whereDate('date', $loopDate);
+
+            $dayTotal = (clone $dayAttendanceQuery)->count();
+            $dayPresent = (clone $dayAttendanceQuery)->whereIn('status', ['present', 'late'])->count();
+            $dayRate = $dayTotal > 0 ? (int) round(($dayPresent / $dayTotal) * 100) : 0;
+
+            $weeklyAttendance[] = [
+                'day' => $daysOfWeekNames[$i],
+                'date' => $loopDate,
+                'rate' => $dayRate,
+                'total' => $dayTotal,
+            ];
+        }
+
+        // 11. Real Recent Activity
+        $recentActivities = collect();
+        $recentAttendances = Attendance::where('organization_id', $organization->id)
+            ->whereIn('class_section_id', $assignedSectionIds)
+            ->with(['classSection.schoolClass'])
+            ->latest()
+            ->take(3)
+            ->get();
+
+        foreach ($recentAttendances as $att) {
+            $recentActivities->push([
+                'id' => 'att_' . $att->id,
+                'title' => 'Marked attendance for ' . ($att->classSection?->schoolClass?->name ?? 'Class') . ' ' . ($att->classSection?->name ?? ''),
+                'time' => $att->created_at ? $att->created_at->diffForHumans() : 'Recently',
+                'created_at_ts' => $att->created_at?->timestamp ?? 0,
+                'type' => 'attendance',
+            ]);
+        }
+
+        foreach ($recentGradesGiven->take(3) as $rg) {
+            $recentActivities->push([
+                'id' => 'grd_' . $rg->id,
+                'title' => 'Added grades for ' . ($rg->assessment?->subject?->name ?? 'Assessment'),
+                'time' => $rg->created_at ? $rg->created_at->diffForHumans() : 'Recently',
+                'created_at_ts' => $rg->created_at?->timestamp ?? 0,
+                'type' => 'grade',
+            ]);
+        }
+
+        $recentActivities = $recentActivities->sortByDesc('created_at_ts')->values()->take(5);
+
         return Inertia::render('tenant/dashboard-teacher', [
             'metrics' => [
                 'assignedClassesCount' => $assignedClasses->count(),
                 'todayPeriodsCount' => $todaySchedule->count(),
+                'totalStudentsCount' => $uniqueStudentsCount,
+                'attendanceTodayRate' => $attendanceTodayRate,
                 'pendingAttendanceCount' => $pendingAttendanceTasks->count(),
                 'pendingGradingCount' => $pendingGradingTasks->count(),
+                'pendingTasksCount' => $pendingAttendanceTasks->count() + $pendingGradingTasks->count(),
             ],
             'assignedClasses' => $assignedClasses,
             'todaySchedule' => $todaySchedule,
@@ -362,6 +435,8 @@ class DashboardController extends Controller
             'attendanceTasks' => $allAttendanceTasks,
             'pendingAttendanceTasks' => $pendingAttendanceTasks,
             'pendingGradingTasks' => $pendingGradingTasks,
+            'weeklyAttendance' => $weeklyAttendance,
+            'recentActivities' => $recentActivities,
             'teacherCourses' => $teacherCourses,
             'recentGradesGiven' => $recentGradesGiven,
             'currentAcademicYear' => $organization->academicYears()->where('is_current', true)->first(),

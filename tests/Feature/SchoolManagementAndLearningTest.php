@@ -574,4 +574,56 @@ class SchoolManagementAndLearningTest extends TestCase
             ])
             ->assertForbidden();
     }
+
+    public function test_teacher_can_view_assigned_classes_and_sections_with_can_manage_false(): void
+    {
+        $class1 = SchoolClass::create(['organization_id' => $this->org->id, 'name' => 'Grade 10', 'code' => 'G10']);
+        $section1A = ClassSection::create(['organization_id' => $this->org->id, 'school_class_id' => $class1->id, 'name' => 'A', 'capacity' => 30]);
+
+        $class2 = SchoolClass::create(['organization_id' => $this->org->id, 'name' => 'Grade 11', 'code' => 'G11']);
+        $section2A = ClassSection::create(['organization_id' => $this->org->id, 'school_class_id' => $class2->id, 'name' => 'A', 'capacity' => 30]);
+
+        $subject = Subject::create(['organization_id' => $this->org->id, 'name' => 'Math', 'code' => 'MTH']);
+
+        // Assign teacher only to Section 1A
+        ClassSubjectTeacher::create([
+            'organization_id' => $this->org->id,
+            'academic_year_id' => $this->academicYear->id,
+            'class_section_id' => $section1A->id,
+            'subject_id' => $subject->id,
+            'teacher_id' => $this->teacher->id,
+        ]);
+
+        // Teacher accesses /school/classes: succeeds with canManage = false, sees only Grade 10
+        $response = $this->actingAs($this->teacher)
+            ->withSession(['current_organization_id' => $this->org->id])
+            ->get('/school/classes');
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('school/classes')
+            ->where('canManage', false)
+            ->has('classes.data', 1)
+            ->where('classes.data.0.name', 'Grade 10')
+        );
+
+        // Teacher accesses /school/sections: succeeds with canManage = false, sees only Section 1A
+        $responseSections = $this->actingAs($this->teacher)
+            ->withSession(['current_organization_id' => $this->org->id])
+            ->get('/school/sections');
+
+        $responseSections->assertOk();
+        $responseSections->assertInertia(fn ($page) => $page
+            ->component('school/sections')
+            ->where('canManage', false)
+            ->has('sections.data', 1)
+            ->where('sections.data.0.name', 'A')
+        );
+
+        // Student cannot access /school/classes
+        $this->actingAs($this->student)
+            ->withSession(['current_organization_id' => $this->org->id])
+            ->get('/school/classes')
+            ->assertForbidden();
+    }
 }

@@ -123,12 +123,29 @@ interface AcademicYear {
     is_current: boolean;
 }
 
+interface WeeklyAttendanceItem {
+    day: string;
+    date: string;
+    rate: number;
+    total: number;
+}
+
+interface TeacherActivityItem {
+    id: string;
+    title: string;
+    time: string;
+    type: 'attendance' | 'grade' | 'message';
+}
+
 interface TeacherDashboardProps {
     metrics?: {
         assignedClassesCount: number;
         todayPeriodsCount: number;
+        totalStudentsCount?: number;
+        attendanceTodayRate?: number | null;
         pendingAttendanceCount: number;
         pendingGradingCount: number;
+        pendingTasksCount?: number;
     };
     assignedClasses?: AssignedClass[];
     todaySchedule?: ScheduleItem[];
@@ -136,6 +153,8 @@ interface TeacherDashboardProps {
     attendanceTasks?: AttendanceTask[];
     pendingAttendanceTasks?: AttendanceTask[];
     pendingGradingTasks?: PendingGradingTask[];
+    weeklyAttendance?: WeeklyAttendanceItem[];
+    recentActivities?: TeacherActivityItem[];
     teacherCourses?: TeacherCourse[];
     recentGradesGiven?: RecentGrade[];
     currentAcademicYear?: AcademicYear | null;
@@ -145,8 +164,11 @@ export default function TeacherDashboard({
     metrics = {
         assignedClassesCount: 0,
         todayPeriodsCount: 0,
+        totalStudentsCount: 0,
+        attendanceTodayRate: null,
         pendingAttendanceCount: 0,
         pendingGradingCount: 0,
+        pendingTasksCount: 0,
     },
     assignedClasses = [],
     todaySchedule = [],
@@ -154,6 +176,8 @@ export default function TeacherDashboard({
     attendanceTasks: _attendanceTasks = [],
     pendingAttendanceTasks: _pendingAttendanceTasks = [],
     pendingGradingTasks = [],
+    weeklyAttendance = [],
+    recentActivities = [],
     teacherCourses: _teacherCourses = [],
     recentGradesGiven: _recentGradesGiven = [],
     currentAcademicYear,
@@ -169,115 +193,64 @@ export default function TeacherDashboard({
 
     const sessionLabel = currentAcademicYear?.name || '2026-2027';
 
-    // Calculate total students enrolled across assigned classes
+    // Calculate real dynamic counts from database props
     const totalStudentsCalculated = assignedClasses.reduce(
         (sum, c) => sum + (c.enrolled_count || 0),
         0
     );
-    const displayTotalStudents = totalStudentsCalculated > 0 ? totalStudentsCalculated : 87;
-    const displayPeriodsCount = metrics.todayPeriodsCount > 0 ? metrics.todayPeriodsCount : 4;
-    const displayPendingTasks = (metrics.pendingAttendanceCount + metrics.pendingGradingCount) > 0
-        ? (metrics.pendingAttendanceCount + metrics.pendingGradingCount)
-        : 2;
+    const displayTotalStudents = metrics.totalStudentsCount ?? totalStudentsCalculated;
+    const displayPeriodsCount = metrics.todayPeriodsCount ?? todaySchedule.length;
+    const displayPendingTasks = metrics.pendingTasksCount ?? (metrics.pendingAttendanceCount + metrics.pendingGradingCount);
+    const attendanceTodayRate = metrics.attendanceTodayRate ?? null;
 
-    // Timeline schedule: use database periods if available, or visual fallback matching screenshot
-    const scheduleItems = todaySchedule.length > 0 ? todaySchedule.map((item, idx) => ({
+    // Timeline schedule: use real database periods
+    const scheduleItems = todaySchedule.map((item, idx) => ({
+        id: item.id,
         time: `${item.start_time} - ${item.end_time}`,
         title: `${item.subject} • ${item.class_name} (${item.section_name})`,
-        status: item.status === 'current' ? 'Ongoing' : 'Upcoming',
-        isOngoing: item.status === 'current' || idx === 0,
-    })) : [
-        { time: '08:00 - 09:00 AM', title: 'Mathematics • Class 10-A', status: 'Ongoing', isOngoing: true },
-        { time: '09:00 - 10:00 AM', title: 'Physics • Class 10-B', status: 'Upcoming', isOngoing: false },
-        { time: '10:00 - 11:00 AM', title: 'Computer Science • Class 11-A', status: 'Upcoming', isOngoing: false },
+        status: item.status === 'current' ? 'Ongoing' : item.status === 'completed' ? 'Completed' : 'Upcoming',
+        isOngoing: item.status === 'current' || (todaySchedule.length === 1 && idx === 0),
+    }));
+
+    // Classes cards: use real assigned classes with cycling theme
+    const classThemes = [
+        { icon: BookOpen, color: 'text-[#C084FC]', bg: 'bg-[#1C1335]', border: 'border-[#7C3AED]/40', btnBg: 'bg-purple-600/30 text-purple-200 border-purple-500/30 hover:bg-purple-600 hover:text-white', iconBox: 'bg-purple-900/40 text-purple-300' },
+        { icon: FlaskConical, color: 'text-[#38BDF8]', bg: 'bg-[#0E2738]', border: 'border-[#0284C7]/40', btnBg: 'bg-sky-600/30 text-sky-200 border-sky-500/30 hover:bg-sky-600 hover:text-white', iconBox: 'bg-sky-900/40 text-sky-300' },
+        { icon: Laptop, color: 'text-[#34D399]', bg: 'bg-[#0D2821]', border: 'border-[#10B981]/40', btnBg: 'bg-emerald-600/30 text-emerald-200 border-emerald-500/30 hover:bg-emerald-600 hover:text-white', iconBox: 'bg-emerald-900/40 text-emerald-300' },
     ];
 
-    // Classes cards: use assigned classes if available, or cohorts matching screenshot
-    const displayClasses = assignedClasses.length >= 3 ? assignedClasses.slice(0, 3).map((c, i) => {
-        const themes = [
-            { icon: BookOpen, color: 'text-[#C084FC]', bg: 'bg-[#1C1335]', border: 'border-[#7C3AED]/40', btnBg: 'bg-purple-600/30 text-purple-200 border-purple-500/30 hover:bg-purple-600 hover:text-white', iconBox: 'bg-purple-900/40 text-purple-300' },
-            { icon: FlaskConical, color: 'text-[#38BDF8]', bg: 'bg-[#0E2738]', border: 'border-[#0284C7]/40', btnBg: 'bg-sky-600/30 text-sky-200 border-sky-500/30 hover:bg-sky-600 hover:text-white', iconBox: 'bg-sky-900/40 text-sky-300' },
-            { icon: Laptop, color: 'text-[#34D399]', bg: 'bg-[#0D2821]', border: 'border-[#10B981]/40', btnBg: 'bg-emerald-600/30 text-emerald-200 border-emerald-500/30 hover:bg-emerald-600 hover:text-white', iconBox: 'bg-emerald-900/40 text-emerald-300' },
-        ][i % 3];
+    const displayClasses = assignedClasses.slice(0, 3).map((c, i) => {
+        const theme = classThemes[i % classThemes.length];
         return {
             title: c.school_class.name,
-            classSub: `Class ${c.name}`,
-            students: c.enrolled_count || 30,
+            classSub: `Section ${c.name}`,
+            students: c.enrolled_count || 0,
             href: `/school/classes`,
-            ...themes,
+            ...theme,
         };
-    }) : [
-        {
-            title: 'Mathematics',
-            classSub: 'Class 10-A',
-            students: 32,
-            icon: BookOpen,
-            bg: 'bg-[#1C1335]',
-            border: 'border-[#7C3AED]/40',
-            btnBg: 'bg-purple-600/30 text-purple-200 border-purple-500/30 hover:bg-purple-600 hover:text-white',
-            iconBox: 'bg-purple-900/40 text-purple-300',
-            href: '/school/classes',
-        },
-        {
-            title: 'Physics',
-            classSub: 'Class 10-B',
-            students: 30,
-            icon: FlaskConical,
-            bg: 'bg-[#0E2738]',
-            border: 'border-[#0284C7]/40',
-            btnBg: 'bg-sky-600/30 text-sky-200 border-sky-500/30 hover:bg-sky-600 hover:text-white',
-            iconBox: 'bg-sky-900/40 text-sky-300',
-            href: '/school/classes',
-        },
-        {
-            title: 'Computer Science',
-            classSub: 'Class 11-A',
-            students: 25,
-            icon: Laptop,
-            bg: 'bg-[#0D2821]',
-            border: 'border-[#10B981]/40',
-            btnBg: 'bg-emerald-600/30 text-emerald-200 border-emerald-500/30 hover:bg-emerald-600 hover:text-white',
-            iconBox: 'bg-emerald-900/40 text-emerald-300',
-            href: '/school/classes',
-        },
-    ];
+    });
 
-    // Pending assessments: use actual tasks or exact items from screenshot
-    const displayAssessments = pendingGradingTasks.length > 0 ? pendingGradingTasks.slice(0, 2).map((t, idx) => ({
-        title: t.title,
-        due: t.due_date ? `Due ${t.due_date}` : 'Due Soon',
-        isUrgent: idx === 0,
-        iconColor: idx === 0 ? 'bg-sky-500/20 text-sky-400' : 'bg-rose-500/20 text-rose-400',
-    })) : [
-        { title: 'Math Quiz - Chapter 5', due: 'Due Tomorrow', isUrgent: true, iconColor: 'bg-sky-500/20 text-sky-400' },
-        { title: 'Physics Assignment', due: 'Due in 2 days', isUrgent: false, iconColor: 'bg-rose-500/20 text-rose-400' },
+    // Attendance Overview Weekly Chart calculation from real backend attendance data
+    const weekDays = (weeklyAttendance && weeklyAttendance.length === 7) ? weeklyAttendance : [
+        { day: 'Mon', rate: 0, total: 0 },
+        { day: 'Tue', rate: 0, total: 0 },
+        { day: 'Wed', rate: 0, total: 0 },
+        { day: 'Thu', rate: 0, total: 0 },
+        { day: 'Fri', rate: 0, total: 0 },
+        { day: 'Sat', rate: 0, total: 0 },
+        { day: 'Sun', rate: 0, total: 0 },
     ];
-
-    // Recent activity matching reference screenshot
-    const recentActivities = [
-        {
-            title: 'Marked attendance for Class 10-A',
-            time: '2 hours ago',
-            icon: Check,
-            iconBg: 'bg-[#10B981] text-white',
-        },
-        {
-            title: 'Added grades for Physics',
-            time: '3 hours ago',
-            icon: BarChart3,
-            iconBg: 'bg-[#A020F0] text-white',
-        },
-        {
-            title: 'Sent message to Class 11-A',
-            time: '4 hours ago',
-            icon: Mail,
-            iconBg: 'bg-[#0284C7] text-white',
-        },
-    ];
+    const xCoords = [10, 50, 90, 130, 170, 210, 250];
+    const chartNodes = weekDays.map((d, i) => {
+        const cy = Math.round(105 - ((d.rate || 0) / 100) * 90);
+        return { cx: xCoords[i], cy, rate: d.rate, day: d.day };
+    });
+    const linePath = chartNodes.map((pt, i) => (i === 0 ? `M ${pt.cx} ${pt.cy}` : `L ${pt.cx} ${pt.cy}`)).join(' ');
+    const areaPath = `${linePath} L 250 110 L 10 110 Z`;
 
     return (
-        <TenantLayout title="Teacher Portal">
-            <Head title="Teacher Dashboard" />
+        <TenantLayout title="">
+            <Head title="Teacher Portal" />
 
             {/* Top Hero Welcome Banner */}
             <div className="relative mb-6 overflow-hidden rounded-3xl border border-[#3B2D6C]/70 bg-gradient-to-r from-[#1E124A] via-[#101F48] to-[#24104E] p-6 shadow-2xl">
@@ -355,7 +328,7 @@ export default function TeacherDashboard({
                             {displayPeriodsCount}
                         </div>
                         <div className="mt-3 h-1.5 w-full rounded-full bg-[#A855F7]/30">
-                            <div className="h-1.5 rounded-full bg-[#A855F7]" style={{ width: '85%' }} />
+                            <div className="h-1.5 rounded-full bg-[#A855F7]" style={{ width: displayPeriodsCount > 0 ? '100%' : '0%' }} />
                         </div>
                     </div>
                 </Link>
@@ -381,7 +354,7 @@ export default function TeacherDashboard({
                             {displayTotalStudents}
                         </div>
                         <div className="mt-3 h-1.5 w-full rounded-full bg-[#06B6D4]/30">
-                            <div className="h-1.5 rounded-full bg-[#06B6D4]" style={{ width: '90%' }} />
+                            <div className="h-1.5 rounded-full bg-[#06B6D4]" style={{ width: displayTotalStudents > 0 ? '100%' : '0%' }} />
                         </div>
                     </div>
                 </Link>
@@ -404,10 +377,13 @@ export default function TeacherDashboard({
                     </div>
                     <div className="mt-4">
                         <div className="text-3xl font-black text-white">
-                            95%
+                            {attendanceTodayRate !== null ? `${attendanceTodayRate}%` : '--'}
                         </div>
                         <div className="mt-3 h-1.5 w-full rounded-full bg-[#10B981]/30">
-                            <div className="h-1.5 rounded-full bg-[#10B981]" style={{ width: '95%' }} />
+                            <div
+                                className="h-1.5 rounded-full bg-[#10B981]"
+                                style={{ width: `${attendanceTodayRate !== null ? Math.min(100, Math.max(0, attendanceTodayRate)) : 0}%` }}
+                            />
                         </div>
                     </div>
                 </Link>
@@ -433,7 +409,7 @@ export default function TeacherDashboard({
                             {displayPendingTasks}
                         </div>
                         <div className="mt-3 h-1.5 w-full rounded-full bg-[#F59E0B]/30">
-                            <div className="h-1.5 rounded-full bg-[#F59E0B]" style={{ width: '40%' }} />
+                            <div className="h-1.5 rounded-full bg-[#F59E0B]" style={{ width: displayPendingTasks > 0 ? '60%' : '0%' }} />
                         </div>
                     </div>
                 </Link>
@@ -462,39 +438,47 @@ export default function TeacherDashboard({
                         </div>
 
                         {/* Connected vertical timeline */}
-                        <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#26364D]">
-                            {scheduleItems.map((item, idx) => (
-                                <div key={idx} className="relative flex items-center justify-between gap-4">
-                                    {/* Timeline dot */}
-                                    <span
-                                        className={`absolute -left-6 top-1.5 size-3.5 rounded-full border-2 border-[#111B2C] ${
-                                            item.isOngoing
-                                                ? 'bg-[#C084FC] shadow-[0_0_10px_#C084FC]'
-                                                : 'bg-slate-500'
-                                        }`}
-                                    />
+                        {scheduleItems.length === 0 ? (
+                            <div className="py-10 text-center text-slate-400">
+                                <Clock className="mx-auto size-8 text-slate-500 opacity-60 mb-2" />
+                                <p className="text-xs font-semibold text-slate-300">No teaching periods scheduled today</p>
+                                <p className="mt-1 text-[11px] text-slate-500">Your timetable is clear for today.</p>
+                            </div>
+                        ) : (
+                            <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#26364D]">
+                                {scheduleItems.map((item, idx) => (
+                                    <div key={item.id || idx} className="relative flex items-center justify-between gap-4">
+                                        {/* Timeline dot */}
+                                        <span
+                                            className={`absolute -left-6 top-1.5 size-3.5 rounded-full border-2 border-[#111B2C] ${
+                                                item.isOngoing
+                                                    ? 'bg-[#C084FC] shadow-[0_0_10px_#C084FC]'
+                                                    : 'bg-slate-500'
+                                            }`}
+                                        />
 
-                                    <div>
-                                        <div className="text-xs font-bold text-white">
-                                            {item.time}
+                                        <div>
+                                            <div className="text-xs font-bold text-white">
+                                                {item.time}
+                                            </div>
+                                            <div className="text-xs text-slate-400">
+                                                {item.title}
+                                            </div>
                                         </div>
-                                        <div className="text-xs text-slate-400">
-                                            {item.title}
-                                        </div>
+
+                                        <span
+                                            className={`rounded-full px-3 py-0.5 text-[11px] font-semibold border ${
+                                                item.isOngoing
+                                                    ? 'border-[#A020F0]/40 bg-[#A020F0]/20 text-[#C084FC]'
+                                                    : 'border-[#0284C7]/40 bg-[#0284C7]/20 text-[#38BDF8]'
+                                            }`}
+                                        >
+                                            {item.status}
+                                        </span>
                                     </div>
-
-                                    <span
-                                        className={`rounded-full px-3 py-0.5 text-[11px] font-semibold border ${
-                                            item.isOngoing
-                                                ? 'border-[#A020F0]/40 bg-[#A020F0]/20 text-[#C084FC]'
-                                                : 'border-[#0284C7]/40 bg-[#0284C7]/20 text-[#38BDF8]'
-                                        }`}
-                                    >
-                                        {item.status}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -518,41 +502,49 @@ export default function TeacherDashboard({
                             </Link>
                         </div>
 
-                        {/* 3 Class Cards */}
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            {displayClasses.map((cls, idx) => {
-                                const IconComponent = cls.icon;
-                                return (
-                                    <div
-                                        key={idx}
-                                        className={`flex flex-col justify-between rounded-2xl border ${cls.border} ${cls.bg} p-4 transition hover:brightness-110`}
-                                    >
-                                        <div>
-                                            <div className={`mb-3 flex size-8 items-center justify-center rounded-lg ${cls.iconBox}`}>
-                                                <IconComponent className="size-4" />
-                                            </div>
-                                            <h3 className="text-sm font-bold text-white">
-                                                {cls.title}
-                                            </h3>
-                                            <p className="mt-0.5 text-xs text-slate-400">
-                                                {cls.classSub}
-                                            </p>
-                                            <div className="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
-                                                <Users className="size-3 text-slate-400" />
-                                                <span>{cls.students} Students</span>
-                                            </div>
-                                        </div>
-
-                                        <Link
-                                            href={cls.href}
-                                            className={`mt-4 block rounded-xl border py-1.5 text-center text-xs font-bold transition ${cls.btnBg}`}
+                        {/* Class Cards */}
+                        {displayClasses.length === 0 ? (
+                            <div className="py-10 text-center text-slate-400">
+                                <BookOpen className="mx-auto size-8 text-slate-500 opacity-60 mb-2" />
+                                <p className="text-xs font-semibold text-slate-300">No classes assigned yet</p>
+                                <p className="mt-1 text-[11px] text-slate-500">Assigned sections and cohorts will display here.</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                {displayClasses.map((cls, idx) => {
+                                    const IconComponent = cls.icon;
+                                    return (
+                                        <div
+                                            key={idx}
+                                            className={`flex flex-col justify-between rounded-2xl border ${cls.border} ${cls.bg} p-4 transition hover:brightness-110`}
                                         >
-                                            View Class &rarr;
-                                        </Link>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                            <div>
+                                                <div className={`mb-3 flex size-8 items-center justify-center rounded-lg ${cls.iconBox}`}>
+                                                    <IconComponent className="size-4" />
+                                                </div>
+                                                <h3 className="text-sm font-bold text-white">
+                                                    {cls.title}
+                                                </h3>
+                                                <p className="mt-0.5 text-xs text-slate-400">
+                                                    {cls.classSub}
+                                                </p>
+                                                <div className="mt-2 text-[11px] text-slate-400 flex items-center gap-1">
+                                                    <Users className="size-3 text-slate-400" />
+                                                    <span>{cls.students} Students</span>
+                                                </div>
+                                            </div>
+
+                                            <Link
+                                                href={cls.href}
+                                                className={`mt-4 block rounded-xl border py-1.5 text-center text-xs font-bold transition ${cls.btnBg}`}
+                                            >
+                                                View Class &rarr;
+                                            </Link>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -595,34 +587,27 @@ export default function TeacherDashboard({
                                         </linearGradient>
                                     </defs>
                                     {/* Grid Lines */}
-                                    <line x1="0" y1="0" x2="280" y2="0" stroke="#26364D" strokeDasharray="3 3" />
-                                    <line x1="0" y1="30" x2="280" y2="30" stroke="#26364D" strokeDasharray="3 3" />
+                                    <line x1="0" y1="10" x2="280" y2="10" stroke="#26364D" strokeDasharray="3 3" />
+                                    <line x1="0" y1="35" x2="280" y2="35" stroke="#26364D" strokeDasharray="3 3" />
                                     <line x1="0" y1="60" x2="280" y2="60" stroke="#26364D" strokeDasharray="3 3" />
-                                    <line x1="0" y1="90" x2="280" y2="90" stroke="#26364D" strokeDasharray="3 3" />
+                                    <line x1="0" y1="85" x2="280" y2="85" stroke="#26364D" strokeDasharray="3 3" />
+                                    <line x1="0" y1="110" x2="280" y2="110" stroke="#26364D" strokeDasharray="3 3" />
 
                                     {/* Area Fill */}
                                     <path
-                                        d="M 10 50 Q 50 35 90 20 T 170 30 T 250 15 L 250 110 L 10 110 Z"
+                                        d={areaPath}
                                         fill="url(#purpleGlow)"
                                     />
                                     {/* Stroke Line */}
                                     <path
-                                        d="M 10 50 Q 50 35 90 20 T 170 30 T 250 15"
+                                        d={linePath}
                                         fill="none"
                                         stroke="#C084FC"
                                         strokeWidth="2.5"
                                     />
 
                                     {/* Nodes */}
-                                    {[
-                                        { cx: 10, cy: 50 },
-                                        { cx: 50, cy: 40 },
-                                        { cx: 90, cy: 20 },
-                                        { cx: 130, cy: 35 },
-                                        { cx: 170, cy: 30 },
-                                        { cx: 210, cy: 25 },
-                                        { cx: 250, cy: 15 },
-                                    ].map((pt, i) => (
+                                    {chartNodes.map((pt, i) => (
                                         <circle
                                             key={i}
                                             cx={pt.cx}
@@ -670,32 +655,40 @@ export default function TeacherDashboard({
                             </Link>
                         </div>
 
-                        <div className="space-y-3">
-                            {displayAssessments.map((item, idx) => (
-                                <div
-                                    key={idx}
-                                    className="flex items-center justify-between rounded-2xl border border-[#26364D]/60 bg-[#0D1423]/70 p-3.5 transition hover:border-[#26364D]"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${item.iconColor}`}>
-                                            <FileText className="size-4.5" />
+                        {pendingGradingTasks.length === 0 ? (
+                            <div className="py-8 text-center text-slate-400">
+                                <CheckCircle2 className="mx-auto size-8 text-emerald-400/60 mb-2" />
+                                <p className="text-xs font-semibold text-slate-300">All assessments evaluated</p>
+                                <p className="mt-1 text-[11px] text-slate-500">No pending grading tasks.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {pendingGradingTasks.slice(0, 3).map((item, idx) => (
+                                    <div
+                                        key={item.id || idx}
+                                        className="flex items-center justify-between rounded-2xl border border-[#26364D]/60 bg-[#0D1423]/70 p-3.5 transition hover:border-[#26364D]"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${idx === 0 ? 'bg-sky-500/20 text-sky-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                                                <FileText className="size-4.5" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-bold text-white">
+                                                    {item.title}
+                                                </h4>
+                                                <span className={`text-[11px] font-medium ${idx === 0 ? 'text-[#F5A623]' : 'text-slate-400'}`}>
+                                                    {item.due_date ? `Due ${item.due_date}` : `${item.ungraded_count} to grade`}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 className="text-xs font-bold text-white">
-                                                {item.title}
-                                            </h4>
-                                            <span className={`text-[11px] font-medium ${item.isUrgent ? 'text-[#F5A623]' : 'text-slate-400'}`}>
-                                                {item.due}
-                                            </span>
-                                        </div>
-                                    </div>
 
-                                    <span className="rounded-full border border-[#A020F0]/40 bg-[#A020F0]/20 px-3 py-1 text-[10px] font-semibold text-[#C084FC]">
-                                        Due Soon
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
+                                        <span className="rounded-full border border-[#A020F0]/40 bg-[#A020F0]/20 px-3 py-1 text-[10px] font-semibold text-[#C084FC]">
+                                            {item.ungraded_count > 0 ? `${item.ungraded_count} Pending` : 'Due Soon'}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -719,29 +712,38 @@ export default function TeacherDashboard({
                             </Link>
                         </div>
 
-                        <div className="space-y-3">
-                            {recentActivities.map((act, idx) => {
-                                const IconComp = act.icon;
-                                return (
-                                    <div
-                                        key={idx}
-                                        className="flex items-center justify-between rounded-2xl border border-[#26364D]/60 bg-[#0D1423]/70 p-3 transition hover:border-[#26364D]"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className={`flex size-7 shrink-0 items-center justify-center rounded-full ${act.iconBg}`}>
-                                                <IconComp className="size-3.5" />
+                        {recentActivities.length === 0 ? (
+                            <div className="py-8 text-center text-slate-400">
+                                <Zap className="mx-auto size-8 text-slate-500/50 mb-2" />
+                                <p className="text-xs font-semibold text-slate-300">No recent activity</p>
+                                <p className="mt-1 text-[11px] text-slate-500">Actions will appear as attendance and grades are logged.</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {recentActivities.map((act) => {
+                                    const IconComp = act.type === 'attendance' ? Check : act.type === 'grade' ? BarChart3 : Mail;
+                                    const iconBg = act.type === 'attendance' ? 'bg-[#10B981] text-white' : act.type === 'grade' ? 'bg-[#A020F0] text-white' : 'bg-[#0284C7] text-white';
+                                    return (
+                                        <div
+                                            key={act.id}
+                                            className="flex items-center justify-between rounded-2xl border border-[#26364D]/60 bg-[#0D1423]/70 p-3 transition hover:border-[#26364D]"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={`flex size-7 shrink-0 items-center justify-center rounded-full ${iconBg}`}>
+                                                    <IconComp className="size-3.5" />
+                                                </div>
+                                                <span className="text-xs font-medium text-white">
+                                                    {act.title}
+                                                </span>
                                             </div>
-                                            <span className="text-xs font-medium text-white">
-                                                {act.title}
+                                            <span className="shrink-0 text-[11px] text-slate-400">
+                                                {act.time}
                                             </span>
                                         </div>
-                                        <span className="shrink-0 text-[11px] text-slate-400">
-                                            {act.time}
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -347,15 +347,8 @@ export default function TenantLayout({
                 title: 'Notifications',
                 href: '/notifications',
                 icon: Bell,
-                badge: unreadCount > 0 ? unreadCount : 3,
+                badge: unreadCount > 0 ? unreadCount : undefined,
                 active: window.location.pathname.startsWith('/notifications'),
-                roles: ['teacher'],
-            },
-            {
-                title: 'Profile Settings',
-                href: '/settings/profile',
-                icon: Settings,
-                active: window.location.pathname.startsWith('/settings'),
                 roles: ['teacher'],
             },
         ];
@@ -471,18 +464,8 @@ export default function TenantLayout({
                     mobileOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
-                {/* Brand Logo Header */}
-                <div className="flex items-center gap-2.5 px-5 pt-5 pb-3">
-                    <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-[#A020F0] to-[#C084FC] text-white shadow-md shadow-purple-600/30">
-                        <GraduationCap className="size-5" />
-                    </div>
-                    <span className="text-base font-black tracking-tight text-slate-900 dark:text-white">
-                        InstitutoPropio
-                    </span>
-                </div>
-
                 {/* School Brand & Workspace Header */}
-                <div className="shrink-0 px-3 pb-3">
+                <div className="shrink-0 px-3 pt-4 pb-3">
                     {currentOrg ? (
                         <div className="relative">
                             <div className="flex items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-slate-50/80 p-2.5 dark:border-[#26364D] dark:bg-[#111B2C]/80">
@@ -757,9 +740,11 @@ export default function TenantLayout({
                 {/* Top Desktop Bar */}
                 <header className="relative z-20 hidden shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-8 py-3.5 backdrop-blur-md md:flex dark:border-[#26364D] dark:bg-[#101827]/95">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-[#F8FAFC]">
-                            {title}
-                        </h1>
+                        {title && title !== 'Teacher Portal' && (
+                            <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-[#F8FAFC]">
+                                {title}
+                            </h1>
+                        )}
 
                         {/* Header Organization Switcher */}
                         {currentOrg ? (
@@ -993,14 +978,6 @@ export default function TenantLayout({
                                 <Moon className="size-4 text-purple-600" />
                             )}
                         </button>
-
-                        <Link
-                            href="/"
-                            target="_blank"
-                            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-purple-300 hover:text-purple-600 dark:border-[#26364D] dark:bg-[#111B2C] dark:text-[#94A3B8] dark:hover:border-purple-500/50 dark:hover:text-[#F8FAFC]"
-                        >
-                            View Public Portal &rarr;
-                        </Link>
                     </div>
                 </header>
 

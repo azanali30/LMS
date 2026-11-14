@@ -4,7 +4,10 @@ namespace App\Http\Controllers\School;
 
 use App\Http\Controllers\Controller;
 use App\Models\ClassSection;
+use App\Models\ClassSubjectTeacher;
 use App\Models\SchoolClass;
+use App\Models\StudentEnrollment;
+use App\Models\TimetableEntry;
 use App\Services\TenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,21 +27,49 @@ class ClassroomController extends Controller
         }
 
         $user = $request->user();
-        if (! $user || (! $user->isSuperAdmin() && ! $user->hasRoleInOrganization($organization->id, ['owner', 'admin']))) {
-            abort(403, 'Unauthorized access to class directory. Administrative role required.');
+        $isAdminOrOwner = $user && ($user->isSuperAdmin() || $user->hasRoleInOrganization($organization->id, ['owner', 'admin']));
+        $isTeacher = $user && $user->hasRoleInOrganization($organization->id, 'teacher');
+
+        if (! $isAdminOrOwner && ! $isTeacher) {
+            abort(403, 'Unauthorized access to class directory.');
         }
 
-        $userRole = TenantContext::currentRole($user);
-        $canManage = true;
+        $canManage = $isAdminOrOwner;
 
-        $classes = SchoolClass::with(['sections' => fn ($q) => $q->withCount('studentEnrollments')])
-            ->where('organization_id', $organization->id)
-            ->latest()
-            ->paginate(10);
+        if ($isAdminOrOwner) {
+            $classes = SchoolClass::with(['sections' => fn ($q) => $q->withCount('studentEnrollments')])
+                ->where('organization_id', $organization->id)
+                ->latest()
+                ->paginate(10);
 
-        $allClasses = SchoolClass::where('organization_id', $organization->id)
-            ->orderBy('name')
-            ->get(['id', 'name', 'code']);
+            $allClasses = SchoolClass::where('organization_id', $organization->id)
+                ->orderBy('name')
+                ->get(['id', 'name', 'code']);
+        } else {
+            // Teacher: restricted strictly to assigned classes and sections
+            $assignedSectionIds = ClassSubjectTeacher::where('organization_id', $organization->id)
+                ->where('teacher_id', $user->id)
+                ->pluck('class_section_id')
+                ->merge(
+                    TimetableEntry::where('organization_id', $organization->id)
+                        ->where('teacher_id', $user->id)
+                        ->pluck('class_section_id')
+                )
+                ->unique()
+                ->filter()
+                ->values();
+
+            $classes = SchoolClass::with(['sections' => fn ($q) => $q->whereIn('id', $assignedSectionIds)->withCount('studentEnrollments')])
+                ->where('organization_id', $organization->id)
+                ->whereHas('sections', fn ($q) => $q->whereIn('id', $assignedSectionIds))
+                ->latest()
+                ->paginate(10);
+
+            $allClasses = SchoolClass::where('organization_id', $organization->id)
+                ->whereHas('sections', fn ($q) => $q->whereIn('id', $assignedSectionIds))
+                ->orderBy('name')
+                ->get(['id', 'name', 'code']);
+        }
 
         return Inertia::render('school/classes', [
             'classes' => $classes,
@@ -58,15 +89,36 @@ class ClassroomController extends Controller
         }
 
         $user = $request->user();
-        if (! $user || (! $user->isSuperAdmin() && ! $user->hasRoleInOrganization($organization->id, ['owner', 'admin']))) {
-            abort(403, 'Unauthorized access to sections administration. Administrative role required.');
+        $isAdminOrOwner = $user && ($user->isSuperAdmin() || $user->hasRoleInOrganization($organization->id, ['owner', 'admin']));
+        $isTeacher = $user && $user->hasRoleInOrganization($organization->id, 'teacher');
+
+        if (! $isAdminOrOwner && ! $isTeacher) {
+            abort(403, 'Unauthorized access to sections directory.');
         }
 
-        $userRole = TenantContext::currentRole($user);
-        $canManage = true;
+        $canManage = $isAdminOrOwner;
+
+        $assignedSectionIds = null;
+        if (! $isAdminOrOwner) {
+            $assignedSectionIds = ClassSubjectTeacher::where('organization_id', $organization->id)
+                ->where('teacher_id', $user->id)
+                ->pluck('class_section_id')
+                ->merge(
+                    TimetableEntry::where('organization_id', $organization->id)
+                        ->where('teacher_id', $user->id)
+                        ->pluck('class_section_id')
+                )
+                ->unique()
+                ->filter()
+                ->values();
+        }
 
         $query = ClassSection::with(['schoolClass', 'studentEnrollments.student', 'subjectTeachers.teacher'])
             ->where('organization_id', $organization->id);
+
+        if (! $isAdminOrOwner) {
+            $query->whereIn('id', $assignedSectionIds ?? []);
+        }
 
         if ($classId = $request->query('class_id')) {
             $query->where('school_class_id', $classId);
@@ -85,20 +137,20 @@ class ClassroomController extends Controller
         $sections = $query->latest()->paginate(15)->withQueryString();
 
         $allClassesQuery = SchoolClass::where('organization_id', $organization->id);
-        if ($userRole === 'teacher' && $teacherHasAssignments) {
-            $allClassesQuery->whereHas('sections.subjectTeachers', fn ($sq) => $sq->where('teacher_id', $user->id));
+        if (! $isAdminOrOwner) {
+            $allClassesQuery->whereHas('sections', fn ($sq) => $sq->whereIn('id', $assignedSectionIds ?? []));
         }
         $allClasses = $allClassesQuery->orderBy('name')->get(['id', 'name', 'code']);
 
         $totalCapacityQuery = ClassSection::where('organization_id', $organization->id);
-        if ($userRole === 'teacher' && $teacherHasAssignments) {
-            $totalCapacityQuery->whereHas('subjectTeachers', fn ($sq) => $sq->where('teacher_id', $user->id));
+        if (! $isAdminOrOwner) {
+            $totalCapacityQuery->whereIn('id', $assignedSectionIds ?? []);
         }
         $totalCapacity = (int) $totalCapacityQuery->sum('capacity');
 
-        $totalStudentsQuery = \App\Models\StudentEnrollment::where('organization_id', $organization->id);
-        if ($userRole === 'teacher' && $teacherHasAssignments) {
-            $totalStudentsQuery->whereHas('classSection.subjectTeachers', fn ($sq) => $sq->where('teacher_id', $user->id));
+        $totalStudentsQuery = StudentEnrollment::where('organization_id', $organization->id);
+        if (! $isAdminOrOwner) {
+            $totalStudentsQuery->whereIn('class_section_id', $assignedSectionIds ?? []);
         }
         $totalStudents = (int) $totalStudentsQuery->count();
 
